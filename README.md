@@ -8,7 +8,7 @@ A lot of the logic is based on the [Freqtrade] bot and was converted to C#. The 
 
 ### Configuration
 
-There are a few settings you can configure to alter the behavior of the bot. These settings are stored in the `appsettings.json` file in the **Azure.Functions** project. You can also edit these from within the Azure portal when your function is deployed.
+There are a few settings you can configure to alter the behavior of the bot. These settings are stored in the `Constants.cs` file in the **Core** project. Azure Functions does not yet support some sort of configuration file that you can use locally and deploy to Azure so for now this will have to do.
 
 | Setting | Description |
 | ------- | ------ |
