@@ -225,7 +225,7 @@ namespace Mynt.Core.TradeManagers
 
             var openRate = GetTargetBid(await _api.GetTicker(pair));
             var amount = amountOfBtcToInvestPerTrader / openRate;
-            var amountYouGet = (amountOfBtcToInvestPerTrader * (1 - (Constants.TransactionFeePercentage / 100))) / openRate;
+            var amountYouGet = (amountOfBtcToInvestPerTrader * (1 - Constants.TransactionFeePercentage)) / openRate;
             var orderId = await _api.Buy(pair, openRate, amount);
 
             return new Trade()
@@ -359,8 +359,8 @@ namespace Mynt.Core.TradeManagers
         private async Task<double> ExecuteSellOrder(Trade trade, double currentRateBid, double balance)
         {
             // Calculate our profit.
-            var investment = (Constants.AmountOfBtcToInvestPerTrader * (1 - (Constants.TransactionFeePercentage / 100)));
-            var sales = (trade.Quantity * currentRateBid) - (trade.Quantity * currentRateBid * (Constants.TransactionFeePercentage / 100));
+            var investment = (Constants.AmountOfBtcToInvestPerTrader * (1 - Constants.TransactionFeePercentage));
+            var sales = (trade.Quantity * currentRateBid) - (trade.Quantity * currentRateBid * Constants.TransactionFeePercentage);
             var profit = 100 * ((sales - investment) / investment);
 
             // Sell the thing.
