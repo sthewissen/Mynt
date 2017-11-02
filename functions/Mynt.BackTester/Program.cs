@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Mynt.Core.Api.Bittrex;
 using Mynt.Core.Api.Bittrex.Models;
+using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
 using Mynt.Core.Strategies;
 using Newtonsoft.Json;

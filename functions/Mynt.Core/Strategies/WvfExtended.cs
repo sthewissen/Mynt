@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Mynt.Core.Indicators;
+using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
 
 namespace Mynt.Core.Strategies

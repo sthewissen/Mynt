@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Mynt.Core.Models;
 
-namespace Mynt.Core.Strategies
+namespace Mynt.Core.Interfaces
 {
     public interface ITradingStrategy
     {
