@@ -19,7 +19,6 @@ namespace Mynt.Core.TradeManagers
         private readonly BittrexApi _api;
         private readonly ITradingStrategy _strategy;
         private readonly Action<string> _log;
-        //private readonly NotificationManager _notification;
         private Balance _totalBalance;
         private Balance _dayBalance;
         private bool _totalBalanceExists;
@@ -32,7 +31,6 @@ namespace Mynt.Core.TradeManagers
             _api = new BittrexApi(Constants.IsDryRunning);
             _strategy = strat;
             _log = log;
-            //_notification = new NotificationManager();
         }
 
         /// <summary>
@@ -47,6 +45,7 @@ namespace Mynt.Core.TradeManagers
             var balanceTable = await ConnectionManager.GetTableConnection(Constants.BalanceTableName, Constants.IsDryRunning);
             var activeTrades = tradeTable.CreateQuery<Trade>().Where(x => x.IsOpen).ToList();
 
+            // Create two batches that we can use to update our tables.
             var batch = new TableBatchOperation();
             var balanceBatch = new TableBatchOperation();
 
@@ -59,6 +58,7 @@ namespace Mynt.Core.TradeManagers
 
             _log($"Currently handling {activeTrades.Count} trades.");
 
+            // If we have less active trades than we can handle, find a new one.
             if (activeTrades.Count < Constants.MaxNumberOfConcurrentTrades)
             {
                 var trade = await StartTrade(activeTrades, batch);
@@ -67,6 +67,7 @@ namespace Mynt.Core.TradeManagers
                     batch.Add(TableOperation.Insert(trade));
             }
 
+            // Handle our active trades.
             foreach (var trade in activeTrades)
             {
                 var orders = await _api.GetOpenOrders(trade.Market);
@@ -83,7 +84,7 @@ namespace Mynt.Core.TradeManagers
 
                     // No open order with the order ID of the trade.
                     // Check if this trade can be closed
-                    if (!await CloseTradeIfFulfilled(trade))
+                    if (!CloseTradeIfFulfilled(trade))
                     {
                         // Check if we can sell our current pair
                         await HandleTrade(trade);
@@ -100,7 +101,11 @@ namespace Mynt.Core.TradeManagers
             if (batch.Count > 0) tradeTable.ExecuteBatch(batch);
             if (balanceBatch.Count > 0) balanceTable.ExecuteBatch(balanceBatch);
         }
-
+        
+        /// <summary>
+        /// Creates our total and daily balance records in the Azure Table Storage.
+        /// </summary>
+        /// <param name="balanceBatch"></param>
         private void CreateBalancesIfNotExists(TableBatchOperation balanceBatch)
         {
             _totalBalanceExists = _totalBalance != null;
@@ -143,6 +148,12 @@ namespace Mynt.Core.TradeManagers
             }
         }
 
+        /// <summary>
+        /// Starts finding an actual strade.
+        /// </summary>
+        /// <param name="activeTrades"></param>
+        /// <param name="batch"></param>
+        /// <returns></returns>
         private async Task<Trade> StartTrade(List<Trade> activeTrades, TableBatchOperation batch)
         {
             try
@@ -169,8 +180,8 @@ namespace Mynt.Core.TradeManagers
         }
 
         /// <summary>
-        /// Checks the implemented trading indicator(s) for a randomly picked pair,
-        /// if one pair triggers the buy_signal a new trade record gets created.
+        /// Checks the implemented trading indicator(s),
+        /// if one pair triggers the buy signal a new trade record gets created.
         /// </summary>
         /// <param name="trades"></param>
         /// <param name="amountOfBtcToInvestPerTrader"></param>
@@ -250,7 +261,7 @@ namespace Mynt.Core.TradeManagers
                 // If the last signal was a 1, we buy!
                 return trend.Last() == 1;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // Couldn't get a buy signal for this market, no problem. Let's skip it.
                 _log($"Couldn't get buy signal for {market}...");
@@ -268,9 +279,7 @@ namespace Mynt.Core.TradeManagers
             // If the ask is below the last, we can get it on the cheap.
             if (tick.Ask < tick.Last) return tick.Ask;
 
-            var balance = Constants.AskLastBalance;
-
-            return tick.Ask + balance * (tick.Last - tick.Ask);
+            return tick.Ask + Constants.AskLastBalance * (tick.Last - tick.Ask);
         }
 
         /// <summary>
@@ -417,7 +426,7 @@ namespace Mynt.Core.TradeManagers
         /// </summary>
         /// <param name="trade"></param>
         /// <returns></returns>
-        private async Task<bool> CloseTradeIfFulfilled(Trade trade)
+        private bool CloseTradeIfFulfilled(Trade trade)
         {
             // If we don't have an open order and the close rate is already set,
             // we can close this trade.
@@ -441,10 +450,3 @@ namespace Mynt.Core.TradeManagers
         }
     }
 }
-
-
-
-
-
-
-
