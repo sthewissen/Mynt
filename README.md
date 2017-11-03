@@ -4,9 +4,9 @@ This is an Azure Functions-based cryptocurrency trading bot. It uses the followi
 - Azure Functions
 - Azure Table Storage
 
-A lot of the logic is based on the [Freqtrade] bot and was converted to C#. The bot currently supports trading on the Bittrex exchange. This software was primarily created for educational purposes only. Don't risk money which you are afraid to lose.
+A lot of the logic is based on the [Freqtrade] bot and was converted to C#. The bot currently supports trading on the Bittrex exchange. This software was primarily created for educational purposes only. Don't risk money which you are afraid to lose. The bot runs at a pre-defined interval of 5 minutes, since that matches the candle data it retrieves from the exchange. This can be changed by altering the CRON expression on the `TradeTimer` function. Do keep in mind that unless you also change the logic for retrieving the candles you're still looking at 5 minute intervals.
 
-The bot runs at a pre-defined interval of 5 minutes, since that matches the candle data it retrieves from the exchange. This can be changed by altering the CRON expression on the `TradeTimer` function. Do keep in mind that unless you also change the logic for retrieving the candles you're still looking at 5 minute intervals.
+This bot was first mentioned in [one of my blogposts].
 
 ### Configuration
 
@@ -121,3 +121,4 @@ Feel like this bot is missing a feature? Pull requests are welcome! A few pointe
 - If you are unsure, discuss the feature in an issue before a PR.
 
    [Freqtrade]: <https://github.com/gcarq/freqtrade>
+   [one of my blogposts]: <https://www.thewissen.io/building-cryptocurrency-trading-bot-using-azure-part-1>
