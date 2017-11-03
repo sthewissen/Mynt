@@ -50,15 +50,7 @@ namespace Mynt.Core.Indicators
 
             if (sma == TicTacTec.TA.Library.Core.RetCode.Success)
             {
-                for (int i = 0; i < smaValues.Length; i++)
-                {
-                    if (i < outBegIdx)
-                        outValues.Add(null);
-                    else
-                        outValues.Add(smaValues[i]);
-                }
-
-                return outValues.ToList();
+               return FixIndicatorOrdering(smaValues.ToList(), outBegIdx, outNbElement);
             }
 
             throw new Exception("Could not calculate SMA!");

@@ -56,17 +56,6 @@ namespace Mynt.Core.TradeManagers
             // Create both the balances if they don't exist yet.
             CreateBalancesIfNotExists(balanceBatch);
 
-            _log($"Currently handling {activeTrades.Count} trades.");
-
-            // If we have less active trades than we can handle, find a new one.
-            if (activeTrades.Count < Constants.MaxNumberOfConcurrentTrades)
-            {
-                var trade = await StartTrade(activeTrades, batch);
-
-                if (trade != null)
-                    batch.Add(TableOperation.Insert(trade));
-            }
-
             // Handle our active trades.
             foreach (var trade in activeTrades)
             {
@@ -93,6 +82,26 @@ namespace Mynt.Core.TradeManagers
                     batch.Add(TableOperation.Replace(trade));
                 }
             }
+
+            // If we have less active trades than we can handle, find a new one.
+            while (activeTrades.Count < Constants.MaxNumberOfConcurrentTrades)
+            {
+                var trade = await StartTrade(activeTrades, batch);
+
+                if (trade != null)
+                {
+                    // Add this to activeTrades so we don't trigger the same.
+                    activeTrades.Add(trade);
+                    batch.Add(TableOperation.Insert(trade));
+                }
+                else
+                {
+                    // No more trade to be found, kill it.
+                    break;
+                }
+            }
+
+            _log($"Currently handling {activeTrades.Count} trades.");
 
             // If these actually changed make a roundtrip to the server to set them.
             if (_dayBalanceExists && _oldDayBalance != _dayBalance.Profit) balanceBatch.Add(TableOperation.Replace(_dayBalance));
@@ -188,14 +197,17 @@ namespace Mynt.Core.TradeManagers
         /// <returns></returns>
         private async Task<Trade> FindTrade(List<Trade> trades, double amountOfBtcToInvestPerTrader)
         {
+            // Get our Bitcoin balance from the exchange
             var currentBtcBalance = await _api.GetBalance("BTC");
 
+            // Do we even have enough funds to invest?
             if (currentBtcBalance < Constants.AmountOfBtcToInvestPerTrader)
                 throw new Exception("Insufficient BTC funds to perform a trade.");
 
             // Retrieve our current markets
             var markets = await _api.GetMarketSummaries();
 
+            // Check if there are markets matching our volume.
             markets = markets.Where(x => (x.BaseVolume > Constants.MinimumAmountOfVolume || Constants.AlwaysTradeList.Contains(x.MarketName)) && x.MarketName.StartsWith("BTC-")).ToList();
 
             // Remove existing trades from the list to check.
