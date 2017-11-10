@@ -7,7 +7,7 @@ namespace Mynt.Core.Indicators
 {
     public static partial class Extensions
     {
-        public static Bband Bbands(this List<Candle> source, int period = 5, double devUp = 2, int devDown = 2, TicTacTec.TA.Library.Core.MAType type = TicTacTec.TA.Library.Core.MAType.Sma)
+        public static Bband Bbands(this List<Candle> source, int period = 5, double devUp = 2, double devDown = 2, TicTacTec.TA.Library.Core.MAType type = TicTacTec.TA.Library.Core.MAType.Sma)
         {
             int outBegIdx, outNbElement;
             double[] upperValues = new double[source.Count];
