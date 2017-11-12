@@ -17,7 +17,7 @@ namespace Mynt.BackTester
         #region trading variables
 
         // As soon as our profit dips below this percentage we sell.
-        public const double StopLossPercentage = -0.03;
+        public const double StopLossPercentage = -0.05;
 
         public static readonly List<(int Duration, double Profit)> ReturnOnInvestment = new List<ValueTuple<int, double>>()
         {
@@ -42,16 +42,53 @@ namespace Mynt.BackTester
             // Use these to anchor in your profits. As soon as one of these profit percentages
             // has been reached we adjust our stop loss to become that percentage. 
             // That way we theoretically lock in some profits and continue to ride an uptrend
-            // 0.02, 0.03, 0.05, 0.08, 0.13, 0.21
+            0.01, 0.02, 0.03, 0.05, 0.08, 0.13, 0.21
         };
 
         public static readonly List<ITradingStrategy> Strategies = new List<ITradingStrategy>()
         {
             // The strategies we want to backtest.
-            new Wvf(),
-            new WvfExtended(),
+            new AdxMomentum(),
+            new AdxSmas(),
+            new AwesomeMacd(),
+            new Base150(),
+            new BbandRsi(),
+            new BreakoutMa(),
+            new CciEma(),
+            new CciScalper(),
+            new DerivativeOscillator(),
+            new DoubleVolatility(),
+            new EmaAdx(),
+            new EmaAdxF(),
+            new EmaAdxMacd(),
+            new EmaAdxSmall(),
+            new EmaCross(),
+            new EmaStochRsi(),
+            new FaMaMaMa(),
+            new FifthElement(),
+            new Fractals(),
             new FreqTrade(),
-            new SmaCrossover()
+            new MacdSma(),
+            new MacdTema(),
+            new Momentum(),
+            new PowerRanger(),
+            new RsiBbands(),
+            new RsiMacd(),
+            new RsiMacdAwesome(),
+            new RsiMacdMfi(),
+            new RsiSarAwesome(),
+            new SarAwesome(),
+            new SarRsi(),
+            new SarStoch(),
+            new SimpleBearBull(),
+            new SmaCrossover(),
+            new SmaSar(),
+            new SmaStochRsi(),
+            new StochAdx(),
+            new ThreeMAgos(),
+            new TripleMa(),
+            new Wvf(),
+            new WvfExtended()
         };
 
         #endregion
@@ -195,6 +232,211 @@ namespace Mynt.BackTester
             WriteSeparator();
         }
 
+
+        private static void BackTestCombinations()
+        {
+
+            Console.WriteLine();
+            Console.WriteLine(
+                $"\t=============== BACKTESTING REPORT ===============");
+            Console.WriteLine();
+
+            var stratResults = new List<StrategyResult>();
+
+            foreach (var strategy1 in Strategies.OrderBy(x => x.Name))
+            {
+                foreach (var strategy2 in Strategies.OrderBy(x => x.Name))
+                {
+                    try
+                    {
+                        var results = new List<BackTestResult>();
+
+                        foreach (var pair in CoinsToBuy)
+                        {
+                            var dataString = File.ReadAllText($"Data/{pair}.json");
+                            var data = JsonConvert.DeserializeObject<ApiResult<List<Core.Api.Bittrex.Models.Candle>>>(dataString);
+
+                            // This creates a list of buy signals.
+                            strategy1.Candles = data.Result.ToGenericCandles();
+                            var trend1 = strategy1.Prepare();
+
+                            strategy2.Candles = data.Result.ToGenericCandles();
+                            var trend2 = strategy2.Prepare();
+
+                            for (int i = 0; i < trend1.Count; i++)
+                            {
+                                if (trend1[i] == 1 && trend2[i] == 1)
+                                {
+                                    // This is a buy signal
+                                    var trade = new Trade()
+                                    {
+                                        OpenRate = strategy1.Candles[i].Close,
+                                        OpenDate = strategy1.Candles[i].Timestamp,
+                                        Quantity = 1
+                                    };
+
+                                    // Calculate win/lose forwards from buy point
+                                    for (int j = i; j < trend1.Count; j++)
+                                    {
+                                        if (trend1[j] == -1 || trend2[j] == -1 || ShouldSell(trade, strategy1.Candles[j].Close, strategy1.Candles[j].Timestamp) != SellType.None)
+                                        {
+                                            var currentProfit = 0.995 * ((strategy1.Candles[j].Close - trade.OpenRate) / trade.OpenRate);
+                                            results.Add(new BackTestResult
+                                            {
+                                                Currency = pair,
+                                                Profit = currentProfit,
+                                                Duration = j - i
+                                            });
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        Console.WriteLine($"\t{strategy1.Name} + {strategy2.Name} FINISHED");
+
+                        if (results.Count == 0)
+                        {
+                            stratResults.Add(new StrategyResult()
+                            {
+                                Name = $"{strategy1.Name} + {strategy2.Name}",
+                                TotalTrades = 0,
+                                ProfitTrades = 0,
+                                NonProfitTrades = 0,
+                                AvgProfit = 0,
+                                TotalProfit = 0,
+                                AvgTime = 0,
+                                Grade = 0
+                            });
+                        }
+                        else
+                        {
+                            stratResults.Add(new StrategyResult()
+                            {
+                                Name = $"{strategy1.Name} + {strategy2.Name}",
+                                TotalTrades = results.Count,
+                                ProfitTrades = results.Count(x => x.Profit > 0),
+                                NonProfitTrades = results.Count(x => x.Profit <= 0),
+                                AvgProfit = results.Select(x => x.Profit).Average() * 100,
+                                TotalProfit = results.Select(x => x.Profit).Sum(),
+                                AvgTime = results.Select(x => x.Duration).Average() * 5,
+                                Grade = 0 // (1/ results.Select(x => x.Profit).Sum()) + (1 - (1/ results.Select(x => x.Duration).Average() * 5)) + ((Convert.ToDouble(results.Count(x => x.Profit > 0))/ Convert.ToDouble(results.Count)))
+                            });
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"\t  {strategy1.Name} + {strategy2.Name}: " + "DNF");
+                    }
+                }
+            }
+
+            PrintResults(stratResults);
+        }
+
+        private static void BackTestEntryExit()
+        {
+
+            Console.WriteLine();
+            Console.WriteLine(
+                $"\t=============== BACKTESTING REPORT ===============");
+            Console.WriteLine();
+
+            var stratResults = new List<StrategyResult>();
+
+            foreach (var entryStrat in Strategies.OrderBy(x => x.Name))
+            {
+                foreach (var exitStrat in Strategies.OrderBy(x => x.Name))
+                {
+                    try
+                    {
+                        var results = new List<BackTestResult>();
+
+                        foreach (var pair in CoinsToBuy)
+                        {
+                            var dataString = File.ReadAllText($"Data/{pair}.json");
+                            var data = JsonConvert.DeserializeObject<ApiResult<List<Core.Api.Bittrex.Models.Candle>>>(dataString);
+
+                            // This creates a list of buy signals.
+                            entryStrat.Candles = data.Result.ToGenericCandles();
+                            var trend1 = entryStrat.Prepare();
+
+                            exitStrat.Candles = data.Result.ToGenericCandles();
+                            var trend2 = exitStrat.Prepare();
+
+                            for (int i = 0; i < trend1.Count; i++)
+                            {
+                                if (trend1[i] == 1)
+                                {
+                                    // This is a buy signal
+                                    var trade = new Trade()
+                                    {
+                                        OpenRate = entryStrat.Candles[i].Close,
+                                        OpenDate = entryStrat.Candles[i].Timestamp,
+                                        Quantity = 1
+                                    };
+
+                                    // Calculate win/lose forwards from buy point
+                                    for (int j = i; j < trend1.Count; j++)
+                                    {
+                                        if (trend2[j] == -1 || ShouldSell(trade, entryStrat.Candles[j].Close, entryStrat.Candles[j].Timestamp) != SellType.None)
+                                        {
+                                            var currentProfit = 0.995 * ((entryStrat.Candles[j].Close - trade.OpenRate) / trade.OpenRate);
+                                            results.Add(new BackTestResult
+                                            {
+                                                Currency = pair,
+                                                Profit = currentProfit,
+                                                Duration = j - i
+                                            });
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        Console.WriteLine($"\t{entryStrat.Name} + {exitStrat.Name} FINISHED");
+
+                        if (results.Count == 0)
+                        {
+                            stratResults.Add(new StrategyResult()
+                            {
+                                Name = $"{entryStrat.Name} + {exitStrat.Name}",
+                                TotalTrades = 0,
+                                ProfitTrades = 0,
+                                NonProfitTrades = 0,
+                                AvgProfit = 0,
+                                TotalProfit = 0,
+                                AvgTime = 0,
+                                Grade =0
+                            });
+                        }
+                        else
+                        {
+                            stratResults.Add(new StrategyResult()
+                            {
+                                Name = $"{entryStrat.Name} + {exitStrat.Name}",
+                                TotalTrades = results.Count,
+                                ProfitTrades = results.Count(x => x.Profit > 0),
+                                NonProfitTrades = results.Count(x => x.Profit <= 0),
+                                AvgProfit = results.Select(x => x.Profit).Average() * 100,
+                                TotalProfit = results.Select(x => x.Profit).Sum(),
+                                AvgTime = results.Select(x => x.Duration).Average() * 5,
+                                Grade = 0 // (1/ results.Select(x => x.Profit).Sum()) + (1 - (1/ results.Select(x => x.Duration).Average() * 5)) + ((Convert.ToDouble(results.Count(x => x.Profit > 0))/ Convert.ToDouble(results.Count)))
+                            });
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"\t  {entryStrat.Name} + {exitStrat.Name}: " + "DNF");
+                    }
+                }
+            }
+
+            PrintResults(stratResults);
+        }
+
         private static SellType ShouldSell(Trade trade, double currentRateBid, DateTime utcNow)
         {
             var currentProfit = (currentRateBid - trade.OpenRate) / trade.OpenRate;
@@ -209,7 +451,7 @@ namespace Mynt.BackTester
             foreach (var item in StopLossAnchors)
             {
                 if (currentProfit > item)
-                    trade.StopLossAnchor = item;
+                    trade.StopLossAnchor = item - 0.01;
             }
 
             // Check if time matches and current rate is above threshold
@@ -228,15 +470,29 @@ namespace Mynt.BackTester
 
         #region results
 
+        private static void PrintResults(List<StrategyResult> results)
+        {
+
+            WriteSeparator();
+
+            Console.WriteLine(results.OrderByDescending(x=>x.TotalProfit).ToStringTable(new[] { "Name", "Total #", "Profitable #", "Nonprofit #", "Profit %", "Profit", "Avg profit", "Avg time", "Grade" }, a => a.Name, a => a.TotalTrades, 
+                a => a.ProfitTrades, a => a.NonProfitTrades, a=> a.TotalTrades > 0 ? ((Convert.ToDouble(a.ProfitTrades)/Convert.ToDouble(a.TotalTrades)) * 100.0).ToString("0.00") + "%" : "0%", a => a.TotalProfit.ToString("0.000"), a => a.AvgProfit.ToString("0.0"), a => a.AvgTime.ToString("0.0"), a=>a.Grade.ToString("0.000")));
+           
+
+            WriteSeparator();
+        }
+
         private static void PrintResults(List<BackTestResult> results)
         {
             var color = results.Select(x => x.Profit).Sum() > 0 ? ConsoleColor.Green : ConsoleColor.Red;
 
             if (results.Count > 0)
-                WriteColoredLine($"Made {results.Count} buys ({results.Where(x => x.Profit > 0).Count()}/{results.Where(x => x.Profit < 0).Count()}). " +
-                                 $"Average profit {(results.Select(x => x.Profit).Average() * 100):0.00}%. " +
-                                 $"Total profit was {(results.Select(x => x.Profit).Sum()):0.000}. " +
-                                 $"Average duration {(results.Select(x => x.Duration).Average() * 5):0.0} mins.", color);
+                WriteColoredLine(
+                    $"{(Convert.ToDouble(results.Count(x => x.Profit > 0)) / Convert.ToDouble(results.Count) * 100.0):0.00}%  |  " +
+                    $"Made {results.Count} buys ({results.Count(x => x.Profit > 0)}/{results.Count(x => x.Profit < 0)}). " +
+                    $"Average profit {(results.Select(x => x.Profit).Average() * 100):0.00}%. " +
+                    $"Total profit was {(results.Select(x => x.Profit).Sum()):0.000}. " +
+                    $"Average duration {(results.Select(x => x.Duration).Average() * 5):0.0} mins.", color);
             else
                 WriteColoredLine($"Made {results.Count} buys. ", ConsoleColor.Yellow);
         }
@@ -289,6 +545,14 @@ namespace Mynt.BackTester
                         BackTestAll();
                         continue;
                     case "3":
+                        Console.WriteLine("\tBacktesting all strategies takes some time and uses historic data. Starting...");
+                        BackTestCombinations();
+                        continue;
+                    case "4":
+                        Console.WriteLine("\tBacktesting all strategies takes some time and uses historic data. Starting...");
+                        BackTestEntryExit();
+                        continue;
+                    case "5":
                     default:
                         Environment.Exit(1);
                         break;
@@ -301,7 +565,9 @@ namespace Mynt.BackTester
         {
             Console.WriteLine("\t1. Run a single strategy");
             Console.WriteLine("\t2. Run all strategies");
-            Console.WriteLine("\t3. Close the tool");
+            Console.WriteLine("\t3. Combine 2 strategies");
+            Console.WriteLine("\t4. Combine entry/exit strategies");
+            Console.WriteLine("\t5. Close the tool");
 
             Console.WriteLine();
             Console.Write("\tWhat do you want to do? ");

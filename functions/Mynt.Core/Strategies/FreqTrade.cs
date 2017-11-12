@@ -28,13 +28,16 @@ namespace Mynt.Core.Strategies
 
             var cci = Candles.Cci(5);
             var stoch = Candles.StochFast();
-            var bbandsLower = Candles.Bbands().LowerBand;
+            var bbandsLower = Candles.Bbands().MiddleBand;
+            var fishers = Candles.Fisher();
 
             for (int i = 0; i < Candles.Count; i++)
             {
-                if (closes[i] < sma[i] && cci[i] < -100 && stoch.D[i] < 20 &&
+                if (closes[i] < sma[i] && cci[i] < -100 && stoch.D[i] < 20 && fishers[i] < 0 &&
                     adx[i] > 20 && mfi[i] < 30 && tema[i] <= bbandsLower[i])
                     result.Add(1);
+                else if (fishers[i] == 1)
+                    result.Add(-1);
                 else
                     result.Add(0);
             }

@@ -233,6 +233,8 @@
     <Compile Include="BackTestResult.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StrategyResult.cs" />
+    <Compile Include="TableParser.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
