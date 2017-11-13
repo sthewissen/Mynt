@@ -15,14 +15,16 @@ namespace Mynt.Core
 
         // Azure settings
         public const string ConnectionString = "";
+        public const string NotificationAccessKey = "";
+        public const string NotificationHubName = "";
         public const string OrderTableName = "orders";
         public const string BalanceTableName = "balance";
 
         // Trade settings
-        public const int MaxNumberOfConcurrentTrades = 4;
-        public const double AmountOfBtcToInvestPerTrader = 0.01054532;
+        public const int MaxNumberOfConcurrentTrades = 2;
+        public const double AmountOfBtcToInvestPerTrader = 0.01860324;
         public const double TransactionFeePercentage = 0.0025;
-        
+
         // If we go below this profit percentage, we sell immediately.
         public const double StopLossPercentage = -0.05;
 

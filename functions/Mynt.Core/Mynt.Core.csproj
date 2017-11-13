@@ -264,6 +264,7 @@
     <Compile Include="Indicators\StochRsi.cs" />
     <Compile Include="Indicators\Tema.cs" />
     <Compile Include="Managers\ConnectionManager.cs" />
+    <Compile Include="Managers\NotificationManager.cs" />
     <Compile Include="Models\Balance.cs" />
     <Compile Include="Models\Candle.cs" />
     <Compile Include="Models\CandleVariable.cs" />
