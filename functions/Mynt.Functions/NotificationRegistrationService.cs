@@ -15,7 +15,7 @@ namespace Mynt.Functions
     public static class NotificationRegistrationService
     {
         [FunctionName("NotificationRegistrationService")]
-        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "post", Route = "notifications")]HttpRequestMessage req, string key, TraceWriter log)
+        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "post", Route = "notifications")]HttpRequestMessage req, TraceWriter log)
         {
             //read json object from request body
             var content = req.Content;

@@ -15,7 +15,7 @@ namespace Mynt.Functions
     public static class SettingsService
     {
         [FunctionName("SettingsService")]
-        public static HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Function, "get", Route = "settings")]HttpRequestMessage req, string key, TraceWriter log)
+        public static HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Function, "get", Route = "settings")]HttpRequestMessage req, TraceWriter log)
         {
             // Fetching the name from the path parameter in the request URL
             return req.CreateResponse(HttpStatusCode.OK, new SettingsDto()

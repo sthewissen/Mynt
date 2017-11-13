@@ -17,7 +17,7 @@ namespace Mynt.Functions
     public static class CurrentTradeService
     {
         [FunctionName("CurrentTradeService")]
-        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = "trades")]HttpRequestMessage req, TraceWriter log)
+        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "get", Route = "trades")]HttpRequestMessage req, TraceWriter log)
         {
             var tradeTable = await ConnectionManager.GetTableConnection(Constants.OrderTableName, Constants.IsDryRunning);
 
@@ -46,8 +46,7 @@ namespace Mynt.Functions
                     Uuid = trade.RowKey
                 });
             }
-
-            // Fetching the name from the path parameter in the request URL
+            
             return req.CreateResponse(HttpStatusCode.OK, trades);
         }
     }

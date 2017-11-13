@@ -16,7 +16,7 @@ namespace Mynt.Functions
     public static class TradeHistoryService
     {
         [FunctionName("TradeHistoryService")]
-        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "get", Route = "history")]HttpRequestMessage req, string key, TraceWriter log)
+        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "get", Route = "history")]HttpRequestMessage req, TraceWriter log)
         {
             var tradeTable = await ConnectionManager.GetTableConnection(Constants.OrderTableName, Constants.IsDryRunning);
             var balanceTable = await ConnectionManager.GetTableConnection(Constants.BalanceTableName, Constants.IsDryRunning);
