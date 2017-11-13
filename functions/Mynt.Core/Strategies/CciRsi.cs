@@ -1,20 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using Mynt.Core.Indicators;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
 
 namespace Mynt.Core.Strategies
 {
-    /// <summary>
-    /// https://www.forexstrategiesresources.com/trend-following-forex-strategies/45-cci-and-ema/
-    /// </summary>
-    public class CciEma : ITradingStrategy
+    public class CciRsi : ITradingStrategy
     {
-        public string Name => "CCI EMA";
+        public string Name => "CCI RSI";
+
         public List<Candle> Candles { get; set; }
 
-        public CciEma()
+        public CciRsi()
         {
             this.Candles = new List<Candle>();
         }
@@ -23,17 +24,16 @@ namespace Mynt.Core.Strategies
         {
             var result = new List<int>();
 
-            var cci = Candles.Cci(30);
-            var ema8 = Candles.Ema(8);
-            var ema28 = Candles.Ema(28);
+            var cci = Candles.Cci();
+            var rsi = Candles.Rsi();
 
             for (int i = 0; i < Candles.Count; i++)
             {
                 if (i == 0)
                     result.Add(0);
-                else if (cci[i] < -100 && ema8[i] > ema28[i] && ema8[i - 1] < ema28[i])
+                else if (rsi[i] < 30 && cci[i] < -100)
                     result.Add(1);
-                else if (cci[i] > 100 && ema8[i] < ema28[i] && ema8[i - 1] > ema28[i])
+                else if (rsi[i] > 70 && cci[i] > 100)
                     result.Add(-1);
                 else
                     result.Add(0);

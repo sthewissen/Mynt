@@ -110,7 +110,7 @@ namespace Mynt.Core.TradeManagers
             if (batch.Count > 0) tradeTable.ExecuteBatch(batch);
             if (balanceBatch.Count > 0) balanceTable.ExecuteBatch(balanceBatch);
         }
-        
+
         /// <summary>
         /// Creates our total and daily balance records in the Azure Table Storage.
         /// </summary>
@@ -415,7 +415,7 @@ namespace Mynt.Core.TradeManagers
             foreach (var item in Constants.StopLossAnchors)
             {
                 if (currentProfit > item)
-                    trade.StopLossAnchor = item;
+                    trade.StopLossAnchor = item - 0.01;
             }
 
             // Check if time matches and current rate is above threshold

@@ -33,9 +33,9 @@ namespace Mynt.Core.Strategies
             {
                 if (i == 0)
                     result.Add(0);
-                else if (rsi[i] < 45 && currentPrices[i-1] < bbands.LowerBand[i-1] && currentPrices[i] >= bbands.LowerBand[i])
+                else if (rsi[i] < 30 && currentPrices[i] < bbands.LowerBand[i])
                     result.Add(1);
-                else if (rsi[i] > 55 && currentPrices[i-1] > bbands.UpperBand[i] && currentPrices[i] <= bbands.UpperBand[i])
+                else if (rsi[i] > 70)
                     result.Add(-1);
                 else
                     result.Add(0);

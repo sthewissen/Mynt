@@ -24,7 +24,7 @@ namespace Mynt.Core
         public const double TransactionFeePercentage = 0.0025;
         
         // If we go below this profit percentage, we sell immediately.
-        public const double StopLossPercentage = -0.03;
+        public const double StopLossPercentage = -0.05;
 
         // Setting this to 0 means we will not look at volume and only look at our AlwaysTradeList. 
         // Setting this to any value higher than 0 means we will get a list of markets currently
@@ -51,7 +51,7 @@ namespace Mynt.Core
         // These are anchors for which we lock in profits to close a trade.
         public static readonly List<double> StopLossAnchors = new List<double>()
         {
-            // 0.02, 0.03, 0.05, 0.08, 0.13, 0.21
+           0.01, 0.02, 0.03, 0.05, 0.08, 0.13, 0.21
         };
 
         // These are the markets we don't want to trade on
