@@ -36,7 +36,7 @@ namespace Mynt.Functions
                 var activeTrade = tradeTable.CreateQuery<Trade>().Where(x => x.RowKey == order.Uuid).FirstOrDefault();
 
                 // Directly sell it off.
-                var tradeManager = new BittrexTradeManager(null, (a) => log.Info(a));
+                var tradeManager = new BittrexTradeManager(null, new NotificationManager(), (a) => log.Info(a));
                 await tradeManager.DirectSell(activeTrade);
     
                 tradeTable.Execute(TableOperation.Replace(activeTrade));

@@ -263,6 +263,7 @@
     <Compile Include="Indicators\StochFast.cs" />
     <Compile Include="Indicators\StochRsi.cs" />
     <Compile Include="Indicators\Tema.cs" />
+    <Compile Include="Interfaces\INotificationManager.cs" />
     <Compile Include="Managers\ConnectionManager.cs" />
     <Compile Include="Managers\NotificationManager.cs" />
     <Compile Include="Models\Balance.cs" />
@@ -313,7 +314,6 @@
     <Compile Include="Strategies\SmaSar.cs" />
     <Compile Include="Strategies\SmaStochRsi.cs" />
     <Compile Include="Strategies\StochAdx.cs" />
-    <Compile Include="Strategies\TheAssassin.cs" />
     <Compile Include="Strategies\ThreeMAgos.cs" />
     <Compile Include="Strategies\RsiBbands.cs" />
     <Compile Include="Strategies\TripleMa.cs" />

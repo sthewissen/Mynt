@@ -98,7 +98,6 @@ namespace Mynt.BackTester
             new SmaSar(),
             new SmaStochRsi(),
             new StochAdx(),
-            new TheAssassin(),
             new ThreeMAgos(),
             new TripleMa(),
             new Wvf(),

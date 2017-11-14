@@ -75,7 +75,7 @@ namespace Mynt.Core.TradeManagers
 
                     // No open order with the order ID of the trade.
                     // Check if this trade can be closed
-                    if (!CloseTradeIfFulfilled(trade))
+                    if (!await CloseTradeIfFulfilled(trade))
                     {
                         // Check if we can sell our current pair
                         await HandleTrade(trade);
