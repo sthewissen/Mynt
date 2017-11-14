@@ -1,19 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Azure.NotificationHubs;
+using Mynt.Core.Interfaces;
 
 namespace Mynt.Core.Managers
 {
-    public class NotificationManager
+    public class NotificationManager : INotificationManager
     {
         public async Task<string> RegisterDevice(Installation installation)
         {
             var hub = NotificationHubClient.CreateClientFromConnectionString(Constants.NotificationAccessKey, Constants.NotificationHubName);
             await hub.CreateOrUpdateInstallationAsync(installation);
-
             return installation.InstallationId;
         }
 

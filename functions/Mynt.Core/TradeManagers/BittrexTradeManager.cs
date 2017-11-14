@@ -17,6 +17,7 @@ namespace Mynt.Core.TradeManagers
     public class BittrexTradeManager : ITradeManager
     {
         private readonly BittrexApi _api;
+        private readonly INotificationManager _notification;
         private readonly ITradingStrategy _strategy;
         private readonly Action<string> _log;
         private Balance _totalBalance;
@@ -26,11 +27,12 @@ namespace Mynt.Core.TradeManagers
         private double _oldDayBalance;
         private double _oldTotalBalance;
 
-        public BittrexTradeManager(ITradingStrategy strat, Action<string> log)
+        public BittrexTradeManager(ITradingStrategy strat, INotificationManager notificationManager, Action<string> log)
         {
             _api = new BittrexApi(Constants.IsDryRunning);
             _strategy = strat;
             _log = log;
+            _notification = notificationManager;
         }
 
         /// <summary>
@@ -173,6 +175,7 @@ namespace Mynt.Core.TradeManagers
                 if (trade != null)
                 {
                     _log($"New trade signal {trade.Market}...");
+                    await SendNotification($"Buying {trade.Market} at {trade.OpenRate:0.0000000 BTC} ({trade.Quantity:0.0000} units)");
                     return trade;
                 }
 
@@ -438,7 +441,7 @@ namespace Mynt.Core.TradeManagers
         /// </summary>
         /// <param name="trade"></param>
         /// <returns></returns>
-        private bool CloseTradeIfFulfilled(Trade trade)
+        private async Task<bool> CloseTradeIfFulfilled(Trade trade)
         {
             // If we don't have an open order and the close rate is already set,
             // we can close this trade.
@@ -455,10 +458,20 @@ namespace Mynt.Core.TradeManagers
 
                 trade.IsOpen = false;
 
+                await SendNotification($"Sold {trade.Market} at {trade.CloseRate:0.0000000 BTC} with a profit of {trade.CloseProfitPercentage:0.00}%");
+
                 return true;
             }
 
             return false;
+        }
+
+        private async Task SendNotification(string message)
+        {
+            if (_notification != null)
+            {
+                await _notification.SendNotification(message);
+            }
         }
     }
 }
