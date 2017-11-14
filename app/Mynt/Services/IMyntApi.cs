@@ -10,15 +10,15 @@ namespace Mynt.Services
     [Headers("Accept: application/json")]
     public interface IMyntApi
     {
-        [Post("/api/orders?code=jzUauHP8lEUPZvSCW1Pi9W1mEeJLNky94g6E8/LqZzvqfGOxaHHV/A==")]
+        [Post("/api/orders?code={INSERT YOUR UNIQUE CODE FROM AZURE}")]
         Task<bool> DirectSell([Body]Trade order);
-        [Get("/api/trades?code=i/iS2/5iBfg1kLPMQrXWyIr8xfL5OUBNbgHe/hxDjIfRI8bf63D9eg==")]
+        [Get("/api/trades?code={INSERT YOUR UNIQUE CODE FROM AZURE}")]
         Task<List<Trade>> GetActiveTrades();
-        [Get("/api/history?code=ckw82JgVpyf28xQ3u6Z2xVcwKATPqohK5aZQhWWQQocpcX98huLO2Q==")]
+        [Get("/api/history?code={INSERT YOUR UNIQUE CODE FROM AZURE}")]
         Task<TradeHistory> GetHistoricTrades();
-        [Get("/api/settings?code=s59/gME3ANefLDB0tXXDXO8pMiQZDagIjUVxVZZOTSWVfL35PbvDcA==")]
+        [Get("/api/settings?code={INSERT YOUR UNIQUE CODE FROM AZURE}")]
         Task<TradeSettings> GetSettings();
-        [Post("/api/notifications?code=taStKFgVxy2vKBqLwOyoCKPCRu5ZgJvR7UaBzk656vywtzZpLGjFCg==")]
+        [Post("/api/notifications?code={INSERT YOUR UNIQUE CODE FROM AZURE}")]
         Task<string> Register([Body] Installation installation);
     }
 }
