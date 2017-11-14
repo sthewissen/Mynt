@@ -1,3 +1,4 @@
+using System;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
@@ -17,14 +18,21 @@ namespace Mynt.Functions
         [FunctionName("SettingsService")]
         public static HttpResponseMessage Run([HttpTrigger(AuthorizationLevel.Function, "get", Route = "settings")]HttpRequestMessage req, TraceWriter log)
         {
-            // Fetching the name from the path parameter in the request URL
-            return req.CreateResponse(HttpStatusCode.OK, new SettingsDto()
+            try
             {
-                AmountOfWorkers = Constants.MaxNumberOfConcurrentTrades,
-                StakePerWorker = Constants.AmountOfBtcToInvestPerTrader,
-                StopLossPercentage = Constants.StopLossPercentage,
-                MinimumAmountOfVolume = Constants.MinimumAmountOfVolume
-            });
+                // Fetching the name from the path parameter in the request URL
+                return req.CreateResponse(HttpStatusCode.OK, new SettingsDto()
+                {
+                    AmountOfWorkers = Constants.MaxNumberOfConcurrentTrades,
+                    StakePerWorker = Constants.AmountOfBtcToInvestPerTrader,
+                    StopLossPercentage = Constants.StopLossPercentage,
+                    MinimumAmountOfVolume = Constants.MinimumAmountOfVolume
+                });
+            }
+            catch (Exception ex)
+            {
+                return req.CreateResponse(HttpStatusCode.InternalServerError, ex.Message + ex.StackTrace);
+            }
         }
     }
 }

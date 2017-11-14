@@ -18,37 +18,44 @@ namespace Mynt.Functions
         [FunctionName("TradeHistoryService")]
         public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "get", Route = "history")]HttpRequestMessage req, TraceWriter log)
         {
-            var tradeTable = await ConnectionManager.GetTableConnection(Constants.OrderTableName, Constants.IsDryRunning);
-            var balanceTable = await ConnectionManager.GetTableConnection(Constants.BalanceTableName, Constants.IsDryRunning);
-
-            var tradeHistory = tradeTable.CreateQuery<Trade>().Where(x => !x.IsOpen).AsQueryable().Take(30).ToList();
-            tradeHistory = tradeHistory.OrderByDescending(x => x.OpenDate).ToList();
-
-            var totalBalance = balanceTable.CreateQuery<Balance>().Where(x => x.PartitionKey == "BALANCE" && x.RowKey == "TOTAL").FirstOrDefault();
-            var dayBalance = balanceTable.CreateQuery<Balance>().Where(x => x.PartitionKey == "BALANCE" && x.RowKey == DateTime.UtcNow.AddDays(-1).ToString("yyyyMMdd")).FirstOrDefault();
-
-            var hist = new TradeHistoryDto()
+            try
             {
-                Trades = tradeHistory.Select(x => new TradeDto()
-                {
-                    CloseDate = x.CloseDate,
-                    OpenDate = x.OpenDate,
-                    Market = x.Market,
-                    CloseRate = x.CloseRate,
-                    CloseProfitPercentage = x.CloseProfitPercentage,
-                    CloseProfit = x.CloseProfit,
-                    OpenRate = x.OpenRate,
-                    Quantity = x.Quantity,
-                    StakeAmount = x.StakeAmount,
-                    Uuid = x.RowKey
-                }).ToList(),
-                TotalProfit = totalBalance?.Profit ?? 0,
-                OverallBalance = totalBalance?.TotalBalance ?? 0,
-                TodaysProfit = dayBalance?.Profit ?? 0,
-            };
+                var tradeTable = await ConnectionManager.GetTableConnection(Constants.OrderTableName, Constants.IsDryRunning);
+                var balanceTable = await ConnectionManager.GetTableConnection(Constants.BalanceTableName, Constants.IsDryRunning);
 
-            // Fetching the name from the path parameter in the request URL
-            return req.CreateResponse(HttpStatusCode.OK, hist);
+                var tradeHistory = tradeTable.CreateQuery<Trade>().Where(x => !x.IsOpen).AsQueryable().Take(30).ToList();
+                tradeHistory = tradeHistory.OrderByDescending(x => x.OpenDate).ToList();
+
+                var totalBalance = balanceTable.CreateQuery<Balance>().Where(x => x.PartitionKey == "BALANCE" && x.RowKey == "TOTAL").FirstOrDefault();
+                var dayBalance = balanceTable.CreateQuery<Balance>().Where(x => x.PartitionKey == "BALANCE" && x.RowKey == DateTime.UtcNow.AddDays(-1).ToString("yyyyMMdd")).FirstOrDefault();
+
+                var hist = new TradeHistoryDto()
+                {
+                    Trades = tradeHistory.Select(x => new TradeDto()
+                    {
+                        CloseDate = x.CloseDate,
+                        OpenDate = x.OpenDate,
+                        Market = x.Market,
+                        CloseRate = x.CloseRate,
+                        CloseProfitPercentage = x.CloseProfitPercentage,
+                        CloseProfit = x.CloseProfit,
+                        OpenRate = x.OpenRate,
+                        Quantity = x.Quantity,
+                        StakeAmount = x.StakeAmount,
+                        Uuid = x.RowKey
+                    }).ToList(),
+                    TotalProfit = totalBalance?.Profit ?? 0,
+                    OverallBalance = totalBalance?.TotalBalance ?? 0,
+                    TodaysProfit = dayBalance?.Profit ?? 0,
+                };
+
+                // Fetching the name from the path parameter in the request URL
+                return req.CreateResponse(HttpStatusCode.OK, hist);
+            }
+            catch (Exception ex)
+            {
+                return req.CreateResponse(HttpStatusCode.InternalServerError, ex.Message + ex.StackTrace);
+            }
         }
     }
 }
