@@ -8,7 +8,7 @@ A lot of the logic is based on the [Freqtrade] bot and was converted to C#. The 
 
 This bot was first mentioned in [one of my blogposts].
 
-![https://sthewissen.visualstudio.com/_apis/public/build/definitions/c865956c-413b-4c44-b678-45d3026ae0b0/11/badge]
+![Build status](https://sthewissen.visualstudio.com/_apis/public/build/definitions/c865956c-413b-4c44-b678-45d3026ae0b0/11/badge)
 
 ### Configuration
 
