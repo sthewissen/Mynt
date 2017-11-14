@@ -8,6 +8,8 @@ A lot of the logic is based on the [Freqtrade] bot and was converted to C#. The 
 
 This bot was first mentioned in [one of my blogposts].
 
+![https://sthewissen.visualstudio.com/_apis/public/build/definitions/c865956c-413b-4c44-b678-45d3026ae0b0/11/badge]
+
 ### Configuration
 
 There are a few settings you can configure to alter the behavior of the bot. These settings are stored in the `Constants.cs` file in the **Core** project. Azure Functions does not yet support some sort of configuration file that you can use locally and deploy to Azure so for now this will have to do.
