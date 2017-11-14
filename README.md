@@ -26,7 +26,7 @@ There are a few settings you can configure to alter the behavior of the bot. The
 | `ReturnOnInvestment` | A list of duration and profit pairs. The duration is a value in minutes and the profit is a double containing a percentage. This list is used to define constraints such as "Sell when 5 minutes have passed and profit is at 3%". |
 | `MarketBlackList` | A list of market names to never trade on (e.g. "BTC-XVG"). |
 | `AlwaysTradeList` | A list of market names to always trade on (e.g. "BTC-OMG"). |
-| `StopLossAnchors` | A list of percentages at which we want to lock in profit. When profit reaches one of these percentages the stop loss is adjusted to this value. That way when profit drops below that we immediately sell. |
+| `StopLossAnchors` | A list of percentages at which we want to lock in profit. Basically these function as a trailing stop loss. When profit reaches one of these percentages the stop loss is adjusted to this value. That way when profit drops below that we immediately sell. |
 | `AzureStorageConnection` | The connection to the Azure Table Storage used to store our data. |
 | `OrderTableName` | The table name for the Order table. |
 | `BalanceTableName` | The table name for the Balance table. |
@@ -88,7 +88,10 @@ All indicators use a .NET wrapper of the TA-Lib library. They are implemented as
 | Bollinger Bands | Period: 5, Deviation up: 2, Deviation down: 2 | Bbands()
 | Bear/Bull | N/A | BearBull()
 | Commodity Channel Index | Period: 14 | Cci()
+| Chande Momentum Oscillator | Period: 14 | Cmo()
+| Derivative Oscillator | | DerivativeOscillator()
 | Exponential Moving Average | Period: 30, Candle variable: Close | Ema()
+| Fisher Ehlers | Period: 10 | Fisher()
 | Moving Average Convergence/Divergence | Fast period: 12, Slow period: 26, Signal period: 9 | Macd()
 | MESA Adaptive Moving Average | Fast period: 12, Slow period: 26, Signal period: 9 | Mama()
 | Momentum Flow Index | Period: 14 | Mfi()
@@ -102,6 +105,7 @@ All indicators use a .NET wrapper of the TA-Lib library. They are implemented as
 | Stochastics Fast | Fast K period: 5, Fast D period: 3, Fast D MA type: SMA | StochFast()
 | Stochastic RSI | Period: 14, Candle variable: Close, Fast K period: 3, Fast D period: 3, Fast D MA type: SMA | StochRsi()
 | Triple Exponential Moving Average | Period: 20, Candle variable: Close | Tema()
+| Weighted Moving Average | Period: 30, Candle variable: Close | Wma()
 
 ### Backtesting
 The project also contains a console application that can be used to backtest your strategies. It uses the 5 minute candle data for 10 popular crypto currencies. The data is distributed over a 20 day period and was gathered using the public Bittrex API. If you want more data or want to backtest using additional currencies you can use this API to retrieve the data.
