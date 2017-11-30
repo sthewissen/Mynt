@@ -326,15 +326,15 @@ namespace Mynt.Core.TradeManagers
         /// <returns></returns>
         private async Task<List<int>> GetTrend(string tradeMarket)
         {
-            var minimumDate = DateTime.UtcNow.AddHours(-24);
-            var candles = await _api.GetTickerHistory(tradeMarket, minimumDate.ToUnixTimestamp());
+            var minimumDate = DateTime.UtcNow.AddHours(-120);
+            var candles = await _api.GetTickerHistory(tradeMarket, minimumDate.ToUnixTimestamp(), Period.Hour);
 
             _strategy.Candles = candles.Where(x => x.Timestamp > minimumDate).ToList();
 
             var signalDate = candles[candles.Count - 1].Timestamp;
 
             // This is an outdated candle...
-            if (signalDate < DateTime.UtcNow.AddMinutes(-10))
+            if (signalDate < DateTime.UtcNow.AddMinutes(-120))
                 return new List<int>() { };
 
             // This calculates a buy signal for each candle.
