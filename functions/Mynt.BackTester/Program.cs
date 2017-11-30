@@ -65,6 +65,7 @@ namespace Mynt.BackTester
             new AwesomeMacd(),
             new Base150(),
             new BbandRsi(),
+            new BigThree(),
             new BreakoutMa(),
             new CciEma(),
             new CciRsi(),

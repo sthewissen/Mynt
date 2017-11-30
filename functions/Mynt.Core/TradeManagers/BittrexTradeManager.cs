@@ -11,6 +11,7 @@ using Mynt.Core.Interfaces;
 using Mynt.Core.Managers;
 using Mynt.Core.Models;
 using Mynt.Core.Strategies;
+using Period = Mynt.Core.Api.Bittrex.Models.Period;
 
 namespace Mynt.Core.TradeManagers
 {
