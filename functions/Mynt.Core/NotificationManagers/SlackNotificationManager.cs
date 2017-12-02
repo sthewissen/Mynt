@@ -8,6 +8,7 @@ namespace Mynt.Core.NotificationManagers
 {
     public class SlackNotificationManager : INotificationManager
     {
+        private readonly string SlackWebhookUrl = "";
         
         public async Task<bool> SendNotification(string message)
         {
