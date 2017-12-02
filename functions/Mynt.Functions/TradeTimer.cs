@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using Mynt.Core.Managers;
 using Mynt.Core.Strategies;
+using Mynt.Core.NotificationManagers;
 
 namespace Mynt.Functions
 {
@@ -20,7 +21,7 @@ namespace Mynt.Functions
                 log.Info("Starting processing...");
 
                 // Call the Bittrex Trade manager with the strategy of our choosing.
-                var manager = new BittrexTradeManager(new BigThree(), new NotificationManager(), (a) => log.Info(a));
+                var manager = new BittrexTradeManager(new BigThree(), new PushNotificationManager(), (a) => log.Info(a));
 
                 // Call the process method to start processing the current situation.
                 await manager.Process();
