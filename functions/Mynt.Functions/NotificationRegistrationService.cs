@@ -8,6 +8,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 using Mynt.Core.Managers;
+using Mynt.Core.NotificationManagers;
 using Newtonsoft.Json;
 
 namespace Mynt.Functions
@@ -22,7 +23,7 @@ namespace Mynt.Functions
             var jsonContent = content.ReadAsStringAsync().Result;
             var installation = JsonConvert.DeserializeObject<Installation>(jsonContent);
 
-            var manager = new NotificationManager();
+            var manager = new PushNotificationManager();
             await manager.RegisterDevice(installation);
 
             return req.CreateResponse(HttpStatusCode.OK, installation.InstallationId);

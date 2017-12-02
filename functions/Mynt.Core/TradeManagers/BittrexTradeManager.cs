@@ -10,6 +10,7 @@ using Mynt.Core.Extensions;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Managers;
 using Mynt.Core.Models;
+using Mynt.Core.NotificationManagers;
 using Mynt.Core.Strategies;
 using Period = Mynt.Core.Api.Bittrex.Models.Period;
 
@@ -45,7 +46,8 @@ namespace Mynt.Core.TradeManagers
         {
             // Get our current trades.
             var tradeTable = await ConnectionManager.GetTableConnection(Constants.OrderTableName, Constants.IsDryRunning);
-            var balanceTable = await ConnectionManager.GetTableConnection(Constants.BalanceTableName, Constants.IsDryRunning);
+            var balanceTable = await ConnectionManager.GetTableConnection(Constants.BalanceTableName,
+                Constants.IsDryRunning);
             var activeTrades = tradeTable.CreateQuery<Trade>().Where(x => x.IsOpen).ToList();
 
             // Create two batches that we can use to update our tables.
@@ -54,7 +56,10 @@ namespace Mynt.Core.TradeManagers
 
             // Can't use FirstOrDefault directly because Linq for Table Storage doesn't support it.
             _totalBalance = balanceTable.CreateQuery<Balance>().Where(x => x.RowKey == "TOTAL").FirstOrDefault();
-            _dayBalance = balanceTable.CreateQuery<Balance>().Where(x => x.RowKey == DateTime.UtcNow.ToString("yyyyMMdd")).FirstOrDefault();
+            _dayBalance =
+                balanceTable.CreateQuery<Balance>()
+                    .Where(x => x.RowKey == DateTime.UtcNow.ToString("yyyyMMdd"))
+                    .FirstOrDefault();
 
             // Create both the balances if they don't exist yet.
             CreateBalancesIfNotExists(balanceBatch);

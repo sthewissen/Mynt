@@ -27,7 +27,7 @@ namespace Mynt.Core.Strategies
             var sma20 = Candles.Sma(20);
             var sma40 = Candles.Sma(40);
             var sma80 = Candles.Sma(80);
-
+            
             for (int i = 0; i < Candles.Count; i++)
             {
                 if (i < 2)

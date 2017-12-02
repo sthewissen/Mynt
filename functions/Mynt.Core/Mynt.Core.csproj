@@ -265,7 +265,9 @@
     <Compile Include="Indicators\Tema.cs" />
     <Compile Include="Interfaces\INotificationManager.cs" />
     <Compile Include="Managers\ConnectionManager.cs" />
-    <Compile Include="Managers\NotificationManager.cs" />
+    <Compile Include="NotificationManagers\NotificationManager.cs" />
+    <Compile Include="NotificationManagers\PushNotificationManager.cs" />
+    <Compile Include="NotificationManagers\SlackNotificationManager.cs" />
     <Compile Include="Models\Balance.cs" />
     <Compile Include="Models\Candle.cs" />
     <Compile Include="Models\CandleVariable.cs" />
@@ -279,6 +281,7 @@
     <Compile Include="Strategies\AdxMomentum.cs" />
     <Compile Include="Strategies\AdxSmas.cs" />
     <Compile Include="Strategies\AwesomeMacd.cs" />
+    <Compile Include="Strategies\AwesomeSma.cs" />
     <Compile Include="Strategies\Base150.cs" />
     <Compile Include="Strategies\BbandRsi.cs" />
     <Compile Include="Strategies\BigThree.cs" />

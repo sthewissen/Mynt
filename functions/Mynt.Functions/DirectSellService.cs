@@ -13,6 +13,7 @@ using Microsoft.WindowsAzure.Storage.Table;
 using Mynt.Core;
 using Mynt.Core.Managers;
 using Mynt.Core.Models;
+using Mynt.Core.NotificationManagers;
 using Mynt.Core.Strategies;
 using Mynt.Core.TradeManagers;
 using Mynt.Functions.Dto;
@@ -36,7 +37,7 @@ namespace Mynt.Functions
                 var activeTrade = tradeTable.CreateQuery<Trade>().Where(x => x.RowKey == order.Uuid).FirstOrDefault();
 
                 // Directly sell it off.
-                var tradeManager = new BittrexTradeManager(null, new NotificationManager(), (a) => log.Info(a));
+                var tradeManager = new BittrexTradeManager(null, new PushNotificationManager(), (a) => log.Info(a));
                 await tradeManager.DirectSell(activeTrade);
     
                 tradeTable.Execute(TableOperation.Replace(activeTrade));

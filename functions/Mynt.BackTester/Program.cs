@@ -63,6 +63,7 @@ namespace Mynt.BackTester
             new AdxMomentum(),
             new AdxSmas(),
             new AwesomeMacd(),
+            new AwesomeSma(),
             new Base150(),
             new BbandRsi(),
             new BigThree(),
