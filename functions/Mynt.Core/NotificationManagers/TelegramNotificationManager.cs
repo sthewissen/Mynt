@@ -16,9 +16,6 @@ namespace Mynt.Core.NotificationManagers
         {
             try
             {
-                
-            var payload = new Payload() { text = message };
-            var payloadJson = JsonConvert.SerializeObject(payload);
             var httpClient = new HttpClient();
 
             Dictionary<string, string> dictionary = new Dictionary<string, string>();
@@ -42,11 +39,6 @@ namespace Mynt.Core.NotificationManagers
         {
             var finalMessage = string.Format(template, parameters);
            return await SendNotification(finalMessage);
-        }
-
-        public class Payload
-        {
-            public string text { get; set; }
         }
     }
 }
