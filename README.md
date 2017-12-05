@@ -119,6 +119,12 @@ All indicators use a .NET wrapper of the TA-Lib library. They are implemented as
 ### Notifications
 You can send/receive notifications using an implementation of the `INotificationManager` interface. Currently the default implementation uses Azure Notification Hubs to send these notifications to all devices registered within the configured Notification Hub. To implement your own custom notifications such as e.g. receiving an e-mail you can implement the `INotificationManager` interface and pass it into the `TradeManager` instance within the `TradeTimer` Azure Function.
 
+Supported notification managers are:
+
+- Push notification in the accompanying mobile app
+- Slack channel using WebHooks
+- Telegram chat using WebHooks
+
 ### Backtesting
 The project also contains a console application that can be used to backtest your strategies. It uses the 5 minute candle data for 10 popular crypto currencies. The data is distributed over a 20 day period and was gathered using the public Bittrex API. If you want more data or want to backtest using additional currencies you can use this API to retrieve the data.
 
