@@ -1,3 +1,10 @@
+Finding this useful? Consider a donation!
+
+| Coin | Address |
+| ------- | ------ |
+| BTC | 13myncc3ie6iGjSmJHCdzahwaKizX7NBB1 |
+| ETH | 0x4398c958468bEDB41DdEF4C297eB543c6d26f440 |
+
 # Mynt
 This is an Azure Functions-based cryptocurrency trading bot. It uses the following cloud components to function:
 
