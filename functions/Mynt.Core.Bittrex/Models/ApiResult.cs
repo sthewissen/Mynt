@@ -1,7 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
 
-namespace Mynt.Core.Api.Bittrex.Models
+namespace Mynt.Core.Bittrex.Models
 {
     /// <summary>
     /// A general result wrapper for the bittrex api end points

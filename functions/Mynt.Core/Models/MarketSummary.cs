@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Mynt.Core.Api.Bittrex.Models
+namespace Mynt.Core.Models
 {
     /// <summary>    
     /// The result of the /public/getmarketsummaries end point

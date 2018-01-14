@@ -1,7 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
 
-namespace Mynt.Core.Api.Bittrex.Models
+namespace Mynt.Core.Bittrex.Models
 {
     /// <summary>
     /// The result of the /market/buylimit and /market/selllimit end points.   

@@ -1,20 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage.Table;
-using Mynt.Core.Api.Bittrex;
-using Mynt.Core.Api.Bittrex.Models;
+using Mynt.Core.Bittrex.Models;
 using Mynt.Core.Extensions;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Managers;
 using Mynt.Core.Models;
-using Mynt.Core.NotificationManagers;
-using Mynt.Core.Strategies;
-using Period = Mynt.Core.Api.Bittrex.Models.Period;
+using Period = Mynt.Core.Bittrex.Models.Period;
 
-namespace Mynt.Core.TradeManagers
+namespace Mynt.Core.Bittrex
 {
     public class BittrexTradeManager : ITradeManager
     {
@@ -332,7 +328,7 @@ namespace Mynt.Core.TradeManagers
         private async Task<List<int>> GetTrend(string tradeMarket)
         {
             var minimumDate = DateTime.UtcNow.AddHours(-120);
-            var candles = await _api.GetTickerHistory(tradeMarket, minimumDate.ToUnixTimestamp(), Period.Hour);
+            var candles = await _api.GetTickerHistory(tradeMarket, minimumDate.ToUnixTimestamp(), Core.Models.Period.Hour);
 
             _strategy.Candles = candles.Where(x => x.Timestamp > minimumDate).ToList();
 

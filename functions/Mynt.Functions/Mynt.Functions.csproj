@@ -10,6 +10,7 @@
     <PackageReference Include="WindowsAzure.Storage" Version="8.5.0" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Mynt.Core.Bittrex\Mynt.Core.Bittrex.csproj" />
     <ProjectReference Include="..\Mynt.Core\Mynt.Core.csproj" />
   </ItemGroup>
   <ItemGroup>

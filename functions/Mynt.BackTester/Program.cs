@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Mynt.BackTester.Traits;
-using Mynt.Core.Api.Bittrex;
-using Mynt.Core.Api.Bittrex.Models;
+using Mynt.Core.Bittrex;
+using Mynt.Core.Bittrex.Models;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
 using Mynt.Core.Strategies;
@@ -134,7 +134,7 @@ namespace Mynt.BackTester
             foreach (var pair in CoinsToBuy)
             {
                 var dataString = File.ReadAllText($"Data/{pair}.json");
-                var data = JsonConvert.DeserializeObject<ApiResult<List<Core.Api.Bittrex.Models.Candle>>>(dataString);
+                var data = JsonConvert.DeserializeObject<ApiResult<List<Core.Bittrex.Models.Candle>>>(dataString);
 
                 // This creates a list of buy signals.
                 strategy.Candles = data.Result.ToGenericCandles();
@@ -198,7 +198,7 @@ namespace Mynt.BackTester
                     foreach (var pair in CoinsToBuy)
                     {
                         var dataString = File.ReadAllText($"Data/{pair}.json");
-                        var data = JsonConvert.DeserializeObject<ApiResult<List<Core.Api.Bittrex.Models.Candle>>>(dataString);
+                        var data = JsonConvert.DeserializeObject<ApiResult<List<Core.Bittrex.Models.Candle>>>(dataString);
 
                         // This creates a list of buy signals.
                         strategy.Candles = data.Result.ToGenericCandles();
@@ -269,7 +269,7 @@ namespace Mynt.BackTester
                         foreach (var pair in CoinsToBuy)
                         {
                             var dataString = File.ReadAllText($"Data/{pair}.json");
-                            var data = JsonConvert.DeserializeObject<ApiResult<List<Core.Api.Bittrex.Models.Candle>>>(dataString);
+                            var data = JsonConvert.DeserializeObject<ApiResult<List<Core.Bittrex.Models.Candle>>>(dataString);
 
                             // This creates a list of buy signals.
                             strategy1.Candles = data.Result.ToGenericCandles();
@@ -371,7 +371,7 @@ namespace Mynt.BackTester
                         foreach (var pair in CoinsToBuy)
                         {
                             var dataString = File.ReadAllText($"Data/{pair}.json");
-                            var data = JsonConvert.DeserializeObject<ApiResult<List<Core.Api.Bittrex.Models.Candle>>>(dataString);
+                            var data = JsonConvert.DeserializeObject<ApiResult<List<Core.Bittrex.Models.Candle>>>(dataString);
 
                             // This creates a list of buy signals.
                             entryStrat.Candles = data.Result.ToGenericCandles();
@@ -492,7 +492,7 @@ namespace Mynt.BackTester
                     foreach (var pair in CoinsToBuy)
                     {
                         var dataString = File.ReadAllText($"Data/{pair}.json");
-                        var data = JsonConvert.DeserializeObject<ApiResult<List<Core.Api.Bittrex.Models.Candle>>>(dataString);
+                        var data = JsonConvert.DeserializeObject<ApiResult<List<Core.Bittrex.Models.Candle>>>(dataString);
 
                         // This creates a list of buy signals.
                         var candles = data.Result.ToGenericCandles();

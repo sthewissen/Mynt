@@ -6,13 +6,14 @@ using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using Mynt.Core.Api.Bittrex.Models;
+using Mynt.Core.Api;
+using Mynt.Core.Bittrex.Models;
 using Mynt.Core.Models;
 using Refit;
 
-namespace Mynt.Core.Api.Bittrex
+namespace Mynt.Core.Bittrex
 {
-    public class BittrexApi
+    public class BittrexApi : IExchangeApi
     {
         private BittrexClient _api;
         private readonly bool _dryRun;
@@ -90,14 +91,30 @@ namespace Mynt.Core.Api.Bittrex
             return result.Result;
         }
 
-        public async Task<List<MarketSummary>> GetMarketSummaries()
+        public async Task<List<Core.Models.MarketSummary>> GetMarketSummaries()
         {
             var result = await _api.GetMarketSummaries();
 
             if (!result.Success)
                 throw new Exception($"Bittrex API failure {result.Message}");
 
-            return result.Result;
+            return result.Result.Select(_ =>
+                new Core.Models.MarketSummary
+                {
+                    Ask = _.Ask,
+                    BaseVolume = _.BaseVolume,
+                    Bid = _.Bid,
+                    Created = _.Created,
+                    High = _.High,
+                    Last = _.Last,
+                    Low = _.Low,
+                    MarketName = _.MarketName,
+                    OpenBuyOrders = _.OpenBuyOrders,
+                    OpenSellOrders = _.OpenSellOrders,
+                    PrevDay = _.PrevDay,
+                    TimeStamp = _.TimeStamp,
+                    Volume = _.Volume
+                }).ToList();
         }
 
         public async Task<List<OpenOrder>> GetOpenOrders(string market)
@@ -139,15 +156,14 @@ namespace Mynt.Core.Api.Bittrex
             return result.Result;
         }
 
-        public async Task<List<Core.Models.Candle>> GetTickerHistory(string market, long startDate, Models.Period period = Models.Period.FiveMin)
+        public async Task<List<Core.Models.Candle>> GetTickerHistory(string market, long startDate, Core.Models.Period period = Core.Models.Period.FiveMinutes)
         {
-            var result = await _api.GetTickerHistory(market, startDate, period);
+            var result = await _api.GetTickerHistory(market, startDate, period.ToBittrexEquivalent());
 
             if (!result.Success)
                 throw new Exception($"Bittrex API failure {result.Message}");
 
             return result.Result.ToGenericCandles();
-        }
-
+        }        
     }
 }

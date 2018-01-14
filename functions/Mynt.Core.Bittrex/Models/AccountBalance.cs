@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Mynt.Core.Api.Bittrex.Models
+namespace Mynt.Core.Bittrex.Models
 {
     /// <summary>
     /// Contains the account balance for a particular currency

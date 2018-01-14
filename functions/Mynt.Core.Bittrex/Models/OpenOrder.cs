@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Mynt.Core.Api.Bittrex.Models
+namespace Mynt.Core.Bittrex.Models
 {
     /// <summary>
     /// An open order result from the /market/getopenorders end point

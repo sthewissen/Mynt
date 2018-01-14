@@ -1,24 +1,23 @@
 ﻿using System;
-using System.Threading.Tasks;
-using Microsoft.Azure.NotificationHubs;
-using Mynt.Core.Interfaces;
 using System.Collections.Generic;
-using Mynt.Core.Api.Bittrex;
 using System.Linq;
+using System.Threading.Tasks;
+using Mynt.Core.Api;
 using Mynt.Core.Extensions;
-using Mynt.Core.Api.Bittrex.Models;
+using Mynt.Core.Interfaces;
+using Mynt.Core.Models;
 
 namespace Mynt.Core.NotificationManagers
 {
     public class NotificationManager
     {
-        private readonly BittrexApi _api;
+        private readonly IExchangeApi _api;
         private readonly ITradingStrategy _strategy;
         private readonly Action<string> _log;
 
-        public NotificationManager(ITradingStrategy strategy, Action<string> log)
+        public NotificationManager(IExchangeApi api, ITradingStrategy strategy, Action<string> log)
         {
-            _api = new BittrexApi(true);
+            _api = api;
             _strategy = strategy;
             _log = log;
         }

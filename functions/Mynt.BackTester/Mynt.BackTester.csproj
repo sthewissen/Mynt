@@ -280,6 +280,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Mynt.Core.Bittrex\Mynt.Core.Bittrex.csproj">
+      <Project>{626d9760-282c-4adf-8c56-dba91de01e87}</Project>
+      <Name>Mynt.Core.Bittrex</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Mynt.Core\Mynt.Core.csproj">
       <Project>{e1879751-5218-46f9-9d5a-d52079fe58bd}</Project>
       <Name>Mynt.Core</Name>

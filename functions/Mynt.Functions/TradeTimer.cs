@@ -1,12 +1,10 @@
-using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Host;
-using Mynt.Core.TradeManagers;
 using System;
 using System.Threading.Tasks;
-using System.Xml;
-using Mynt.Core.Managers;
-using Mynt.Core.Strategies;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Host;
+using Mynt.Core.Bittrex;
 using Mynt.Core.NotificationManagers;
+using Mynt.Core.Strategies;
 
 namespace Mynt.Functions
 {

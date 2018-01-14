@@ -5,10 +5,10 @@ using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using Mynt.Core.Api.Bittrex.Models;
+using Mynt.Core.Bittrex.Models;
 using Newtonsoft.Json;
 
-namespace Mynt.Core.Api.Bittrex
+namespace Mynt.Core.Bittrex
 {
     /// <summary>
     /// A http client for the Bittrex crypto trading platform api
