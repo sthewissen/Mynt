@@ -8,6 +8,7 @@ namespace Mynt.Core.Bittrex.Models
     /// Every end point provides results in the same format containing a success flag, a message field to return any errors that may have occurred and the actual json result.
     /// </summary>
     /// <typeparam name="T"></typeparam>
+    [Obsolete]
     public class ApiResult<T> 
     {
         public ApiResult(bool success, string message, T result)
