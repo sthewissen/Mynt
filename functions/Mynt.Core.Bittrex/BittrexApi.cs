@@ -1,15 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
 using Mynt.Core.Api;
 using Mynt.Core.Bittrex.Models;
 using Mynt.Core.Models;
-using Refit;
 
 namespace Mynt.Core.Bittrex
 {
@@ -47,6 +42,7 @@ namespace Mynt.Core.Bittrex
 
             return result.Result.Uuid.ToString();
         }
+
         public async Task<string> Sell(string market, double quantity, double rate)
         {
             if (_dryRun) return "DRY_RUN_SELL";
@@ -117,16 +113,36 @@ namespace Mynt.Core.Bittrex
                 }).ToList();
         }
 
-        public async Task<List<OpenOrder>> GetOpenOrders(string market)
+        public async Task<List<Core.Models.OpenOrder>> GetOpenOrders(string market)
         {
-            if (_dryRun) return new List<OpenOrder>();
+            if (_dryRun) return new List<Core.Models.OpenOrder>();
 
             var result = await _api.GetOpenOrders(market);
 
             if (!result.Success)
                 throw new Exception($"Bittrex API failure {result.Message}");
 
-            return result.Result;
+            return result.Result.Select(_ =>
+                new Core.Models.OpenOrder
+                {
+                    CancelInitiated = _.CancelInitiated,
+                    Closed = _.Closed,
+                    CommissionPaid = _.CommissionPaid,
+                    Condition = _.Condition,
+                    ConditionTarget = _.ConditionTarget,
+                    Exchange = _.Exchange,
+                    ImmediateOrCancel = _.ImmediateOrCancel,
+                    IsConditional = _.IsConditional,
+                    Limit = _.Limit,
+                    Opened = _.Opened,
+                    OrderType = _.OrderType,
+                    OrderUuid = _.OrderUuid,
+                    Price = _.Price,
+                    PricePerUnit = _.PricePerUnit,
+                    Quantity = _.Quantity,
+                    QuantityRemaining = _.QuantityRemaining,
+                    Uuid = _.Uuid
+                }).ToList();
         }
 
         public string GetPairDetailUrl(string market)
@@ -134,14 +150,19 @@ namespace Mynt.Core.Bittrex
             return $"https://bittrex.com/Market/Index?MarketName={market}";
         }
 
-        public async Task<Ticker> GetTicker(string market)
+        public async Task<Core.Models.Ticker> GetTicker(string market)
         {
             var result = await _api.GetTicker(market);
 
             if (!result.Success)
                 throw new Exception($"Bittrex API failure {result.Message}");
 
-            return result.Result;
+            return new Core.Models.Ticker
+            {
+                Ask = result.Result.Ask,
+                Bid = result.Result.Bid,
+                Last = result.Result.Last
+            };
         }
         
         public async Task<HistoricAccountOrder> GetOrder(string orderId)

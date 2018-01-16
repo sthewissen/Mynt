@@ -1,19 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage.Table;
-using Mynt.Core.Bittrex.Models;
+using Mynt.Core.Api;
 using Mynt.Core.Extensions;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Managers;
 using Mynt.Core.Models;
 
-namespace Mynt.Core.Bittrex
+namespace Mynt.Core.TradeManagers
 {
-    public class BittrexTradeManager : ITradeManager
+    class GenericTradeManager : ITradeManager
     {
-        private readonly BittrexApi _api;
+        private readonly IExchangeApi _api;
         private readonly INotificationManager _notification;
         private readonly ITradingStrategy _strategy;
         private readonly Action<string> _log;
@@ -24,9 +25,9 @@ namespace Mynt.Core.Bittrex
         private double _oldDayBalance;
         private double _oldTotalBalance;
 
-        public BittrexTradeManager(ITradingStrategy strat, INotificationManager notificationManager, Action<string> log)
+        public GenericTradeManager(IExchangeApi api /*= new BittrexApi(Constants.IsDryRunning)*/, ITradingStrategy strat, INotificationManager notificationManager, Action<string> log)
         {
-            _api = new BittrexApi(Constants.IsDryRunning);
+            _api = api;
             _strategy = strat;
             _log = log;
             _notification = notificationManager;
@@ -290,7 +291,7 @@ namespace Mynt.Core.Bittrex
         /// </summary>
         /// <param name="tick"></param>
         /// <returns></returns>
-        private double GetTargetBid(Core.Models.Ticker tick)
+        private double GetTargetBid(Ticker tick)
         {
             // If the ask is below the last, we can get it on the cheap.
             if (tick.Ask < tick.Last) return tick.Ask;

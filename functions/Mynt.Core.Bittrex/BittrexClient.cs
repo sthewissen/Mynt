@@ -99,8 +99,7 @@ namespace Mynt.Core.Bittrex
 
             return JsonConvert.DeserializeObject<ApiResult<List<MarketSummary>>>(json);
         }
-
-
+        
         /// <summary>
         /// Used to get the candles of a given market for a given period. 
         /// Example: https://bittrex.com/api/v2.0/pub/market/getticks?marketName={market}&tickInterval={period}&_={startDate}   

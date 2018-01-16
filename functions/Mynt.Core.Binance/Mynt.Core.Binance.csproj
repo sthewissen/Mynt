@@ -100,7 +100,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BinanceExchangeClient.cs" />
+    <Compile Include="BinanceApi.cs" />
     <Compile Include="Models\KlineCandleStick.cs" />
     <Compile Include="Models\KlineInterval.cs" />
     <Compile Include="Models\KlinesCandlesticksConfiguration.cs" />
