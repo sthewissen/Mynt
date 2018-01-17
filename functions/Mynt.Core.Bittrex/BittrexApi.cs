@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Mynt.Core.Api;
 using Mynt.Core.Bittrex.Models;
+using Mynt.Core.Extensions;
 using Mynt.Core.Models;
 
 namespace Mynt.Core.Bittrex
@@ -100,15 +101,11 @@ namespace Mynt.Core.Bittrex
                     Ask = _.Ask,
                     BaseVolume = _.BaseVolume,
                     Bid = _.Bid,
-                    Created = _.Created,
                     High = _.High,
                     Last = _.Last,
                     Low = _.Low,
                     MarketName = _.MarketName,
-                    OpenBuyOrders = _.OpenBuyOrders,
-                    OpenSellOrders = _.OpenSellOrders,
                     PrevDay = _.PrevDay,
-                    TimeStamp = _.TimeStamp,
                     Volume = _.Volume
                 }).ToList();
         }
@@ -126,22 +123,15 @@ namespace Mynt.Core.Bittrex
                 new Core.Models.OpenOrder
                 {
                     CancelInitiated = _.CancelInitiated,
-                    Closed = _.Closed,
-                    CommissionPaid = _.CommissionPaid,
-                    Condition = _.Condition,
-                    ConditionTarget = _.ConditionTarget,
                     Exchange = _.Exchange,
                     ImmediateOrCancel = _.ImmediateOrCancel,
-                    IsConditional = _.IsConditional,
                     Limit = _.Limit,
-                    Opened = _.Opened,
                     OrderType = _.OrderType,
-                    OrderUuid = _.OrderUuid,
+                    OrderUuid = _.OrderUuid.ToString(),
                     Price = _.Price,
                     PricePerUnit = _.PricePerUnit,
                     Quantity = _.Quantity,
-                    QuantityRemaining = _.QuantityRemaining,
-                    Uuid = _.Uuid
+                    QuantityRemaining = _.QuantityRemaining
                 }).ToList();
         }
 
@@ -177,9 +167,9 @@ namespace Mynt.Core.Bittrex
             return result.Result;
         }
 
-        public async Task<List<Core.Models.Candle>> GetTickerHistory(string market, long startDate, Core.Models.Period period = Core.Models.Period.FiveMinutes)
+        public async Task<List<Core.Models.Candle>> GetTickerHistory(string market, DateTime startDate, Core.Models.Period period = Core.Models.Period.FiveMinutes)
         {
-            var result = await _api.GetTickerHistory(market, startDate, period.ToBittrexEquivalent());
+            var result = await _api.GetTickerHistory(market, startDate.ToUnixTimestamp(), period.ToBittrexEquivalent());
 
             if (!result.Success)
                 throw new Exception($"Bittrex API failure {result.Message}");

@@ -327,7 +327,7 @@ namespace Mynt.Core.Bittrex
         private async Task<List<int>> GetTrend(string tradeMarket)
         {
             var minimumDate = DateTime.UtcNow.AddHours(-120);
-            var candles = await _api.GetTickerHistory(tradeMarket, minimumDate.ToUnixTimestamp(), Core.Models.Period.Hour);
+            var candles = await _api.GetTickerHistory(tradeMarket, minimumDate, Core.Models.Period.Hour);
 
             _strategy.Candles = candles.Where(x => x.Timestamp > minimumDate).ToList();
 

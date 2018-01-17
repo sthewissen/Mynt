@@ -67,45 +67,102 @@ namespace Mynt.Core.Binance
         public async Task<List<MarketSummary>> GetMarketSummaries()
         {
             var symbols = await _client.GetSymbolsPriceTicker();
-            var tasks = symbols.Select(async _=> Tuple.Create<string,SymbolPriceChangeTickerResponse>(_.Symbol, await _client.GetDailyTicker(_.Symbol)));
+            var tasks = symbols.Select(async _ => Tuple.Create<string, SymbolPriceChangeTickerResponse, KlineCandleStickResponse>(
+                _.Symbol, await _client.GetDailyTicker(_.Symbol), await GetLastDaysCandle(_.Symbol)));
             var tickers = await Task.WhenAll(tasks);
             return tickers.Select(_ =>
                 new MarketSummary
                 {
                     Ask= (double)_.Item2.AskPrice,
-                    Bid= (double)_.Item2.BidPrice,
-                    High= (double)_.Item2.HighPrice,
-                    Last=(double)_.Item2.LastPrice,
-                    //Low=(double)_.Item2.LowPrice,
+                    BaseVolume = (double)_.Item3.TakerBuyQuoteAssetVolume,
+                    Bid = (double)_.Item2.BidPrice,
+                    High = (double)_.Item3.High,
+                    Last=(double)_.Item3.Close,
+                    Low = (double)_.Item3.Low,
                     MarketName = _.Item1,
-                    PrevDay = (double)_.Item2.OpenPrice,
-                    Volume = (double)_.Item2.Volume, 
+                    PrevDay = (double)_.Item3.Open,
+                    Volume = (double)_.Item2.Volume,
                 }).ToList();
         }
 
         public async Task<List<OpenOrder>> GetOpenOrders(string market)
         {
-            throw new NotImplementedException();
-
-            var request = new CurrentOpenOrdersRequest { Symbol = market };
+            var request = new CurrentOpenOrdersRequest { Symbol = market  };
             var result = await _client.GetCurrentOpenOrders(request);
 
             return result.Select(_ =>
                 new OpenOrder
                 {
-                    CancelInitiated= (_.Status ==BinanceExchange.API.Enums.OrderStatus.Cancelled || _.Status == BinanceExchange.API.Enums.OrderStatus.PendingCancel),
-                    
+                    CancelInitiated = (_.Status == BinanceExchange.API.Enums.OrderStatus.Cancelled || _.Status == BinanceExchange.API.Enums.OrderStatus.PendingCancel),
+                    Exchange = _.Symbol,
+                    ImmediateOrCancel = (_.TimeInForce == BinanceExchange.API.Enums.TimeInForce.IOC),
+                    Limit = (double)_.StopPrice,
+                    OrderType = $"{_.Type.ToString()}_{_.Side.ToString()}".ToUpper(),
+                    OrderUuid = _.OrderId.ToString(),
+                    Price = (double)(_.Price * _.OriginalQuantity),
+                    PricePerUnit = (double)_.Price,
+                    Quantity = (double)_.OriginalQuantity,
+                    QuantityRemaining = (double)(_.OriginalQuantity - _.ExecutedQuantity)
                 }).ToList();
         }
 
         public async Task<Ticker> GetTicker(string market)
         {
-            throw new NotImplementedException();
+            var result = await _client.GetDailyTicker(market);
+
+            return new Ticker
+            {
+                Ask = (double)result.AskPrice,
+                Bid = (double)result.BidPrice,
+                Last = (double)result.LastPrice
+            };
         }
 
-        public async Task<List<Candle>> GetTickerHistory(string market, long startDate, Period period)
+        public async Task<List<Candle>> GetTickerHistory(string market, DateTime startDate, Period period)
         {
-            throw new NotImplementedException();
+            var endTime = DateTime.UtcNow;
+            var start = startDate;
+            var candles =new List<KlineCandleStickResponse>();
+            while (start < endTime)
+            {
+                var request = new GetKlinesCandlesticksRequest
+                {
+                    Symbol = market,
+                    Interval = (BinanceExchange.API.Enums.KlineInterval)period,
+                    StartTime = start,
+                    EndTime = endTime
+                };
+
+                var candlesticksToAdd = await _client.GetKlinesCandlesticks(request);
+                candles.AddRange(candlesticksToAdd);
+                start = candlesticksToAdd.Count() == 0 ? DateTime.MaxValue : candlesticksToAdd.Max(_ => _.CloseTime);
+            }
+
+            return candles.Select(_ =>
+                new Candle
+                {
+                    Close = (double)_.Close,
+                    High=(double)_.High,
+                    Low=(double)_.Low,
+                    Open=(double)_.Open,
+                    Timestamp=_.OpenTime
+                }
+            ).ToList();
+        }
+
+        private async Task<KlineCandleStickResponse> GetLastDaysCandle(string symbol)
+        {
+            var endTime = DateTime.UtcNow;
+            var startTime = endTime.AddDays(-1);
+            var request = new GetKlinesCandlesticksRequest
+            {
+                Symbol=symbol,
+                StartTime = startTime,
+                EndTime= endTime,
+                Interval= BinanceExchange.API.Enums.KlineInterval.OneDay
+            };
+            var result = await _client.GetKlinesCandlesticks(request);
+            return result.SingleOrDefault();
         }
     }
 }

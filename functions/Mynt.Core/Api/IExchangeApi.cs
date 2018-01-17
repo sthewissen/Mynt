@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Mynt.Core.Models;
 
@@ -18,6 +19,6 @@ namespace Mynt.Core.Api
 
         Task<Ticker> GetTicker(string market);
 
-        Task<List<Candle>> GetTickerHistory(string market, long startDate, Period period);
+        Task<List<Candle>> GetTickerHistory(string market, DateTime startDate, Period period);
     }
 }

@@ -66,7 +66,7 @@ namespace Mynt.Core.NotificationManagers
         private async Task<List<int>> GetTrend(string tradeMarket)
         {
             var minimumDate = DateTime.UtcNow.AddHours(-120);
-            var candles = await _api.GetTickerHistory(tradeMarket, minimumDate.ToUnixTimestamp(), Period.Hour);
+            var candles = await _api.GetTickerHistory(tradeMarket, minimumDate, Period.Hour);
 
             _strategy.Candles = candles.Where(x => x.Timestamp > minimumDate).ToList();
 
