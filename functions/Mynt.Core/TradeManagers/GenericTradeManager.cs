@@ -1,18 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage.Table;
 using Mynt.Core.Api;
-using Mynt.Core.Extensions;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Managers;
 using Mynt.Core.Models;
 
 namespace Mynt.Core.TradeManagers
 {
-    class GenericTradeManager : ITradeManager
+    public class GenericTradeManager : ITradeManager
     {
         private readonly IExchangeApi _api;
         private readonly INotificationManager _notification;
@@ -25,7 +23,7 @@ namespace Mynt.Core.TradeManagers
         private double _oldDayBalance;
         private double _oldTotalBalance;
 
-        public GenericTradeManager(IExchangeApi api /*= new BittrexApi(Constants.IsDryRunning)*/, ITradingStrategy strat, INotificationManager notificationManager, Action<string> log)
+        public GenericTradeManager(IExchangeApi api , ITradingStrategy strat, INotificationManager notificationManager, Action<string> log)
         {
             _api = api;
             _strategy = strat;

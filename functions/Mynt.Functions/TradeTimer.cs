@@ -2,9 +2,11 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
+using Mynt.Core;
 using Mynt.Core.Bittrex;
 using Mynt.Core.NotificationManagers;
 using Mynt.Core.Strategies;
+using Mynt.Core.TradeManagers;
 
 namespace Mynt.Functions
 {
@@ -19,7 +21,7 @@ namespace Mynt.Functions
                 log.Info("Starting processing...");
 
                 // Call the Bittrex Trade manager with the strategy of our choosing.
-                var manager = new BittrexTradeManager(new BigThree(), new PushNotificationManager(), (a) => log.Info(a));
+                var manager = new GenericTradeManager(new BittrexApi(Constants.IsDryRunning), new BigThree(), new PushNotificationManager(), (a) => log.Info(a));
 
                 // Call the process method to start processing the current situation.
                 await manager.Process();

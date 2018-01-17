@@ -175,7 +175,6 @@
   <ItemGroup>
     <Compile Include="BittrexApi.cs" />
     <Compile Include="BittrexClient.cs" />
-    <Compile Include="BittrexTradeManager.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Models\AccountBalance.cs" />
     <Compile Include="Models\ApiResult.cs" />
