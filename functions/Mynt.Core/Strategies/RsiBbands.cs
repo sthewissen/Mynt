@@ -15,16 +15,16 @@ namespace Mynt.Core.Strategies
     public class RsiBbands : ITradingStrategy
     {
         public string Name => "RSI Bbands";
-        public List<Candle> Candles { get; set; }
-        public List<int> Prepare()
+
+        public List<int> Prepare(List<Candle> candles)
         {
             var result = new List<int>();
 
-            var rsi = Candles.Rsi(6);
-            var bbands = Candles.Bbands(200);
-            var closes = Candles.Select(x => x.Close).ToList();
+            var rsi = candles.Rsi(6);
+            var bbands = candles.Bbands(200);
+            var closes = candles.Select(x => x.Close).ToList();
 
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
                 if (i < 1)
                     result.Add(0);

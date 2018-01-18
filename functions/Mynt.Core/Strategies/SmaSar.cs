@@ -9,26 +9,19 @@ namespace Mynt.Core.Strategies
     public class SmaSar : ITradingStrategy
     {
         public string Name => "SMA SAR";
-
-        public List<Candle> Candles { get; set; }
-
-        public SmaSar()
-        {
-            this.Candles = new List<Candle>();
-        }
-
-        public List<int> Prepare()
+        
+        public List<int> Prepare(List<Candle> candles)
         {
             var result = new List<int>();
 
-            var sma = Candles.Sma(60);
-            var sar = Candles.Sar();
-            var highs = Candles.Select(x => x.High).ToList();
-            var lows = Candles.Select(x => x.Low).ToList();
-            var closes = Candles.Select(x => x.Close).ToList();
-            var opens = Candles.Select(x => x.Open).ToList();
+            var sma = candles.Sma(60);
+            var sar = candles.Sar();
+            var highs = candles.Select(x => x.High).ToList();
+            var lows = candles.Select(x => x.Low).ToList();
+            var closes = candles.Select(x => x.Close).ToList();
+            var opens = candles.Select(x => x.Open).ToList();
 
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
                 if (i > 2)
                 {

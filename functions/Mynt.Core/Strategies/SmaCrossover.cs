@@ -9,21 +9,15 @@ namespace Mynt.Core.Strategies
     public class SmaCrossover : ITradingStrategy
     {
         public string Name => "SMA Crossover";
-        public List<Candle> Candles { get; set; }
 
-        public SmaCrossover()
-        {
-            this.Candles = new List<Candle>();
-        }
-
-        public List<int> Prepare()
+        public List<int> Prepare(List<Candle> candles)
         {
             var result = new List<int>();
 
-            var sma12 = Candles.Sma(12);
-            var sma26 = Candles.Sma(26);
+            var sma12 = candles.Sma(12);
+            var sma26 = candles.Sma(26);
 
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
                 // Since we look back 1 candle, the first candle can never be a signal.
                 if (i == 0)

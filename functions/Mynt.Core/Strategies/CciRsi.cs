@@ -12,22 +12,15 @@ namespace Mynt.Core.Strategies
     public class CciRsi : ITradingStrategy
     {
         public string Name => "CCI RSI";
-
-        public List<Candle> Candles { get; set; }
-
-        public CciRsi()
-        {
-            this.Candles = new List<Candle>();
-        }
-
-        public List<int> Prepare()
+        
+        public List<int> Prepare(List<Candle> candles)
         {
             var result = new List<int>();
 
-            var cci = Candles.Cci();
-            var rsi = Candles.Rsi();
+            var cci = candles.Cci();
+            var rsi = candles.Rsi();
 
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
                 if (i == 0)
                     result.Add(0);

@@ -11,23 +11,16 @@ namespace Mynt.Core.Strategies
     public class StochAdx : ITradingStrategy
     {
         public string Name => "Stoch ADX";
-
-        public List<Candle> Candles { get; set; }
-
-        public StochAdx()
-        {
-            this.Candles = new List<Candle>();
-        }
-
-        public List<int> Prepare()
+        
+        public List<int> Prepare(List<Candle> candles)
         {
             var result = new List<int>();
 
-            var stoch = Candles.Stoch(13);
-            var adx = Candles.Adx(14);
-            var bearBull = Candles.BearBull();
+            var stoch = candles.Stoch(13);
+            var adx = candles.Adx(14);
+            var bearBull = candles.BearBull();
 
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
                 if (adx[i] > 50 && (stoch.K[i] > 90 || stoch.D[i] > 90) && bearBull[i] == -1)
                     result.Add(-1);

@@ -12,20 +12,13 @@ namespace Mynt.Core.Strategies
     public class PowerRanger : ITradingStrategy
     {
         public string Name => "Power Ranger";
-
-        public List<Candle> Candles { get; set; }
-
-        public PowerRanger()
-        {
-            this.Candles = new List<Candle>();
-        }
-
-        public List<int> Prepare()
+        
+        public List<int> Prepare(List<Candle> candles)
         {
             var result = new List<int>();
-            var stoch = Candles.Stoch(10);
+            var stoch = candles.Stoch(10);
 
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
                 if (i < 1)
                     result.Add(0);

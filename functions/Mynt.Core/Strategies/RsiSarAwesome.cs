@@ -13,25 +13,18 @@ namespace Mynt.Core.Strategies
     public class RsiSarAwesome : ITradingStrategy
     {
         public string Name => "RSI SAR Awesome";
-
-        public List<Candle> Candles { get; set; }
-
-        public RsiSarAwesome()
-        {
-            this.Candles = new List<Candle>();
-        }
-
-        public List<int> Prepare()
+        
+        public List<int> Prepare(List<Candle> candles)
         {
             var result = new List<int>();
 
-            var sar = Candles.Sar();
-            var rsi = Candles.Rsi(5);
-            var ao = Candles.AwesomeOscillator();
+            var sar = candles.Sar();
+            var rsi = candles.Rsi(5);
+            var ao = candles.AwesomeOscillator();
 
-            var close = Candles.Select(x => x.Close).ToList();
+            var close = candles.Select(x => x.Close).ToList();
 
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
                 if (i >= 2)
                 {

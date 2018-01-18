@@ -12,19 +12,14 @@ namespace Mynt.Core.Strategies
     public class FisherTransform : ITradingStrategy
     {
         public string Name => "Fisher Transform";
-        public List<Candle> Candles { get; set; }
-        public FisherTransform()
+        
+        public List<int> Prepare(List<Candle> candles)
         {
-            this.Candles = new List<Candle>();
-        }
-        public List<int> Prepare()
-        {
-
             var result = new List<int>();
-            var fishers = Candles.Fisher(10);
-            var ao = Candles.AwesomeOscillator();
+            var fishers = candles.Fisher(10);
+            var ao = candles.AwesomeOscillator();
 
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
                 if (i == 0)
                     result.Add(0);

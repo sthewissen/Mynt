@@ -12,23 +12,16 @@ namespace Mynt.Core.Strategies
     public class AwesomeSma : ITradingStrategy
     {
         public string Name => "Awesome SMA";
-
-        public List<Candle> Candles { get; set; }
-
-        public AwesomeSma()
-        {
-            this.Candles = new List<Candle>();
-        }
-
-        public List<int> Prepare()
+        
+        public List<int> Prepare(List<Candle> candles)
         {
             var result = new List<int>();
 
-            var ao = Candles.AwesomeOscillator();
-            var smaShort = Candles.Sma(20);
-            var smaLong = Candles.Sma(40);
+            var ao = candles.AwesomeOscillator();
+            var smaShort = candles.Sma(20);
+            var smaLong = candles.Sma(40);
 
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
                 if (i == 0)
                     result.Add(0);

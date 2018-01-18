@@ -12,23 +12,16 @@ namespace Mynt.Core.Strategies
     public class MacdTema : ITradingStrategy
     {
         public string Name => "MACD TEMA";
-
-        public List<Candle> Candles { get; set; }
-
-        public MacdTema()
-        {
-            this.Candles = new List<Candle>();
-        }
-
-        public List<int> Prepare()
+        
+        public List<int> Prepare(List<Candle> candles)
         {
             var result = new List<int>();
-            var macd = Candles.Macd(12, 26, 9);
-            var tema = Candles.Tema(50);
+            var macd = candles.Macd(12, 26, 9);
+            var tema = candles.Tema(50);
 
-            var close = Candles.Select(x => x.Close).ToList();
+            var close = candles.Select(x => x.Close).ToList();
 
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
                 if (i == 0)
                     result.Add(0);

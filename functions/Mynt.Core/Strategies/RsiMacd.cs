@@ -8,24 +8,16 @@ namespace Mynt.Core.Strategies
 
     public class RsiMacd : ITradingStrategy
     {
-
         public string Name => "RSI MACD";
-
-        public List<Candle> Candles { get; set; }
-
-        public RsiMacd()
-        {
-            this.Candles = new List<Candle>();
-        }
-
-        public List<int> Prepare()
+        
+        public List<int> Prepare(List<Candle> candles)
         {
             var result = new List<int>();
 
-            var _macd = Candles.Macd(24, 52, 18);
-            var _rsi = Candles.Rsi(14);
+            var _macd = candles.Macd(24, 52, 18);
+            var _rsi = candles.Rsi(14);
 
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
                 if (_rsi[i] > 70 && (_macd.Macd[i] - _macd.Signal[i]) < 0)
                     result.Add(-1);

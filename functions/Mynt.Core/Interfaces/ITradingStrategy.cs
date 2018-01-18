@@ -6,7 +6,7 @@ namespace Mynt.Core.Interfaces
     public interface ITradingStrategy
     {
         string Name { get;  }
-        List<Candle> Candles { get; set; }
-        List<int> Prepare();
+
+        List<int> Prepare(List<Candle> candles);
     }
 }

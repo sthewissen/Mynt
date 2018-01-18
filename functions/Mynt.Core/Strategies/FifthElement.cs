@@ -12,21 +12,14 @@ namespace Mynt.Core.Strategies
     public class FifthElement : ITradingStrategy
     {
         public string Name => "5th Element";
-
-        public List<Candle> Candles { get; set; }
-
-        public FifthElement()
-        {
-            this.Candles = new List<Candle>();
-        }
-
-        public List<int> Prepare()
+        
+        public List<int> Prepare(List<Candle> candles)
         {
             var result = new List<int>();
 
-            var macd = Candles.Macd(12, 26, 9);
+            var macd = candles.Macd(12, 26, 9);
 
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
                 if (i < 4)
                     result.Add(0);

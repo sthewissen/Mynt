@@ -15,19 +15,19 @@ namespace Mynt.Core.Strategies
     public class ThreeMAgos : ITradingStrategy
     {
         public string Name => "Three MAgos";
-        public List<Candle> Candles { get; set; }
-        public List<int> Prepare()
+
+        public List<int> Prepare(List<Candle> candles)
         {
             var result = new List<int>();
 
-            var sma = Candles.Sma(15);
-            var ema = Candles.Ema(15);
-            var wma = Candles.Wma(15);
-            var closes = Candles.Select(x => x.Close).ToList();
+            var sma = candles.Sma(15);
+            var ema = candles.Ema(15);
+            var wma = candles.Wma(15);
+            var closes = candles.Select(x => x.Close).ToList();
 
             var bars = new List<string>();
 
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
                 if ((closes[i] > sma[i]) && (closes[i] > ema[i]) && (closes[i] > wma[i]))
                     bars.Add("green");
@@ -38,7 +38,7 @@ namespace Mynt.Core.Strategies
 
             }
             
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
                 if (i < 1)
                     result.Add(0);

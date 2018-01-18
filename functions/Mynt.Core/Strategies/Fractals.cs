@@ -12,8 +12,8 @@ namespace Mynt.Core.Strategies
     public class Fractals : ITradingStrategy
     {
         public string Name => "Fractals";
-        public List<Candle> Candles { get; set; }
-        public List<int> Prepare()
+
+        public List<int> Prepare(List<Candle> candles)
         {
             // Settings for this strat.
             var exitAfterBars = 3;
@@ -26,11 +26,11 @@ namespace Mynt.Core.Strategies
             var fractalAverage = new List<double>();
             var fractalTrend = new List<bool>();
 
-            var ao = Candles.AwesomeOscillator();
-            var high = Candles.Select(x => x.High).ToList();
-            var highLowAvgs = Candles.Select(x => (x.High + x.Low) / 2).ToList();
+            var ao = candles.AwesomeOscillator();
+            var high = candles.Select(x => x.High).ToList();
+            var highLowAvgs = candles.Select(x => (x.High + x.Low) / 2).ToList();
 
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
                 // Calculate the price for this fractal
                 if (i < 4)

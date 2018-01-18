@@ -11,25 +11,18 @@ namespace Mynt.Core.Strategies
     public class EmaAdxMacd : ITradingStrategy
     {
         public string Name => "EMA ADX MACD";
-
-        public List<Candle> Candles { get; set; }
-
-        public EmaAdxMacd()
-        {
-            this.Candles = new List<Candle>();
-        }
-
-        public List<int> Prepare()
+        
+        public List<int> Prepare(List<Candle> candles)
         {
             var result = new List<int>();
 
-            var ema4 = Candles.Ema(4);
-            var ema10 = Candles.Ema(10);
-            var plusDi = Candles.PlusDI(28);
-            var minusDi = Candles.MinusDI(28);
-            var macd = Candles.Macd(5, 10, 4);
+            var ema4 = candles.Ema(4);
+            var ema10 = candles.Ema(10);
+            var plusDi = candles.PlusDI(28);
+            var minusDi = candles.MinusDI(28);
+            var macd = candles.Macd(5, 10, 4);
 
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
                 if(i==0)
                     result.Add(0);

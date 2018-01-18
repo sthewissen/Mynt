@@ -13,27 +13,20 @@ namespace Mynt.Core.Strategies
     public class SarAwesome : ITradingStrategy
     {
         public string Name => "SAR Awesome";
-
-        public List<Candle> Candles { get; set; }
-
-        public SarAwesome()
-        {
-            this.Candles = new List<Candle>();
-        }
-
-        public List<int> Prepare()
+        
+        public List<int> Prepare(List<Candle> candles)
         {
             var result = new List<int>();
 
-            var sar = Candles.Sar();
-            var ema5 = Candles.Ema(5);
-            var ao = Candles.AwesomeOscillator();
+            var sar = candles.Sar();
+            var ema5 = candles.Ema(5);
+            var ao = candles.AwesomeOscillator();
 
-            var close = Candles.Select(x => x.Close).ToList();
-            var highs = Candles.Select(x => x.High).ToList();
-            var lows = Candles.Select(x => x.Low).ToList();
+            var close = candles.Select(x => x.Close).ToList();
+            var highs = candles.Select(x => x.High).ToList();
+            var lows = candles.Select(x => x.Low).ToList();
 
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
                 if (i >= 2)
                 {

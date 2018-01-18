@@ -15,25 +15,18 @@ namespace Mynt.Core.Strategies
     public class EmaAdxF : ITradingStrategy
     {
         public string Name => "EMA ADX F";
-
-        public List<Candle> Candles { get; set; }
-
-        public EmaAdxF()
-        {
-            this.Candles = new List<Candle>();
-        }
-
-        public List<int> Prepare()
+        
+        public List<int> Prepare(List<Candle> candles)
         {
             var result = new List<int>();
 
-            var closes = Candles.Select(x => x.Close).ToList();
-            var ema9 = Candles.Ema(9);
-            var adx = Candles.Adx(14);
-            var minusDI = Candles.MinusDI(14);
-            var plusDI = Candles.PlusDI(14);
+            var closes = candles.Select(x => x.Close).ToList();
+            var ema9 = candles.Ema(9);
+            var adx = candles.Adx(14);
+            var minusDI = candles.MinusDI(14);
+            var plusDI = candles.PlusDI(14);
 
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
                 if (i == 0)
                     result.Add(0);

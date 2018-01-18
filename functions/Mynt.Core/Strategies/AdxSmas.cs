@@ -11,23 +11,16 @@ namespace Mynt.Core.Strategies
     public class AdxSmas : ITradingStrategy
     {
         public string Name => "ADX Smas";
-
-        public List<Candle> Candles { get; set; }
-
-        public AdxSmas()
-        {
-            this.Candles = new List<Candle>();
-        }
-
-        public List<int> Prepare()
+        
+        public List<int> Prepare(List<Candle> candles)
         {
             var result = new List<int>();
 
-            var sma6 = Candles.Sma(3);
-            var sma40 = Candles.Sma(10);
-            var adx = Candles.Adx(14);
+            var sma6 = candles.Sma(3);
+            var sma40 = candles.Sma(10);
+            var adx = candles.Adx(14);
 
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
                 if (i == 0)
                 {

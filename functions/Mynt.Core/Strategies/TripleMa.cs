@@ -12,16 +12,16 @@ namespace Mynt.Core.Strategies
     public class TripleMa : ITradingStrategy
     {
         public string Name => "Triple MA";
-        public List<Candle> Candles { get; set; }
-        public List<int> Prepare()
+
+        public List<int> Prepare(List<Candle> candles)
         {
             var result = new List<int>();
 
-            var sma20 = Candles.Sma(20);
-            var sma50 = Candles.Sma(50);
-            var ema11 = Candles.Ema(11);
+            var sma20 = candles.Sma(20);
+            var sma50 = candles.Sma(50);
+            var ema11 = candles.Ema(11);
 
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
                 if (i == 0)
                     result.Add(0);

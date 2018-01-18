@@ -8,14 +8,14 @@ namespace Mynt.Core.Strategies
     public class SimpleBearBull : ITradingStrategy
     {
         public string Name => "The Bull & The Bear";
-        public List<Candle> Candles { get; set; }
-        public List<int> Prepare()
+
+        public List<int> Prepare(List<Candle> candles)
         {
             var result = new List<int>();
 
-            var closes = Candles.Select(x => x.Close).ToList();
+            var closes = candles.Select(x => x.Close).ToList();
 
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
                 if (i >= 2)
                 {

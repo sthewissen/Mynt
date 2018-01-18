@@ -13,23 +13,16 @@ namespace Mynt.Core.Strategies
     public class BbandRsi : ITradingStrategy
     {
         public string Name => "BBand RSI";
-
-        public List<Candle> Candles { get; set; }
-
-        public BbandRsi()
-        {
-            this.Candles = new List<Candle>();
-        }
-
-        public List<int> Prepare()
+        
+        public List<int> Prepare(List<Candle> candles)
         {
             var result = new List<int>();
 
-            var currentPrices = Candles.Select(x => x.Close).ToList();
-            var bbands = Candles.Bbands(20);
-            var rsi = Candles.Rsi(16);
+            var currentPrices = candles.Select(x => x.Close).ToList();
+            var bbands = candles.Bbands(20);
+            var rsi = candles.Rsi(16);
             
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
                 if (i == 0)
                     result.Add(0);

@@ -12,27 +12,20 @@ namespace Mynt.Core.Strategies
     public class SarRsi : ITradingStrategy
     {
         public string Name => "SAR RSI";
-
-        public List<Candle> Candles { get; set; }
-
-        public SarRsi()
-        {
-            this.Candles = new List<Candle>();
-        }
-
-        public List<int> Prepare()
+        
+        public List<int> Prepare(List<Candle> candles)
         {
             var result = new List<int>();
 
-            var sar = Candles.Sar();
-            var rsi = Candles.Rsi();
+            var sar = candles.Sar();
+            var rsi = candles.Rsi();
 
-            var highs = Candles.Select(x => x.High).ToList();
-            var lows = Candles.Select(x => x.Low).ToList();
-            var closes = Candles.Select(x => x.Close).ToList();
-            var opens = Candles.Select(x => x.Open).ToList();
+            var highs = candles.Select(x => x.High).ToList();
+            var lows = candles.Select(x => x.Low).ToList();
+            var closes = candles.Select(x => x.Close).ToList();
+            var opens = candles.Select(x => x.Open).ToList();
 
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
                 if (i > 2)
                 {

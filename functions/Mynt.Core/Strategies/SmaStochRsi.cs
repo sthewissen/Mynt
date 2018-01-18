@@ -10,24 +10,17 @@ namespace Mynt.Core.Strategies
     public class SmaStochRsi : ITradingStrategy
     {
         public string Name => "SMA Stoch RSI";
-
-        public List<Candle> Candles { get; set; }
-
-        public SmaStochRsi()
-        {
-            this.Candles = new List<Candle>();
-        }
-
-        public List<int> Prepare()
+        
+        public List<int> Prepare(List<Candle> candles)
         {
             var result = new List<int>();
 
-            var price = Candles.Select(x => x.Close).ToList();
-            var stoch = Candles.Stoch(8);
-            var sma150 = Candles.Sma(150);
-            var rsi = Candles.Rsi(3);
+            var price = candles.Select(x => x.Close).ToList();
+            var stoch = candles.Stoch(8);
+            var sma150 = candles.Sma(150);
+            var rsi = candles.Rsi(3);
 
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
                 if (i < 1)
                     result.Add(0);

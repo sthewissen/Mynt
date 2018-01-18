@@ -11,24 +11,17 @@ namespace Mynt.Core.Strategies
     public class Base150 : ITradingStrategy
     {
         public string Name => "Base 150";
-
-        public List<Candle> Candles { get; set; }
-
-        public Base150()
-        {
-            this.Candles = new List<Candle>();
-        }
-
-        public List<int> Prepare()
+        
+        public List<int> Prepare(List<Candle> candles)
         {
             var result = new List<int>();
 
-            var sma6 = Candles.Sma(6);
-            var sma25 = Candles.Sma(25);
-            var sma150 = Candles.Sma(150);
-            var sma365 = Candles.Sma(365);
+            var sma6 = candles.Sma(6);
+            var sma25 = candles.Sma(25);
+            var sma150 = candles.Sma(150);
+            var sma365 = candles.Sma(365);
 
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
                 if (i == 0)
                 {

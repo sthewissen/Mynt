@@ -12,22 +12,16 @@ namespace Mynt.Core.Strategies
     public class CciEma : ITradingStrategy
     {
         public string Name => "CCI EMA";
-        public List<Candle> Candles { get; set; }
 
-        public CciEma()
-        {
-            this.Candles = new List<Candle>();
-        }
-
-        public List<int> Prepare()
+        public List<int> Prepare(List<Candle> candles)
         {
             var result = new List<int>();
 
-            var cci = Candles.Cci(30);
-            var ema8 = Candles.Ema(8);
-            var ema28 = Candles.Ema(28);
+            var cci = candles.Cci(30);
+            var ema8 = candles.Ema(8);
+            var ema28 = candles.Ema(28);
 
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
                 if (i == 0)
                     result.Add(0);

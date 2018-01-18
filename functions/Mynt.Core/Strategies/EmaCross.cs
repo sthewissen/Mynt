@@ -8,21 +8,15 @@ namespace Mynt.Core.Strategies
     public class EmaCross : ITradingStrategy
     {
         public string Name => "EMA Cross";
-        public List<Candle> Candles { get; set; }
 
-        public EmaCross()
-        {
-            this.Candles = new List<Candle>();
-        }
-
-        public List<int> Prepare()
+        public List<int> Prepare(List<Candle> candles)
         {
             var result = new List<int>();
 
-            var ema12 = Candles.Ema(12);
-            var ema26 = Candles.Ema(26);
+            var ema12 = candles.Ema(12);
+            var ema26 = candles.Ema(26);
 
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
                 if (i == 0)
                     result.Add(0);

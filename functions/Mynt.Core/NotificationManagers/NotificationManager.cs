@@ -67,9 +67,7 @@ namespace Mynt.Core.NotificationManagers
         {
             var minimumDate = DateTime.UtcNow.AddHours(-120);
             var candles = await _api.GetTickerHistory(tradeMarket, minimumDate, Period.Hour);
-
-            _strategy.Candles = candles.Where(x => x.Timestamp > minimumDate).ToList();
-
+            
             var signalDate = candles[candles.Count - 1].Timestamp;
 
             // This is an outdated candle...
@@ -77,7 +75,7 @@ namespace Mynt.Core.NotificationManagers
                 return new List<int>() { };
 
             // This calculates a buy signal for each candle.
-            var trend = _strategy.Prepare();
+            var trend = _strategy.Prepare(candles.Where(x => x.Timestamp > minimumDate).ToList());
 
             return trend;
         }

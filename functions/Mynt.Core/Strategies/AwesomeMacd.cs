@@ -11,22 +11,15 @@ namespace Mynt.Core.Strategies
     public class AwesomeMacd : ITradingStrategy
     {
         public string Name => "Awesome MACD";
-
-        public List<Candle> Candles { get; set; }
-
-        public AwesomeMacd()
-        {
-            this.Candles = new List<Candle>();
-        }
-
-        public List<int> Prepare()
+        
+        public List<int> Prepare(List<Candle> candles)
         {
             var result = new List<int>();
 
-            var ao = Candles.AwesomeOscillator();
-            var macd = Candles.Macd(5, 7, 4);
+            var ao = candles.AwesomeOscillator();
+            var macd = candles.Macd(5, 7, 4);
 
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
                 if(i==0)
                     result.Add(0);

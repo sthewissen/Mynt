@@ -12,25 +12,18 @@ namespace Mynt.Core.Strategies
     public class AdxMomentum : ITradingStrategy
     {
         public string Name => "ADX Momentum";
-
-        public List<Candle> Candles { get; set; }
-
-        public AdxMomentum()
-        {
-            this.Candles = new List<Candle>();
-        }
-
-        public List<int> Prepare()
+                
+        public List<int> Prepare(List<Candle> candles)
         {
             var result = new List<int>();
 
-            var adx = Candles.Adx(14);
-            var diPlus = Candles.PlusDI(25);
-            var diMinus = Candles.MinusDI(25);
-            var sar = Candles.Sar();
-            var mom = Candles.Mom(14);
+            var adx = candles.Adx(14);
+            var diPlus = candles.PlusDI(25);
+            var diMinus = candles.MinusDI(25);
+            var sar = candles.Sar();
+            var mom = candles.Mom(14);
 
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
 
                 if (adx[i] > 25 && mom[i] < 0 && diMinus[i] > 25 && diPlus[i] < diMinus[i])

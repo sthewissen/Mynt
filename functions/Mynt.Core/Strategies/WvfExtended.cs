@@ -12,20 +12,18 @@ namespace Mynt.Core.Strategies
     public class WvfExtended : ITradingStrategy
     {
         public string Name => "Williams Vix Fix (Extended)";
-
-        public List<Candle> Candles { get; set; }
-
-        public List<int> Prepare()
+        
+        public List<int> Prepare(List<Candle> candles)
         {
             var result = new List<int>();
 
-            var ao = Candles.AwesomeOscillator();
-            var close = Candles.Select(x => x.Close).ToList();
-            var high = Candles.Select(x => x.High).ToList();
-            var low = Candles.Select(x => x.Low).ToList();
-            var open = Candles.Select(x => x.Open).ToList();
+            var ao = candles.AwesomeOscillator();
+            var close = candles.Select(x => x.Close).ToList();
+            var high = candles.Select(x => x.High).ToList();
+            var low = candles.Select(x => x.Low).ToList();
+            var open = candles.Select(x => x.Open).ToList();
 
-            var stochRsi = Candles.StochRsi(14);
+            var stochRsi = candles.StochRsi(14);
 
             var wvfs = new List<double>();
             var standardDevs = new List<double>();
@@ -42,13 +40,13 @@ namespace Mynt.Core.Strategies
             var mtLB = 14; // Medium-Term Look Back Current Bar Has To Close Below This Value OR Long Term")
             var str = 3; // Entry Price Action Strength--Close > X Bars Back")
 
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
                 var itemsToPick = i < pd - 1 ? i + 1 : pd;
                 var indexToStartFrom = i < pd - 1 ? 0 : i - pd;
 
-                var highestClose = Candles.Skip(indexToStartFrom).Take(itemsToPick).Select(x => x.Close).Max();
-                var wvf = ((highestClose - Candles[i].Low) / (highestClose)) * 100;
+                var highestClose = candles.Skip(indexToStartFrom).Take(itemsToPick).Select(x => x.Close).Max();
+                var wvf = ((highestClose - candles[i].Low) / (highestClose)) * 100;
 
                 // Calculate the WVF
                 wvfs.Add(wvf);
@@ -69,7 +67,7 @@ namespace Mynt.Core.Strategies
 
             var midLines = wvfs.Sma(bbl);
 
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
                 var upperBand = midLines[i] + standardDevs[i];
 
@@ -85,7 +83,7 @@ namespace Mynt.Core.Strategies
                 rangeHighs.Add(rangeHigh);
             }
 
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
                 if (i < ltLB)
                     result.Add(0);

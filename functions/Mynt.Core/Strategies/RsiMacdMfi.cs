@@ -10,26 +10,19 @@ namespace Mynt.Core.Strategies
     public class RsiMacdMfi : ITradingStrategy
     {
         public string Name => "RSI MACD MFI";
-
-        public List<Candle> Candles { get; set; }
-
-        public RsiMacdMfi()
-        {
-            this.Candles = new List<Candle>();
-        }
-
-        public List<int> Prepare()
+        
+        public List<int> Prepare(List<Candle> candles)
         {
             var result = new List<int>();
 
-            var macd = Candles.Macd(5,10,4);
-            var rsi = Candles.Rsi(16);
-            var mfi = Candles.Mfi();
-            var ao = Candles.AwesomeOscillator();
+            var macd = candles.Macd(5,10,4);
+            var rsi = candles.Rsi(16);
+            var mfi = candles.Mfi();
+            var ao = candles.AwesomeOscillator();
 
-            var close = Candles.Select(x => x.Close).ToList();
+            var close = candles.Select(x => x.Close).ToList();
 
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {       
                     if (mfi[i] <30 && rsi[i] < 45 && ao[i] > 0)
                         result.Add(1);

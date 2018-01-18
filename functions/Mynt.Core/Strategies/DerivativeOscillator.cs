@@ -12,17 +12,13 @@ namespace Mynt.Core.Strategies
     public class DerivativeOscillator : ITradingStrategy
     {
         public string Name => "Derivative Oscillator";
-        public List<Candle> Candles { get; set; }
-        public DerivativeOscillator()
-        {
-            this.Candles = new List<Candle>();
-        }
-        public List<int> Prepare()
+
+        public List<int> Prepare(List<Candle> candles)
         {
             var result = new List<int>();
-            var derivativeOsc = Candles.DerivativeOscillator();
+            var derivativeOsc = candles.DerivativeOscillator();
 
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
                 if (i == 0)
                     result.Add(0);

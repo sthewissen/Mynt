@@ -9,27 +9,20 @@ namespace Mynt.Core.Strategies
     public class SarStoch : ITradingStrategy
     {
         public string Name => "SAR Stoch";
-
-        public List<Candle> Candles { get; set; }
-
-        public SarStoch()
-        {
-            this.Candles = new List<Candle>();
-        }
-
-        public List<int> Prepare()
+        
+        public List<int> Prepare(List<Candle> candles)
         {
             var result = new List<int>();
 
-            var stoch = Candles.Stoch(13);
-            var stochFast = Candles.StochFast(13);
-            var sar = Candles.Sar(3);
-            var highs = Candles.Select(x => x.High).ToList();
-            var lows = Candles.Select(x => x.Low).ToList();
-            var closes = Candles.Select(x => x.Close).ToList();
-            var opens = Candles.Select(x => x.Open).ToList();
+            var stoch = candles.Stoch(13);
+            var stochFast = candles.StochFast(13);
+            var sar = candles.Sar(3);
+            var highs = candles.Select(x => x.High).ToList();
+            var lows = candles.Select(x => x.Low).ToList();
+            var closes = candles.Select(x => x.Close).ToList();
+            var opens = candles.Select(x => x.Open).ToList();
 
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
                 if (i > 2)
                 {

@@ -12,19 +12,19 @@ namespace Mynt.Core.Strategies
     public class MacdSma : ITradingStrategy
     {
         public string Name => "MACD SMA";
-        public List<Candle> Candles { get; set; }
-        public List<int> Prepare()
+
+        public List<int> Prepare(List<Candle> candles)
         {
             var result = new List<int>();
 
-            var macd = Candles.Macd();
-            var fastMa = Candles.Sma(12);
-            var slowMa = Candles.Sma(26);
-            var sma200 = Candles.Sma(200);
+            var macd = candles.Macd();
+            var fastMa = candles.Sma(12);
+            var slowMa = candles.Sma(26);
+            var sma200 = candles.Sma(200);
 
-            var closes = Candles.Select(x => x.Close).ToList();
+            var closes = candles.Select(x => x.Close).ToList();
             
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
                 if (i < 25)
                     result.Add(0);

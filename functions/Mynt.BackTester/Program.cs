@@ -137,25 +137,25 @@ namespace Mynt.BackTester
                 var data = JsonConvert.DeserializeObject<ApiResult<List<Core.Bittrex.Models.Candle>>>(dataString);
 
                 // This creates a list of buy signals.
-                strategy.Candles = data.Result.ToGenericCandles();
-                var trend = strategy.Prepare();
+                var candles = data.Result.ToGenericCandles();
+                var trend = strategy.Prepare(candles);
 
                 for (int i = 0; i < trend.Count; i++)
                 {
                     if (trend[i] == 1)
                     {
                         // This is a buy signal
-                        var trade = new Trade() { OpenRate = strategy.Candles[i].Close, OpenDate = strategy.Candles[i].Timestamp, Quantity = 1 };
+                        var trade = new Trade() { OpenRate = candles[i].Close, OpenDate = candles[i].Timestamp, Quantity = 1 };
 
                         // Calculate win/lose forwards from buy point
                         for (int j = i; j < trend.Count; j++)
                         {
                             // There are 2 ways we can sell, either through the strategy telling us to do so (-1)
                             // or because other conditions such as the ROI or stoploss tell us to.
-                            if (trend[j] == -1 || ShouldSell(trade, strategy.Candles[j].Close, strategy.Candles[j].Timestamp) != SellType.None)
+                            if (trend[j] == -1 || ShouldSell(trade, candles[j].Close, candles[j].Timestamp) != SellType.None)
                             {
                                 // Bittrex charges 0,25% transaction fee, so deduct that.
-                                var currentProfit = 0.995 * ((strategy.Candles[j].Close - trade.OpenRate) / trade.OpenRate);
+                                var currentProfit = 0.995 * ((candles[j].Close - trade.OpenRate) / trade.OpenRate);
                                 results.Add(new BackTestResult { Currency = pair, Profit = currentProfit, Duration = j - i });
                                 break;
                             }
@@ -201,8 +201,8 @@ namespace Mynt.BackTester
                         var data = JsonConvert.DeserializeObject<ApiResult<List<Core.Bittrex.Models.Candle>>>(dataString);
 
                         // This creates a list of buy signals.
-                        strategy.Candles = data.Result.ToGenericCandles();
-                        var trend = strategy.Prepare();
+                        var candles = data.Result.ToGenericCandles();
+                        var trend = strategy.Prepare(candles);
 
                         for (int i = 0; i < trend.Count; i++)
                         {
@@ -211,17 +211,17 @@ namespace Mynt.BackTester
                                 // This is a buy signal
                                 var trade = new Trade()
                                 {
-                                    OpenRate = strategy.Candles[i].Close,
-                                    OpenDate = strategy.Candles[i].Timestamp,
+                                    OpenRate = candles[i].Close,
+                                    OpenDate = candles[i].Timestamp,
                                     Quantity = 1
                                 };
 
                                 // Calculate win/lose forwards from buy point
                                 for (int j = i; j < trend.Count; j++)
                                 {
-                                    if (trend[j] == -1 || ShouldSell(trade, strategy.Candles[j].Close, strategy.Candles[j].Timestamp) != SellType.None)
+                                    if (trend[j] == -1 || ShouldSell(trade, candles[j].Close, candles[j].Timestamp) != SellType.None)
                                     {
-                                        var currentProfit = 0.995 * ((strategy.Candles[j].Close - trade.OpenRate) / trade.OpenRate);
+                                        var currentProfit = 0.995 * ((candles[j].Close - trade.OpenRate) / trade.OpenRate);
                                         results.Add(new BackTestResult
                                         {
                                             Currency = pair,
@@ -272,11 +272,9 @@ namespace Mynt.BackTester
                             var data = JsonConvert.DeserializeObject<ApiResult<List<Core.Bittrex.Models.Candle>>>(dataString);
 
                             // This creates a list of buy signals.
-                            strategy1.Candles = data.Result.ToGenericCandles();
-                            var trend1 = strategy1.Prepare();
-
-                            strategy2.Candles = data.Result.ToGenericCandles();
-                            var trend2 = strategy2.Prepare();
+                            var candles = data.Result.ToGenericCandles();
+                            var trend1 = strategy1.Prepare(candles);                            
+                            var trend2 = strategy2.Prepare(candles);
 
                             for (int i = 0; i < trend1.Count; i++)
                             {
@@ -285,17 +283,17 @@ namespace Mynt.BackTester
                                     // This is a buy signal
                                     var trade = new Trade()
                                     {
-                                        OpenRate = strategy1.Candles[i].Close,
-                                        OpenDate = strategy1.Candles[i].Timestamp,
+                                        OpenRate = candles[i].Close,
+                                        OpenDate = candles[i].Timestamp,
                                         Quantity = 1
                                     };
 
                                     // Calculate win/lose forwards from buy point
                                     for (int j = i; j < trend1.Count; j++)
                                     {
-                                        if (trend1[j] == -1 || trend2[j] == -1 || ShouldSell(trade, strategy1.Candles[j].Close, strategy1.Candles[j].Timestamp) != SellType.None)
+                                        if (trend1[j] == -1 || trend2[j] == -1 || ShouldSell(trade, candles[j].Close, candles[j].Timestamp) != SellType.None)
                                         {
-                                            var currentProfit = 0.995 * ((strategy1.Candles[j].Close - trade.OpenRate) / trade.OpenRate);
+                                            var currentProfit = 0.995 * ((candles[j].Close - trade.OpenRate) / trade.OpenRate);
                                             results.Add(new BackTestResult
                                             {
                                                 Currency = pair,
@@ -374,11 +372,9 @@ namespace Mynt.BackTester
                             var data = JsonConvert.DeserializeObject<ApiResult<List<Core.Bittrex.Models.Candle>>>(dataString);
 
                             // This creates a list of buy signals.
-                            entryStrat.Candles = data.Result.ToGenericCandles();
-                            var trend1 = entryStrat.Prepare();
-
-                            exitStrat.Candles = data.Result.ToGenericCandles();
-                            var trend2 = exitStrat.Prepare();
+                            var candles = data.Result.ToGenericCandles();
+                            var trend1 = entryStrat.Prepare(candles);
+                            var trend2 = exitStrat.Prepare(candles);
 
                             for (int i = 0; i < trend1.Count; i++)
                             {
@@ -387,17 +383,17 @@ namespace Mynt.BackTester
                                     // This is a buy signal
                                     var trade = new Trade()
                                     {
-                                        OpenRate = entryStrat.Candles[i].Close,
-                                        OpenDate = entryStrat.Candles[i].Timestamp,
+                                        OpenRate = candles[i].Close,
+                                        OpenDate = candles[i].Timestamp,
                                         Quantity = 1
                                     };
 
                                     // Calculate win/lose forwards from buy point
                                     for (int j = i; j < trend1.Count; j++)
                                     {
-                                        if (trend2[j] == -1 || ShouldSell(trade, entryStrat.Candles[j].Close, entryStrat.Candles[j].Timestamp) != SellType.None)
+                                        if (trend2[j] == -1 || ShouldSell(trade, candles[j].Close, candles[j].Timestamp) != SellType.None)
                                         {
-                                            var currentProfit = 0.995 * ((entryStrat.Candles[j].Close - trade.OpenRate) / trade.OpenRate);
+                                            var currentProfit = 0.995 * ((candles[j].Close - trade.OpenRate) / trade.OpenRate);
                                             results.Add(new BackTestResult
                                             {
                                                 Currency = pair,
