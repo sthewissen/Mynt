@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2020
+VisualStudioVersion = 15.0.27130.2024
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mynt.Functions", "Mynt.Functions\Mynt.Functions.csproj", "{30DE788A-0914-4842-9AC7-3A65E2397DB6}"
 EndProject
@@ -17,6 +17,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.Core.Bittrex", "Mynt.Core.Bittrex\Mynt.Core.Bittrex.csproj", "{626D9760-282C-4ADF-8C56-DBA91DE01E87}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.Core.Binance", "Mynt.Core.Binance\Mynt.Core.Binance.csproj", "{F34D0F30-7063-48BE-80A9-B7974A7ECF76}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.Core.Tests", "Mynt.Core.Tests\Mynt.Core.Tests.csproj", "{BA80095C-5B5B-466C-AE44-3A9DBC08E123}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -44,6 +46,10 @@ Global
 		{F34D0F30-7063-48BE-80A9-B7974A7ECF76}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F34D0F30-7063-48BE-80A9-B7974A7ECF76}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F34D0F30-7063-48BE-80A9-B7974A7ECF76}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA80095C-5B5B-466C-AE44-3A9DBC08E123}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA80095C-5B5B-466C-AE44-3A9DBC08E123}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA80095C-5B5B-466C-AE44-3A9DBC08E123}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA80095C-5B5B-466C-AE44-3A9DBC08E123}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
