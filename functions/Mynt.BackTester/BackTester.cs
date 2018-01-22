@@ -13,15 +13,14 @@ using EmaCross = Mynt.Core.Strategies.EmaCross;
 
 namespace Mynt.BackTester
 {
-    public class Program
+    public class BackTester
     {
-
         #region trading variables
 
         // As soon as our profit dips below this percentage we sell.
-        public const double StopLossPercentage = -0.05;
+        private const double stopLossPercentage = -0.05;
 
-        public static readonly List<(int Duration, double Profit)> ReturnOnInvestment = new List<ValueTuple<int, double>>()
+        private readonly List<(int Duration, double Profit)> returnOnInvestment = new List<ValueTuple<int, double>>()
         {
             // These values determine how much time we want to way for profits.
             new ValueTuple<int, double>(5, 0.03), // If the profit percentage is above 3% after 5 minutes, we sell
@@ -31,7 +30,7 @@ namespace Mynt.BackTester
             new ValueTuple<int, double>(0, 0.05)  // If the profit percentage is above 5% we always sell
         };
 
-        private static readonly List<string> CoinsToBuy = new List<string>() {
+        private readonly List<string> coinsToBuy = new List<string>() {
             // These are the coins we're interested in. 
             // This is what we have some backtest data for. 
             // You can always add more backtest data by saving data from the Bittrex API.
@@ -39,7 +38,7 @@ namespace Mynt.BackTester
              "btc-pivx", "btc-qtum", "btc-mtl", "btc-etc", "btc-ltc"
         };
 
-        public static readonly List<double> StopLossAnchors = new List<double>()
+        private readonly List<double> stopLossAnchors = new List<double>()
         {
             // Use these to anchor in your profits. As soon as one of these profit percentages
             // has been reached we adjust our stop loss to become that percentage. 
@@ -47,7 +46,7 @@ namespace Mynt.BackTester
             0.01, 0.02, 0.03, 0.05, 0.08, 0.13, 0.21
         };
 
-        public static readonly List<ITrait> Traits = new List<ITrait>()
+        private readonly List<ITrait> traits = new List<ITrait>()
         {
             new Traits.Cci(),
             new Traits.Cmo(),
@@ -57,67 +56,26 @@ namespace Mynt.BackTester
             new Traits.SmaCross()
         };
 
-        public static readonly List<ITradingStrategy> Strategies = new List<ITradingStrategy>()
+        private readonly List<ITradingStrategy> strategies;
+        #endregion
+
+        #region constructors
+
+        public BackTester(List<ITradingStrategy> strategies)
         {
-            // The strategies we want to backtest.
-            new AdxMomentum(),
-            new AdxSmas(),
-            new AwesomeMacd(),
-            new AwesomeSma(),
-            new Base150(),
-            new BbandRsi(),
-            new BigThree(),
-            new BreakoutMa(),
-            new BuyAndHold(),
-            new CciEma(),
-            new CciRsi(),
-            new CciScalper(),
-            new DerivativeOscillator(),
-            new DoubleVolatility(),
-            new EmaAdx(),
-            new EmaAdxF(),
-            new EmaAdxMacd(),
-            new EmaAdxSmall(),
-            new EmaCross(),
-            new EmaStochRsi(),
-            new FaMaMaMa(),
-            new FifthElement(),
-            new Fractals(),
-            new FreqTrade(),
-            new MacdSma(),
-            new MacdTema(),
-            new Momentum(),
-            new PowerRanger(),
-            new RsiBbands(),
-            new RsiMacd(),
-            new RsiMacdAwesome(),
-            new RsiMacdMfi(),
-            new RsiSarAwesome(),
-            new SarAwesome(),
-            new SarRsi(),
-            new SarStoch(),
-            new SimpleBearBull(),
-            new SmaCrossover(),
-            new SmaSar(),
-            new SmaStochRsi(),
-            new StochAdx(),
-            new ThreeMAgos(),
-            new TripleMa(),
-            new Wvf(),
-            new WvfExtended()
-        };
+            this.strategies = strategies;
+        }
 
         #endregion
 
-
         #region backtesting
 
-        private static void BackTest(ITradingStrategy strategy)
+        private void BackTest(ITradingStrategy strategy)
         {
             var results = new List<BackTestResult>();
 
             // Go through our coinpairs and backtest them.
-            foreach (var pair in CoinsToBuy)
+            foreach (var pair in coinsToBuy)
             {
                 var dataString = File.ReadAllText($"Data/{pair}.json");
                 var data = JsonConvert.DeserializeObject<ApiResult<List<Core.Bittrex.Models.Candle>>>(dataString);
@@ -155,7 +113,7 @@ namespace Mynt.BackTester
             Console.WriteLine();
 
             // Prints the results for each coin for this strategy.
-            foreach (var pair in CoinsToBuy)
+            foreach (var pair in coinsToBuy)
             {
                 Console.Write($"\t{pair.ToUpper()}:".PadRight(15, ' '));
                 PrintResults(results.Where(x => x.Currency == pair).ToList());
@@ -167,7 +125,7 @@ namespace Mynt.BackTester
             WriteSeparator();
         }
 
-        private static void BackTestAll()
+        private void BackTestAll()
         {
 
             Console.WriteLine();
@@ -175,13 +133,13 @@ namespace Mynt.BackTester
                 $"\t=============== BACKTESTING REPORT ===============");
             Console.WriteLine();
 
-            foreach (var strategy in Strategies.OrderBy(x => x.Name))
+            foreach (var strategy in strategies.OrderBy(x => x.Name))
             {
                 try
                 {
                     var results = new List<BackTestResult>();
 
-                    foreach (var pair in CoinsToBuy)
+                    foreach (var pair in coinsToBuy)
                     {
                         var dataString = File.ReadAllText($"Data/{pair}.json");
                         var data = JsonConvert.DeserializeObject<ApiResult<List<Core.Bittrex.Models.Candle>>>(dataString);
@@ -232,9 +190,8 @@ namespace Mynt.BackTester
 
             WriteSeparator();
         }
-
-
-        private static void BackTestCombinations()
+        
+        private void BackTestCombinations()
         {
 
             Console.WriteLine();
@@ -244,15 +201,15 @@ namespace Mynt.BackTester
 
             var stratResults = new List<StrategyResult>();
 
-            foreach (var strategy1 in Strategies.Where(x => x.Name.ToUpper() == "CCI RSI").OrderBy(x => x.Name))
+            foreach (var strategy1 in strategies.Where(x => x.Name.ToUpper() == "CCI RSI").OrderBy(x => x.Name))
             {
-                foreach (var strategy2 in Strategies.OrderBy(x => x.Name))
+                foreach (var strategy2 in strategies.OrderBy(x => x.Name))
                 {
                     try
                     {
                         var results = new List<BackTestResult>();
 
-                        foreach (var pair in CoinsToBuy)
+                        foreach (var pair in coinsToBuy)
                         {
                             var dataString = File.ReadAllText($"Data/{pair}.json");
                             var data = JsonConvert.DeserializeObject<ApiResult<List<Core.Bittrex.Models.Candle>>>(dataString);
@@ -334,7 +291,7 @@ namespace Mynt.BackTester
             PrintResults(stratResults);
         }
 
-        private static void BackTestEntryExit()
+        private void BackTestEntryExit()
         {
 
             Console.WriteLine();
@@ -344,15 +301,15 @@ namespace Mynt.BackTester
 
             var stratResults = new List<StrategyResult>();
 
-            foreach (var entryStrat in Strategies.OrderBy(x => x.Name))
+            foreach (var entryStrat in strategies.OrderBy(x => x.Name))
             {
-                foreach (var exitStrat in Strategies.OrderBy(x => x.Name))
+                foreach (var exitStrat in strategies.OrderBy(x => x.Name))
                 {
                     try
                     {
                         var results = new List<BackTestResult>();
 
-                        foreach (var pair in CoinsToBuy)
+                        foreach (var pair in coinsToBuy)
                         {
                             var dataString = File.ReadAllText($"Data/{pair}.json");
                             var data = JsonConvert.DeserializeObject<ApiResult<List<Core.Bittrex.Models.Candle>>>(dataString);
@@ -434,7 +391,7 @@ namespace Mynt.BackTester
             PrintResults(stratResults);
         }
 
-        private static void BackTestTraits()
+        private void BackTestTraits()
         {
 
             Console.WriteLine();
@@ -471,7 +428,7 @@ namespace Mynt.BackTester
                 {
                     var results = new List<BackTestResult>();
 
-                    foreach (var pair in CoinsToBuy)
+                    foreach (var pair in coinsToBuy)
                     {
                         var dataString = File.ReadAllText($"Data/{pair}.json");
                         var data = JsonConvert.DeserializeObject<ApiResult<List<Core.Bittrex.Models.Candle>>>(dataString);
@@ -572,25 +529,25 @@ namespace Mynt.BackTester
             PrintResults(stratResults);
         }
 
-        private static SellType ShouldSell(Trade trade, double currentRateBid, DateTime utcNow)
+        private SellType ShouldSell(Trade trade, double currentRateBid, DateTime utcNow)
         {
             var currentProfit = (currentRateBid - trade.OpenRate) / trade.OpenRate;
 
-            if (currentProfit < StopLossPercentage)
+            if (currentProfit < stopLossPercentage)
                 return SellType.StopLoss;
 
             if (currentProfit < trade.StopLossAnchor)
                 return SellType.StopLossAnchor;
 
             // Set a stop loss anchor to minimize losses.
-            foreach (var item in StopLossAnchors)
+            foreach (var item in stopLossAnchors)
             {
                 if (currentProfit > item)
                     trade.StopLossAnchor = item - 0.01;
             }
 
             // Check if time matches and current rate is above threshold
-            foreach (var item in ReturnOnInvestment)
+            foreach (var item in returnOnInvestment)
             {
                 var timeDiff = (utcNow - trade.OpenDate).TotalSeconds / 60;
 
@@ -605,7 +562,7 @@ namespace Mynt.BackTester
 
         #region results
 
-        private static void PrintResults(List<StrategyResult> results)
+        private void PrintResults(List<StrategyResult> results)
         {
 
             WriteSeparator();
@@ -617,7 +574,7 @@ namespace Mynt.BackTester
             WriteSeparator();
         }
 
-        private static void PrintResults(List<BackTestResult> results)
+        private void PrintResults(List<BackTestResult> results)
         {
             var color = results.Select(x => x.Profit).Sum() > 0 ? ConsoleColor.Green : ConsoleColor.Red;
 
@@ -636,7 +593,7 @@ namespace Mynt.BackTester
 
         #region console bootstrapping
 
-        public static void PresentMenuToUser()
+        public void PresentMenuToUser()
         {
             while (true)
             {
@@ -652,7 +609,7 @@ namespace Mynt.BackTester
                 switch (result)
                 {
                     case "1":
-                        var strats = Strategies.OrderBy(x => x.Name).ToList();
+                        var strats = strategies.OrderBy(x => x.Name).ToList();
 
                         for (int i = 0; i < strats.Count; i++)
                         {
@@ -699,7 +656,7 @@ namespace Mynt.BackTester
             }
         }
 
-        public static void WriteIntro()
+        public void WriteIntro()
         {
             Console.WriteLine();
 
@@ -716,7 +673,7 @@ namespace Mynt.BackTester
             Console.WriteLine(@"                   \______/");
         }
 
-        public static void WriteColoredLine(string line, ConsoleColor color, bool padded = false)
+        public void WriteColoredLine(string line, ConsoleColor color, bool padded = false)
         {
             Console.ForegroundColor = color;
             if (padded) Console.WriteLine();
@@ -725,7 +682,7 @@ namespace Mynt.BackTester
             Console.ResetColor();
         }
 
-        private static void WriteMenu()
+        private void WriteMenu()
         {
             Console.WriteLine("\t1. Run a single strategy");
             Console.WriteLine("\t2. Run all strategies");
@@ -738,7 +695,7 @@ namespace Mynt.BackTester
             Console.Write("\tWhat do you want to do? ");
         }
                 
-        private static void WriteColored(string line, ConsoleColor color, bool padded = false)
+        private void WriteColored(string line, ConsoleColor color, bool padded = false)
         {
             Console.ForegroundColor = color;
             if (padded) Console.WriteLine();
@@ -747,7 +704,7 @@ namespace Mynt.BackTester
             Console.ResetColor();
         }
 
-        private static void WriteSeparator()
+        private void WriteSeparator()
         {
             Console.WriteLine();
             Console.WriteLine("\t============================================================");
