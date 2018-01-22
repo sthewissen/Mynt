@@ -30,13 +30,12 @@ namespace Mynt.BackTester
             new ValueTuple<int, double>(0, 0.05)  // If the profit percentage is above 5% we always sell
         };
 
-        private readonly List<string> coinsToBuy = new List<string>() {
-            // These are the coins we're interested in. 
-            // This is what we have some backtest data for. 
-            // You can always add more backtest data by saving data from the Bittrex API.
-            "btc-eth", "btc-neo", "btc-omg", "btc-edg", "btc-pay",
-             "btc-pivx", "btc-qtum", "btc-mtl", "btc-etc", "btc-ltc"
-        };
+        // These are the coins we're interested in. 
+        // This is what we have some backtest data for. 
+        // You can always add more backtest data by saving data from the Bittrex API.
+        private readonly List<string> coinsToBuy;
+            
+
 
         private readonly List<double> stopLossAnchors = new List<double>()
         {
@@ -61,8 +60,14 @@ namespace Mynt.BackTester
 
         #region constructors
 
-        public BackTester(List<ITradingStrategy> strategies)
+        public BackTester(List<ITradingStrategy> strategies, string coinsToBuyCsv)
         {
+            // Create Data Folder
+            if (!Directory.Exists(GetDataDirectory()))
+                Directory.CreateDirectory(GetDataDirectory());
+
+            coinsToBuy = coinsToBuyCsv.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList();            
+
             this.strategies = strategies;
         }
 
@@ -78,10 +83,10 @@ namespace Mynt.BackTester
             foreach (var pair in coinsToBuy)
             {
                 var dataString = File.ReadAllText($"Data/{pair}.json");
-                var data = JsonConvert.DeserializeObject<ApiResult<List<Core.Bittrex.Models.Candle>>>(dataString);
+
 
                 // This creates a list of buy signals.
-                var candles = data.Result.ToGenericCandles();
+                var candles = JsonConvert.DeserializeObject<List<Core.Models.Candle>>(dataString);
                 var trend = strategy.Prepare(candles);
 
                 for (int i = 0; i < trend.Count; i++)
@@ -142,10 +147,9 @@ namespace Mynt.BackTester
                     foreach (var pair in coinsToBuy)
                     {
                         var dataString = File.ReadAllText($"Data/{pair}.json");
-                        var data = JsonConvert.DeserializeObject<ApiResult<List<Core.Bittrex.Models.Candle>>>(dataString);
 
                         // This creates a list of buy signals.
-                        var candles = data.Result.ToGenericCandles();
+                        var candles = JsonConvert.DeserializeObject<List<Core.Models.Candle>>(dataString);
                         var trend = strategy.Prepare(candles);
 
                         for (int i = 0; i < trend.Count; i++)
@@ -212,10 +216,9 @@ namespace Mynt.BackTester
                         foreach (var pair in coinsToBuy)
                         {
                             var dataString = File.ReadAllText($"Data/{pair}.json");
-                            var data = JsonConvert.DeserializeObject<ApiResult<List<Core.Bittrex.Models.Candle>>>(dataString);
 
                             // This creates a list of buy signals.
-                            var candles = data.Result.ToGenericCandles();
+                            var candles = JsonConvert.DeserializeObject<List<Core.Models.Candle>>(dataString);
                             var trend1 = strategy1.Prepare(candles);                            
                             var trend2 = strategy2.Prepare(candles);
 
@@ -312,10 +315,9 @@ namespace Mynt.BackTester
                         foreach (var pair in coinsToBuy)
                         {
                             var dataString = File.ReadAllText($"Data/{pair}.json");
-                            var data = JsonConvert.DeserializeObject<ApiResult<List<Core.Bittrex.Models.Candle>>>(dataString);
 
                             // This creates a list of buy signals.
-                            var candles = data.Result.ToGenericCandles();
+                            var candles = JsonConvert.DeserializeObject<List<Core.Models.Candle>>(dataString);
                             var trend1 = entryStrat.Prepare(candles);
                             var trend2 = exitStrat.Prepare(candles);
 
@@ -431,10 +433,9 @@ namespace Mynt.BackTester
                     foreach (var pair in coinsToBuy)
                     {
                         var dataString = File.ReadAllText($"Data/{pair}.json");
-                        var data = JsonConvert.DeserializeObject<ApiResult<List<Core.Bittrex.Models.Candle>>>(dataString);
 
                         // This creates a list of buy signals.
-                        var candles = data.Result.ToGenericCandles();
+                        var candles = JsonConvert.DeserializeObject<List<Core.Models.Candle>>(dataString);
 
                         var cci = new Traits.Cci().Create(candles);
                         var mfi = new Traits.Mfi().Create(candles);
@@ -648,6 +649,14 @@ namespace Mynt.BackTester
                         BackTestTraits();
                         continue;
                     case "6":
+                        Console.WriteLine("\tRefreshing case. Starting...");
+                        RefreshCandleData().Wait();
+                        continue;
+                    case "7":
+                        Console.WriteLine("\tCopy example data. Starting...");
+                        CopyExampleCandleData();
+                        continue;
+                    case "8":
                     default:
                         Environment.Exit(1);
                         break;
@@ -684,17 +693,28 @@ namespace Mynt.BackTester
 
         private void WriteMenu()
         {
+            TimeSpan cacheAge = GetCacheAge();
+
             Console.WriteLine("\t1. Run a single strategy");
             Console.WriteLine("\t2. Run all strategies");
             Console.WriteLine("\t3. Combine 2 strategies");
             Console.WriteLine("\t4. Combine entry/exit strategies");
             Console.WriteLine("\t5. Combine traits");
-            Console.WriteLine("\t6. Close the tool");
+            Console.WriteLine("\t6. Refresh candle data");
+            Console.WriteLine("\t7. Copy example candle data");
+            Console.WriteLine("\t8. Close the tool");
+            Console.WriteLine();
+
+            if (cacheAge == TimeSpan.MinValue)
+                WriteColoredLine("\tCache is empty. You must refresh (6) or copy example data (7).", ConsoleColor.Red);
+            else
+                Console.WriteLine($"\tCache age: {cacheAge}"); // Ofcourse indivual files could differ in time
+
 
             Console.WriteLine();
             Console.Write("\tWhat do you want to do? ");
         }
-                
+
         private void WriteColored(string line, ConsoleColor color, bool padded = false)
         {
             Console.ForegroundColor = color;
@@ -709,6 +729,104 @@ namespace Mynt.BackTester
             Console.WriteLine();
             Console.WriteLine("\t============================================================");
             Console.WriteLine();
+        }
+
+        private void ActionCompleted()
+        {
+            WriteColoredLine("\tCompleted...", ConsoleColor.DarkGreen);
+            WriteColoredLine("\tPress key to continue...", ConsoleColor.Gray);
+            Console.ReadKey();
+            Console.Clear();
+            WriteIntro();
+            Console.WriteLine();
+            Console.WriteLine();
+        }
+
+        #endregion
+
+        #region data management
+
+        static string GetDataDirectory()
+        {
+            string basePath = AppDomain.CurrentDomain.BaseDirectory;
+            return Path.Combine(basePath, "Data");
+        }
+
+        static string GetJsonFilePath(string pair)
+        {
+            string basePath = AppDomain.CurrentDomain.BaseDirectory;
+            return Path.Combine(GetDataDirectory(), $"{pair}.json");
+        }
+
+        public void CopyExampleCandleData()
+        {
+            string examplesPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ExampleData");
+            string dataPath = GetDataDirectory();
+
+            // Clear current data directory
+            foreach (FileInfo fi in new DirectoryInfo(dataPath).EnumerateFiles())
+                File.Delete(fi.FullName);
+
+            // Copy all files
+            foreach (FileInfo fi in new DirectoryInfo(examplesPath).EnumerateFiles())
+                File.Copy(fi.FullName, Path.Combine(dataPath, fi.Name));
+
+            // Finish up.
+            ActionCompleted();
+        }
+
+        public async System.Threading.Tasks.Task RefreshCandleData()
+        {
+            DateTime startDate = DateTime.Now.AddDays(-30);
+            var period = Core.Models.Period.FiveMinutes;
+
+            BittrexApi api = new BittrexApi(true);
+
+            List<string> writtenFiles = new List<string>();
+
+            foreach (var coinToBuy in coinsToBuy)
+            {
+                WriteColoredLine($"\tRefreshing {coinToBuy}", ConsoleColor.DarkGreen);
+
+                var candles = await api.GetTickerHistory(coinToBuy, startDate, period);
+                var jsonPath = GetJsonFilePath(coinToBuy);
+
+                if (File.Exists(jsonPath))
+                    File.Delete(jsonPath);
+
+                try
+                {
+                    File.WriteAllText(jsonPath, JsonConvert.SerializeObject(candles));
+                    WriteColoredLine($"\tWritten {coinToBuy}", ConsoleColor.DarkGreen);
+                    writtenFiles.Add(jsonPath);
+                }
+                catch (Exception e)
+                {
+                    WriteColoredLine($"\tRefreshCache failed for {coinToBuy}: {e.Message}", ConsoleColor.Red);
+                }
+            }
+
+            // Delete everything that's not refreshed
+            foreach (FileInfo fi in new DirectoryInfo(GetDataDirectory()).EnumerateFiles())
+            {
+                if (!writtenFiles.Contains(fi.FullName))
+                    File.Delete(fi.FullName);
+            }
+
+            // Finish up.
+            ActionCompleted();
+        }
+
+        static TimeSpan GetCacheAge()
+        {
+            string dataFolder = Path.GetDirectoryName(GetJsonFilePath("dummy-dummy"));
+
+            if (Directory.GetFiles(dataFolder).Length == 0)
+                return TimeSpan.MinValue;
+
+            FileSystemInfo fileInfo = new DirectoryInfo(dataFolder).GetFileSystemInfos().OrderBy(fi => fi.CreationTime).First();
+
+            return DateTime.Now - fileInfo.LastWriteTime;
         }
 
         #endregion

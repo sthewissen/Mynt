@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<appSettings>
+	<add key="CoinsToBuy" value="btc-eth,btc-neo,btc-dash,btc-xrp" />		
+</appSettings>

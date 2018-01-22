@@ -12,7 +12,9 @@ namespace Mynt.BackTester.Console
     {
         static void Main(string[] args)
         {
-            var backTester = new BackTester(GetTradingStrategies());
+            string coinsToBuyCsv = System.Configuration.ConfigurationManager.AppSettings["CoinsToBuy"];
+
+            var backTester = new BackTester(GetTradingStrategies(), coinsToBuyCsv);
             try
             {
                 backTester.WriteIntro();
