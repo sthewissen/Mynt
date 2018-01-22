@@ -372,7 +372,7 @@ namespace Mynt.Core.TradeManagers
         private async Task<double> ExecuteSellOrder(Trade trade, double currentRateBid, double balance)
         {
             // Calculate our profit.
-            var investment = (Constants.AmountOfBtcToInvestPerTrader * (1 - Constants.TransactionFeePercentage));
+            var investment = (trade.StakeAmount * (1 - Constants.TransactionFeePercentage));
             var sales = (trade.Quantity * currentRateBid) - (trade.Quantity * currentRateBid * Constants.TransactionFeePercentage);
             var profit = 100 * ((sales - investment) / investment);
 
