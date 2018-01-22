@@ -13,7 +13,7 @@ using EmaCross = Mynt.Core.Strategies.EmaCross;
 
 namespace Mynt.BackTester
 {
-    class Program
+    public class Program
     {
 
         #region trading variables
@@ -109,21 +109,6 @@ namespace Mynt.BackTester
 
         #endregion
 
-        static void Main(string[] args)
-        {
-            try
-            {
-                WriteIntro();
-                Console.WriteLine();
-                Console.WriteLine();
-                PresentMenuToUser();
-            }
-            catch (Exception ex)
-            {
-                WriteColoredLine($"\t{ex.Message}", ConsoleColor.Red);
-                Console.ReadLine();
-            }
-        }
 
         #region backtesting
 
@@ -646,13 +631,12 @@ namespace Mynt.BackTester
             else
                 WriteColoredLine($"Made {results.Count} buys. ", ConsoleColor.Yellow);
         }
-
-
+        
         #endregion
 
         #region console bootstrapping
 
-        private static void PresentMenuToUser()
+        public static void PresentMenuToUser()
         {
             while (true)
             {
@@ -715,20 +699,7 @@ namespace Mynt.BackTester
             }
         }
 
-        private static void WriteMenu()
-        {
-            Console.WriteLine("\t1. Run a single strategy");
-            Console.WriteLine("\t2. Run all strategies");
-            Console.WriteLine("\t3. Combine 2 strategies");
-            Console.WriteLine("\t4. Combine entry/exit strategies");
-            Console.WriteLine("\t5. Combine traits");
-            Console.WriteLine("\t6. Close the tool");
-
-            Console.WriteLine();
-            Console.Write("\tWhat do you want to do? ");
-        }
-
-        private static void WriteIntro()
+        public static void WriteIntro()
         {
             Console.WriteLine();
 
@@ -745,7 +716,7 @@ namespace Mynt.BackTester
             Console.WriteLine(@"                   \______/");
         }
 
-        static void WriteColoredLine(string line, ConsoleColor color, bool padded = false)
+        public static void WriteColoredLine(string line, ConsoleColor color, bool padded = false)
         {
             Console.ForegroundColor = color;
             if (padded) Console.WriteLine();
@@ -754,7 +725,20 @@ namespace Mynt.BackTester
             Console.ResetColor();
         }
 
-        static void WriteColored(string line, ConsoleColor color, bool padded = false)
+        private static void WriteMenu()
+        {
+            Console.WriteLine("\t1. Run a single strategy");
+            Console.WriteLine("\t2. Run all strategies");
+            Console.WriteLine("\t3. Combine 2 strategies");
+            Console.WriteLine("\t4. Combine entry/exit strategies");
+            Console.WriteLine("\t5. Combine traits");
+            Console.WriteLine("\t6. Close the tool");
+
+            Console.WriteLine();
+            Console.Write("\tWhat do you want to do? ");
+        }
+                
+        private static void WriteColored(string line, ConsoleColor color, bool padded = false)
         {
             Console.ForegroundColor = color;
             if (padded) Console.WriteLine();
@@ -763,7 +747,7 @@ namespace Mynt.BackTester
             Console.ResetColor();
         }
 
-        public static void WriteSeparator()
+        private static void WriteSeparator()
         {
             Console.WriteLine();
             Console.WriteLine("\t============================================================");

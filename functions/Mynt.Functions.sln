@@ -20,6 +20,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.Core.Binance", "Mynt.C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.Core.Tests", "Mynt.Core.Tests\Mynt.Core.Tests.csproj", "{BA80095C-5B5B-466C-AE44-3A9DBC08E123}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.BackTester.Console", "Mynt.BackTester.Console\Mynt.BackTester.Console.csproj", "{8A0DA4E2-77CD-4712-ABEB-BDFA0F014AC6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -50,6 +52,10 @@ Global
 		{BA80095C-5B5B-466C-AE44-3A9DBC08E123}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BA80095C-5B5B-466C-AE44-3A9DBC08E123}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BA80095C-5B5B-466C-AE44-3A9DBC08E123}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8A0DA4E2-77CD-4712-ABEB-BDFA0F014AC6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8A0DA4E2-77CD-4712-ABEB-BDFA0F014AC6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8A0DA4E2-77CD-4712-ABEB-BDFA0F014AC6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8A0DA4E2-77CD-4712-ABEB-BDFA0F014AC6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
