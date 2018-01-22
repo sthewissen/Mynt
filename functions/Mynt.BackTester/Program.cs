@@ -68,6 +68,7 @@ namespace Mynt.BackTester
             new BbandRsi(),
             new BigThree(),
             new BreakoutMa(),
+            new BuyAndHold(),
             new CciEma(),
             new CciRsi(),
             new CciScalper(),

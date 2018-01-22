@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Strategies\BuyAndHoldTests.cs" />
     <Compile Include="Strategies\SmaCrossoverTests.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -273,6 +273,7 @@
     <Compile Include="Strategies\BbandRsi.cs" />
     <Compile Include="Strategies\BigThree.cs" />
     <Compile Include="Strategies\BreakoutMa.cs" />
+    <Compile Include="Strategies\BuyAndHold.cs" />
     <Compile Include="Strategies\CciEma.cs" />
     <Compile Include="Strategies\CciRsi.cs" />
     <Compile Include="Strategies\CciScalper.cs" />
