@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Mynt.Core.Bittrex;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Strategies;
 
@@ -14,7 +12,7 @@ namespace Mynt.BackTester.Console
         {
             string coinsToBuyCsv = System.Configuration.ConfigurationManager.AppSettings["CoinsToBuy"];
 
-            var backTester = new BackTester(GetTradingStrategies(), coinsToBuyCsv);
+            var backTester = new BackTester(GetTradingStrategies(), new BittrexApi(true), coinsToBuyCsv);
             try
             {
                 backTester.WriteIntro();

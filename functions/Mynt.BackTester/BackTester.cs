@@ -3,19 +3,19 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Mynt.BackTester.Traits;
-using Mynt.Core.Bittrex;
-using Mynt.Core.Bittrex.Models;
+using Mynt.Core.Api;
+//using Mynt.Core.Bittrex;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
-using Mynt.Core.Strategies;
 using Newtonsoft.Json;
-using EmaCross = Mynt.Core.Strategies.EmaCross;
 
 namespace Mynt.BackTester
 {
     public class BackTester
     {
         #region trading variables
+
+        private IExchangeApi exchangeApi;
 
         // As soon as our profit dips below this percentage we sell.
         private const double stopLossPercentage = -0.05;
@@ -34,8 +34,6 @@ namespace Mynt.BackTester
         // This is what we have some backtest data for. 
         // You can always add more backtest data by saving data from the Bittrex API.
         private readonly List<string> coinsToBuy;
-            
-
 
         private readonly List<double> stopLossAnchors = new List<double>()
         {
@@ -60,7 +58,7 @@ namespace Mynt.BackTester
 
         #region constructors
 
-        public BackTester(List<ITradingStrategy> strategies, string coinsToBuyCsv)
+        public BackTester(List<ITradingStrategy> strategies, IExchangeApi exchangeApi, string coinsToBuyCsv)
         {
             // Create Data Folder
             if (!Directory.Exists(GetDataDirectory()))
@@ -69,6 +67,7 @@ namespace Mynt.BackTester
             coinsToBuy = coinsToBuyCsv.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList();            
 
             this.strategies = strategies;
+            this.exchangeApi = exchangeApi;
         }
 
         #endregion
@@ -778,17 +777,15 @@ namespace Mynt.BackTester
         public async System.Threading.Tasks.Task RefreshCandleData()
         {
             DateTime startDate = DateTime.Now.AddDays(-30);
-            var period = Core.Models.Period.FiveMinutes;
-
-            BittrexApi api = new BittrexApi(true);
-
+            var period = Period.FiveMinutes;
+            
             List<string> writtenFiles = new List<string>();
 
             foreach (var coinToBuy in coinsToBuy)
             {
                 WriteColoredLine($"\tRefreshing {coinToBuy}", ConsoleColor.DarkGreen);
 
-                var candles = await api.GetTickerHistory(coinToBuy, startDate, period);
+                var candles = await exchangeApi.GetTickerHistory(coinToBuy, startDate, period);
                 var jsonPath = GetJsonFilePath(coinToBuy);
 
                 if (File.Exists(jsonPath))
