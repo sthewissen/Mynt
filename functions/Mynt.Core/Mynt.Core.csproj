@@ -223,6 +223,8 @@
     <Compile Include="Api\BlockChain\Models\Prices.cs" />
     <Compile Include="Api\IExchangeApi.cs" />
     <Compile Include="Constants.cs" />
+    <Compile Include="Enums\EnumExtensions.cs" />
+    <Compile Include="Enums\TradeAdvice.cs" />
     <Compile Include="Extensions\DateTimeExtensions.cs" />
     <Compile Include="Indicators\DerivativeOscillator.cs" />
     <Compile Include="Indicators\Cmo.cs" />

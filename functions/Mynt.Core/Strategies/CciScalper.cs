@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Mynt.Core.Enums;
 using Mynt.Core.Indicators;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
@@ -13,9 +14,9 @@ namespace Mynt.Core.Strategies
     {
         public string Name => "CCI Scalper";
 
-        public List<int> Prepare(List<Candle> candles)
+        public List<TradeAdvice> Prepare(List<Candle> candles)
         {
-            var result = new List<int>();
+            var result = new List<TradeAdvice>();
 
             if (candles.Count < 200)
                 throw new Exception("Need larger data set: (200 min).");
@@ -28,11 +29,11 @@ namespace Mynt.Core.Strategies
             for (int i = 0; i < candles.Count; i++)
             {
                 if (cci[i] > 0 && ema10[i] > ema21[i] && ema10[i] > ema50[i])
-                    result.Add(1);
+                    result.Add(TradeAdvice.Buy);
                 else if (cci[i] < 0 && ema10[i] < ema21[i] && ema10[i] < ema50[i])
-                    result.Add(-1);
+                    result.Add(TradeAdvice.Sell);
                 else
-                    result.Add(0);
+                    result.Add(TradeAdvice.Hold);
             }
 
             return result;

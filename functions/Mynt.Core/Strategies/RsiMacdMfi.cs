@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using Mynt.Core.Enums;
 using Mynt.Core.Indicators;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
@@ -11,9 +11,9 @@ namespace Mynt.Core.Strategies
     {
         public string Name => "RSI MACD MFI";
         
-        public List<int> Prepare(List<Candle> candles)
+        public List<TradeAdvice> Prepare(List<Candle> candles)
         {
-            var result = new List<int>();
+            var result = new List<TradeAdvice>();
 
             var macd = candles.Macd(5,10,4);
             var rsi = candles.Rsi(16);
@@ -25,11 +25,11 @@ namespace Mynt.Core.Strategies
             for (int i = 0; i < candles.Count; i++)
             {       
                     if (mfi[i] <30 && rsi[i] < 45 && ao[i] > 0)
-                        result.Add(1);
+                        result.Add(TradeAdvice.Buy);
                     else if ( mfi[i] > 30 && rsi[i] > 45 && ao[i] < 0)
-                        result.Add(-1);
+                        result.Add(TradeAdvice.Sell);
                     else
-                        result.Add(0);
+                        result.Add(TradeAdvice.Hold);
              }
 
             return result;

@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
+using Mynt.Core.Enums;
 using Mynt.Core.Indicators;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
@@ -13,9 +13,9 @@ namespace Mynt.Core.Strategies
     {
         public string Name => "ADX Momentum";
                 
-        public List<int> Prepare(List<Candle> candles)
+        public List<TradeAdvice> Prepare(List<Candle> candles)
         {
-            var result = new List<int>();
+            var result = new List<TradeAdvice>();
 
             var adx = candles.Adx(14);
             var diPlus = candles.PlusDI(25);
@@ -27,11 +27,11 @@ namespace Mynt.Core.Strategies
             {
 
                 if (adx[i] > 25 && mom[i] < 0 && diMinus[i] > 25 && diPlus[i] < diMinus[i])
-                    result.Add(-1);
+                    result.Add(TradeAdvice.Sell);
                 else if (adx[i] > 25 && mom[i] > 0 && diPlus[i] > 25 && diPlus[i] > diMinus[i])
-                    result.Add(1);
+                    result.Add(TradeAdvice.Buy);
                 else
-                    result.Add(0);
+                    result.Add(TradeAdvice.Hold);
             }
 
             return result;

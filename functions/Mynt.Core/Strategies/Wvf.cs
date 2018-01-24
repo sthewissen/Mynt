@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Mynt.Core.Enums;
 using Mynt.Core.Indicators;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
@@ -13,9 +12,9 @@ namespace Mynt.Core.Strategies
     {
         public string Name => "Williams Vix Fix";
         
-        public List<int> Prepare(List<Candle> candles)
+        public List<TradeAdvice> Prepare(List<Candle> candles)
         {
-            var result = new List<int>();
+            var result = new List<TradeAdvice>();
 
             var ao = candles.AwesomeOscillator();
             var close = candles.Select(x => x.Close).ToList();
@@ -82,11 +81,11 @@ namespace Mynt.Core.Strategies
             for (int i = 0; i < candles.Count; i++)
             {
                 if (wvfs[i] >= upperRanges[i] || wvfs[i] >= rangeHighs[i] && ao[i] > 0 && ao[i - 1] < 0)
-                    result.Add(1);
+                    result.Add(TradeAdvice.Buy);
                 else if (stochRsi.K[i] > 80 && stochRsi.K[i] > stochRsi.D[i] && stochRsi.K[i - 1] < stochRsi.D[i - 1] && ao[i] < 0 && ao[i - 1] > 0)
-                    result.Add(-1);
+                    result.Add(TradeAdvice.Sell);
                 else
-                    result.Add(0);
+                    result.Add(TradeAdvice.Hold);
             }
 
             return result;

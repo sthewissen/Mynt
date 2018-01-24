@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Mynt.BackTester.Traits;
 using Mynt.Core.Api;
+using Mynt.Core.Enums;
 //using Mynt.Core.Bittrex;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
@@ -90,7 +91,7 @@ namespace Mynt.BackTester
 
                 for (int i = 0; i < trend.Count; i++)
                 {
-                    if (trend[i] == 1)
+                    if (trend[i] == TradeAdvice.Buy)
                     {
                         // This is a buy signal
                         var trade = new Trade() { OpenRate = candles[i].Close, OpenDate = candles[i].Timestamp, Quantity = 1 };
@@ -100,7 +101,7 @@ namespace Mynt.BackTester
                         {
                             // There are 2 ways we can sell, either through the strategy telling us to do so (-1)
                             // or because other conditions such as the ROI or stoploss tell us to.
-                            if (trend[j] == -1 || ShouldSell(trade, candles[j].Close, candles[j].Timestamp) != SellType.None)
+                            if (trend[j] == TradeAdvice.Sell || ShouldSell(trade, candles[j].Close, candles[j].Timestamp) != SellType.None)
                             {
                                 // Bittrex charges 0,25% transaction fee, so deduct that.
                                 var currentProfit = 0.995 * ((candles[j].Close - trade.OpenRate) / trade.OpenRate);
@@ -153,7 +154,7 @@ namespace Mynt.BackTester
 
                         for (int i = 0; i < trend.Count; i++)
                         {
-                            if (trend[i] == 1)
+                            if (trend[i] == TradeAdvice.Buy)
                             {
                                 // This is a buy signal
                                 var trade = new Trade()
@@ -166,7 +167,7 @@ namespace Mynt.BackTester
                                 // Calculate win/lose forwards from buy point
                                 for (int j = i; j < trend.Count; j++)
                                 {
-                                    if (trend[j] == -1 || ShouldSell(trade, candles[j].Close, candles[j].Timestamp) != SellType.None)
+                                    if (trend[j] == TradeAdvice.Sell || ShouldSell(trade, candles[j].Close, candles[j].Timestamp) != SellType.None)
                                     {
                                         var currentProfit = 0.995 * ((candles[j].Close - trade.OpenRate) / trade.OpenRate);
                                         results.Add(new BackTestResult
@@ -223,7 +224,7 @@ namespace Mynt.BackTester
 
                             for (int i = 0; i < trend1.Count; i++)
                             {
-                                if (trend1[i] == 1 && trend2[i] == 1)
+                                if (trend1[i] == TradeAdvice.Buy && trend2[i] == TradeAdvice.Buy)
                                 {
                                     // This is a buy signal
                                     var trade = new Trade()
@@ -236,7 +237,7 @@ namespace Mynt.BackTester
                                     // Calculate win/lose forwards from buy point
                                     for (int j = i; j < trend1.Count; j++)
                                     {
-                                        if (trend1[j] == -1 || trend2[j] == -1 || ShouldSell(trade, candles[j].Close, candles[j].Timestamp) != SellType.None)
+                                        if (trend1[j] == TradeAdvice.Sell || trend2[j] == TradeAdvice.Sell || ShouldSell(trade, candles[j].Close, candles[j].Timestamp) != SellType.None)
                                         {
                                             var currentProfit = 0.995 * ((candles[j].Close - trade.OpenRate) / trade.OpenRate);
                                             results.Add(new BackTestResult
@@ -322,7 +323,7 @@ namespace Mynt.BackTester
 
                             for (int i = 0; i < trend1.Count; i++)
                             {
-                                if (trend1[i] == 1)
+                                if (trend1[i] == TradeAdvice.Buy)
                                 {
                                     // This is a buy signal
                                     var trade = new Trade()
@@ -335,7 +336,7 @@ namespace Mynt.BackTester
                                     // Calculate win/lose forwards from buy point
                                     for (int j = i; j < trend1.Count; j++)
                                     {
-                                        if (trend2[j] == -1 || ShouldSell(trade, candles[j].Close, candles[j].Timestamp) != SellType.None)
+                                        if (trend2[j] == TradeAdvice.Sell || ShouldSell(trade, candles[j].Close, candles[j].Timestamp) != SellType.None)
                                         {
                                             var currentProfit = 0.995 * ((candles[j].Close - trade.OpenRate) / trade.OpenRate);
                                             results.Add(new BackTestResult

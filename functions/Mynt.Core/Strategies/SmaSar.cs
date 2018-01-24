@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Mynt.Core.Enums;
 using Mynt.Core.Indicators;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
@@ -10,9 +11,9 @@ namespace Mynt.Core.Strategies
     {
         public string Name => "SMA SAR";
         
-        public List<int> Prepare(List<Candle> candles)
+        public List<TradeAdvice> Prepare(List<Candle> candles)
         {
-            var result = new List<int>();
+            var result = new List<TradeAdvice>();
 
             var sma = candles.Sma(60);
             var sar = candles.Sar();
@@ -60,11 +61,11 @@ namespace Mynt.Core.Strategies
                         fsar = -1;
 
                     if (closes[i] > sma[i] && fsar == 1)
-                        result.Add(1);
+                        result.Add(TradeAdvice.Buy);
                     else if (closes[i] < sma[i] && fsar == -1)
-                        result.Add(-1);
+                        result.Add(TradeAdvice.Sell);
                     else
-                        result.Add(0);
+                        result.Add(TradeAdvice.Hold);
                 }
                 else
                 {

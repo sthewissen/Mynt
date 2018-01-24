@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Mynt.Core.Enums;
 using Mynt.Core.Indicators;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
@@ -12,9 +13,9 @@ namespace Mynt.Core.Strategies
     {
         public string Name => "Base 150";
         
-        public List<int> Prepare(List<Candle> candles)
+        public List<TradeAdvice> Prepare(List<Candle> candles)
         {
-            var result = new List<int>();
+            var result = new List<TradeAdvice>();
 
             var sma6 = candles.Sma(6);
             var sma25 = candles.Sma(25);
@@ -25,7 +26,7 @@ namespace Mynt.Core.Strategies
             {
                 if (i == 0)
                 {
-                    result.Add(0);
+                    result.Add(TradeAdvice.Hold);
                 }
                 else
                 {
@@ -37,7 +38,7 @@ namespace Mynt.Core.Strategies
                         || sma6[i - 1] < sma365[i]
                         || sma25[i - 1] < sma150[i]
                         || sma25[i - 1] < sma365[i]))
-                        result.Add(1);
+                        result.Add(TradeAdvice.Buy);
                     if (sma6[i] < sma150[i]
                         && sma6[i] < sma365[i]
                         && sma25[i] < sma150[i]
@@ -46,9 +47,9 @@ namespace Mynt.Core.Strategies
                         || sma6[i - 1] > sma365[i]
                         || sma25[i - 1] > sma150[i]
                         || sma25[i - 1] > sma365[i]))
-                        result.Add(-1);
+                        result.Add(TradeAdvice.Sell);
                     else
-                        result.Add(0);
+                        result.Add(TradeAdvice.Hold);
                 }
             }
 

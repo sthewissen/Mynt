@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Mynt.Core.Enums;
 using Mynt.Core.Indicators;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
@@ -12,9 +13,9 @@ namespace Mynt.Core.Strategies
     {
         public string Name => "Stoch ADX";
         
-        public List<int> Prepare(List<Candle> candles)
+        public List<TradeAdvice> Prepare(List<Candle> candles)
         {
-            var result = new List<int>();
+            var result = new List<TradeAdvice>();
 
             var stoch = candles.Stoch(13);
             var adx = candles.Adx(14);
@@ -23,11 +24,11 @@ namespace Mynt.Core.Strategies
             for (int i = 0; i < candles.Count; i++)
             {
                 if (adx[i] > 50 && (stoch.K[i] > 90 || stoch.D[i] > 90) && bearBull[i] == -1)
-                    result.Add(-1);
+                    result.Add(TradeAdvice.Sell);
                 else if (adx[i] < 20 && (stoch.K[i] < 10 || stoch.D[i] < 10) && bearBull[i] == 1)
-                    result.Add(1);
+                    result.Add(TradeAdvice.Buy);
                 else
-                    result.Add(0);
+                    result.Add(TradeAdvice.Hold);
             }
 
             return result;

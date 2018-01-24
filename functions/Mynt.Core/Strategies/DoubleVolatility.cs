@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Mynt.Core.Enums;
 using Mynt.Core.Indicators;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
@@ -14,9 +15,9 @@ namespace Mynt.Core.Strategies
     {
         public string Name => "Double Volatility";
         
-        public List<int> Prepare(List<Candle> candles)
+        public List<TradeAdvice> Prepare(List<Candle> candles)
         {
-            var result = new List<int>();
+            var result = new List<TradeAdvice>();
 
             var sma5High = candles.Sma(5, CandleVariable.High);
             var sma20High = candles.Sma(20, CandleVariable.High);
@@ -28,13 +29,13 @@ namespace Mynt.Core.Strategies
             for (int i = 0; i < candles.Count; i++)
             {
                 if(i<1)
-                    result.Add(0);
+                    result.Add(TradeAdvice.Hold);
                 else if (sma5High[i] > sma20High[i] && rsi[i] > 65 && Math.Abs(opens[i] - closes[i]) / Math.Abs(opens[i-1] - closes[i-1]) < 2)
-                    result.Add(1);
+                    result.Add(TradeAdvice.Buy);
                 else if (sma5High[i] < sma20Low[i] && rsi[i] < 35)
-                    result.Add(-1);
+                    result.Add(TradeAdvice.Sell);
                 else
-                    result.Add(0);
+                    result.Add(TradeAdvice.Hold);
             }
 
             return result;

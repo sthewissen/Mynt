@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using Mynt.Core.Enums;
 using Mynt.Core.Indicators;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
@@ -14,9 +14,9 @@ namespace Mynt.Core.Strategies
     {
         public string Name => "RSI SAR Awesome";
         
-        public List<int> Prepare(List<Candle> candles)
+        public List<TradeAdvice> Prepare(List<Candle> candles)
         {
-            var result = new List<int>();
+            var result = new List<TradeAdvice>();
 
             var sar = candles.Sar();
             var rsi = candles.Rsi(5);
@@ -32,11 +32,11 @@ namespace Mynt.Core.Strategies
                     var priorSar = sar[i - 1];
                     
                     if (currentSar < close[i] && priorSar > close[i] && ao[i] > 0 && rsi[i] > 50)
-                        result.Add(1);
+                        result.Add(TradeAdvice.Buy);
                     else if (currentSar > close[i] && priorSar < close[i] && ao[i] < 0 && rsi[i] < 50)
-                        result.Add(-1);
+                        result.Add(TradeAdvice.Sell);
                     else
-                        result.Add(0);
+                        result.Add(TradeAdvice.Hold);
                 }
                 else
                 {

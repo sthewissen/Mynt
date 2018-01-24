@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using Mynt.Core.Enums;
 using Mynt.Core.Indicators;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
@@ -11,9 +11,9 @@ namespace Mynt.Core.Strategies
     {
         public string Name => "SMA Stoch RSI";
         
-        public List<int> Prepare(List<Candle> candles)
+        public List<TradeAdvice> Prepare(List<Candle> candles)
         {
-            var result = new List<int>();
+            var result = new List<TradeAdvice>();
 
             var price = candles.Select(x => x.Close).ToList();
             var stoch = candles.Stoch(8);
@@ -27,11 +27,11 @@ namespace Mynt.Core.Strategies
                 else
                 {
                     if (price[i] > sma150[i] && stoch.K[i] > 70 && rsi[i] < 20 && stoch.K[i] > stoch.D[i])
-                        result.Add(1);
+                        result.Add(TradeAdvice.Buy);
                     else if (price[i] < sma150[i] && stoch.K[i] > 70 && rsi[i] > 80 && stoch.K[i] < stoch.D[i])
-                        result.Add(-1);
+                        result.Add(TradeAdvice.Sell);
                     else
-                        result.Add(0);
+                        result.Add(TradeAdvice.Hold);
                 }
             }
 

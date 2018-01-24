@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Mynt.Core.Enums;
 using Mynt.Core.Indicators;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
@@ -13,23 +14,23 @@ namespace Mynt.Core.Strategies
     {
         public string Name => "Power Ranger";
         
-        public List<int> Prepare(List<Candle> candles)
+        public List<TradeAdvice> Prepare(List<Candle> candles)
         {
-            var result = new List<int>();
+            var result = new List<TradeAdvice>();
             var stoch = candles.Stoch(10);
 
             for (int i = 0; i < candles.Count; i++)
             {
                 if (i < 1)
-                    result.Add(0);
+                    result.Add(TradeAdvice.Hold);
                 else
                 {
                     if ((stoch.K[i] > 20 && stoch.K[i - 1] < 20) || (stoch.D[i] > 20 && stoch.D[i - 1] < 20))
-                        result.Add(1);
+                        result.Add(TradeAdvice.Buy);
                     else if ((stoch.K[i] < 80 && stoch.K[i - 1] > 80) || (stoch.D[i] < 80 && stoch.D[i - 1] > 80))
-                        result.Add(-1);
+                        result.Add(TradeAdvice.Sell);
                     else
-                        result.Add(0);
+                        result.Add(TradeAdvice.Hold);
                 }
             }
 

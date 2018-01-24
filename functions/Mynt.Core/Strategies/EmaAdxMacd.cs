@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Mynt.Core.Enums;
 using Mynt.Core.Indicators;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
@@ -11,10 +12,10 @@ namespace Mynt.Core.Strategies
     public class EmaAdxMacd : ITradingStrategy
     {
         public string Name => "EMA ADX MACD";
-        
-        public List<int> Prepare(List<Candle> candles)
+
+        public List<TradeAdvice> Prepare(List<Candle> candles)
         {
-            var result = new List<int>();
+            var result = new List<TradeAdvice>();
 
             var ema4 = candles.Ema(4);
             var ema10 = candles.Ema(10);
@@ -24,14 +25,14 @@ namespace Mynt.Core.Strategies
 
             for (int i = 0; i < candles.Count; i++)
             {
-                if(i==0)
-                    result.Add(0);
+                if (i == 0)
+                    result.Add(TradeAdvice.Hold);
                 else if (ema4[i] < ema10[i] && ema4[i - 1] > ema10[i] && macd.Macd[i] < 0 && plusDi[i] > minusDi[i])
-                    result.Add(1);
+                    result.Add(TradeAdvice.Buy);
                 else if (ema4[i] > ema10[i] && ema4[i - 1] < ema10[i] && macd.Macd[i] > 0 && plusDi[i] < minusDi[i])
-                    result.Add(-1);
+                    result.Add(TradeAdvice.Sell);
                 else
-                    result.Add(0);
+                    result.Add(TradeAdvice.Hold);
             }
 
             return result;

@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Mynt.Core.Enums;
 using Mynt.Core.Indicators;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
@@ -16,9 +14,9 @@ namespace Mynt.Core.Strategies
     {
         public string Name => "Three MAgos";
 
-        public List<int> Prepare(List<Candle> candles)
+        public List<TradeAdvice> Prepare(List<Candle> candles)
         {
-            var result = new List<int>();
+            var result = new List<TradeAdvice>();
 
             var sma = candles.Sma(15);
             var ema = candles.Ema(15);
@@ -41,13 +39,13 @@ namespace Mynt.Core.Strategies
             for (int i = 0; i < candles.Count; i++)
             {
                 if (i < 1)
-                    result.Add(0);
+                    result.Add(TradeAdvice.Hold);
                 else if (bars[i] == "blue" && bars[i - 1] == "red")
-                    result.Add(1);
+                    result.Add(TradeAdvice.Buy);
                 else if (bars[i] == "blue" && bars[i - 1] == "green")
-                    result.Add(-1);
+                    result.Add(TradeAdvice.Sell);
                 else
-                    result.Add(0);
+                    result.Add(TradeAdvice.Hold);
             }
 
             return result;

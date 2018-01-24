@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Mynt.Core.Enums;
 using Mynt.Core.Indicators;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
@@ -13,9 +14,9 @@ namespace Mynt.Core.Strategies
     {
         public string Name => "CCI RSI";
         
-        public List<int> Prepare(List<Candle> candles)
+        public List<TradeAdvice> Prepare(List<Candle> candles)
         {
-            var result = new List<int>();
+            var result = new List<TradeAdvice>();
 
             var cci = candles.Cci();
             var rsi = candles.Rsi();
@@ -23,13 +24,13 @@ namespace Mynt.Core.Strategies
             for (int i = 0; i < candles.Count; i++)
             {
                 if (i == 0)
-                    result.Add(0);
+                    result.Add(TradeAdvice.Hold);
                 else if (rsi[i] < 30 && cci[i] < -100)
-                    result.Add(1);
+                    result.Add(TradeAdvice.Buy);
                 else if (rsi[i] > 70 && cci[i] > 100)
-                    result.Add(-1);
+                    result.Add(TradeAdvice.Sell);
                 else
-                    result.Add(0);
+                    result.Add(TradeAdvice.Hold);
             }
 
             return result;

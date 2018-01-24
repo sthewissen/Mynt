@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Mynt.Core.Enums;
 using Mynt.Core.Indicators;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
@@ -13,9 +11,9 @@ namespace Mynt.Core.Strategies
     {
         public string Name => "Big Three";
         
-        public List<int> Prepare(List<Candle> candles)
+        public List<TradeAdvice> Prepare(List<Candle> candles)
         {
-            var result = new List<int>();
+            var result = new List<TradeAdvice>();
             
             var sma20 = candles.Sma(20);
             var sma40 = candles.Sma(40);
@@ -25,7 +23,7 @@ namespace Mynt.Core.Strategies
             {
                 if (i < 2)
                 {
-                    result.Add(0);
+                    result.Add(TradeAdvice.Hold);
                 }
                 else
                 {
@@ -48,11 +46,11 @@ namespace Mynt.Core.Strategies
                     var hitsAnSma = (sma80[i] < candles[i].High && sma80[i] > candles[i].Low);
 
                     if (lastIsGreen && previousIsRed && beforeIsGreen && allAboveSma && sma20[i] > sma40[i] && sma20[i] > sma80[i])
-                        result.Add(1);
+                        result.Add(TradeAdvice.Buy);
                     else if (hitsAnSma)
-                        result.Add(-1);
+                        result.Add(TradeAdvice.Sell);
                     else
-                        result.Add(0);
+                        result.Add(TradeAdvice.Hold);
                 }
             }
 

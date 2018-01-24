@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Mynt.Core.Enums;
 using Mynt.Core.Indicators;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
@@ -13,7 +11,7 @@ namespace Mynt.Core.Strategies
     {
         public string Name => "Fractals";
 
-        public List<int> Prepare(List<Candle> candles)
+        public List<TradeAdvice> Prepare(List<Candle> candles)
         {
             // Settings for this strat.
             var exitAfterBars = 3;
@@ -21,7 +19,7 @@ namespace Mynt.Core.Strategies
             var noRepainting = true;
 
             // Our lists to hold our values
-            var result = new List<int>();
+            var result = new List<TradeAdvice>();
             var fractalPrice = new List<double>();
             var fractalAverage = new List<double>();
             var fractalTrend = new List<bool>();
@@ -38,7 +36,7 @@ namespace Mynt.Core.Strategies
                     fractalPrice.Add(0);
                     fractalAverage.Add(0);
                     fractalTrend.Add(false);
-                    result.Add(0);
+                    result.Add(TradeAdvice.Hold);
                 }
                 else
                 {
@@ -68,11 +66,11 @@ namespace Mynt.Core.Strategies
                     var tradeExit = fractalTrend[i - exitAfterBars] && fractalTrend[i] == false;
 
                     if (tradeExit)
-                        result.Add(-1);
+                        result.Add(TradeAdvice.Sell);
                     else if (tradeEntry && ao[i]>0)
-                        result.Add(1);
+                        result.Add(TradeAdvice.Buy);
                     else
-                        result.Add(0);
+                        result.Add(TradeAdvice.Hold);
                 }
             }
 
