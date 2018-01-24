@@ -269,6 +269,10 @@
       <Project>{e1879751-5218-46f9-9d5a-d52079fe58bd}</Project>
       <Name>Mynt.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Mynt.DataAccess.FileBasedStorage\Mynt.DataAccess.FileBasedStorage.csproj">
+      <Project>{9B066863-B898-4D73-9BFE-433C1F3C5694}</Project>
+      <Name>Mynt.DataAccess.FileBasedStorage</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\refit.3.0.1\build\netstandard1.3\refit.targets" Condition="Exists('..\packages\refit.3.0.1\build\netstandard1.3\refit.targets')" />

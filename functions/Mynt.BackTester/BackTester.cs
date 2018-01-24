@@ -5,9 +5,9 @@ using System.Linq;
 using Mynt.BackTester.Traits;
 using Mynt.Core.Api;
 using Mynt.Core.Enums;
-//using Mynt.Core.Bittrex;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
+using Mynt.DataAccess.FileBasedStorage;
 using Newtonsoft.Json;
 
 namespace Mynt.BackTester
@@ -82,11 +82,10 @@ namespace Mynt.BackTester
             // Go through our coinpairs and backtest them.
             foreach (var pair in coinsToBuy)
             {
-                var dataString = File.ReadAllText($"Data/{pair}.json");
-
+                var candleProvider = new JsonCandleProvider("Data");
 
                 // This creates a list of buy signals.
-                var candles = JsonConvert.DeserializeObject<List<Core.Models.Candle>>(dataString);
+                var candles = candleProvider.GetCandles(pair);
                 var trend = strategy.Prepare(candles);
 
                 for (int i = 0; i < trend.Count; i++)

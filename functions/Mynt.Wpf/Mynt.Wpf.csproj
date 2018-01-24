@@ -130,9 +130,21 @@
       <Project>{e1879751-5218-46f9-9d5a-d52079fe58bd}</Project>
       <Name>Mynt.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Mynt.DataAccess.FileBasedStorage\Mynt.DataAccess.FileBasedStorage.csproj">
+      <Project>{9B066863-B898-4D73-9BFE-433C1F3C5694}</Project>
+      <Name>Mynt.DataAccess.FileBasedStorage</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Mynt.DataAccess.Interfaces\Mynt.DataAccess.Interfaces.csproj">
+      <Project>{09BEC4BC-6233-4072-ABB9-7633AC83437A}</Project>
+      <Name>Mynt.DataAccess.Interfaces</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Mynt.Extensibility\Mynt.Extensibility.csproj">
       <Project>{71abd5bd-e1cb-4820-8beb-f34763ed0083}</Project>
       <Name>Mynt.Extensibility</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Mynt.Services\Mynt.Services.csproj">
+      <Project>{575EF25F-90B5-4266-9260-56B5E56269F6}</Project>
+      <Name>Mynt.Services</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

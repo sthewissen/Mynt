@@ -6,7 +6,10 @@ namespace Mynt.Core.Enums
 {
     public static class EnumExtensions
     {
-        public  static string GetDescription<T>(this T enumerationValue) where T : struct
+        /// <summary>
+        /// https://stackoverflow.com/a/479453/436667
+        /// </summary>
+        public static string GetDescription<T>(this T enumerationValue) where T : struct
         {
             Type type = enumerationValue.GetType();
             if (!type.IsEnum)

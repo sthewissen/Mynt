@@ -26,6 +26,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.Wpf", "Mynt.Wpf\Mynt.W
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.Extensibility", "Mynt.Extensibility\Mynt.Extensibility.csproj", "{71ABD5BD-E1CB-4820-8BEB-F34763ED0083}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.Services", "Mynt.Services\Mynt.Services.csproj", "{575EF25F-90B5-4266-9260-56B5E56269F6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.DataAccess.FileBasedStorage", "Mynt.DataAccess.FileBasedStorage\Mynt.DataAccess.FileBasedStorage.csproj", "{9B066863-B898-4D73-9BFE-433C1F3C5694}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.DataAccess.Interfaces", "Mynt.DataAccess.Interfaces\Mynt.DataAccess.Interfaces.csproj", "{09BEC4BC-6233-4072-ABB9-7633AC83437A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -68,6 +74,18 @@ Global
 		{71ABD5BD-E1CB-4820-8BEB-F34763ED0083}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{71ABD5BD-E1CB-4820-8BEB-F34763ED0083}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{71ABD5BD-E1CB-4820-8BEB-F34763ED0083}.Release|Any CPU.Build.0 = Release|Any CPU
+		{575EF25F-90B5-4266-9260-56B5E56269F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{575EF25F-90B5-4266-9260-56B5E56269F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{575EF25F-90B5-4266-9260-56B5E56269F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{575EF25F-90B5-4266-9260-56B5E56269F6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B066863-B898-4D73-9BFE-433C1F3C5694}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B066863-B898-4D73-9BFE-433C1F3C5694}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B066863-B898-4D73-9BFE-433C1F3C5694}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B066863-B898-4D73-9BFE-433C1F3C5694}.Release|Any CPU.Build.0 = Release|Any CPU
+		{09BEC4BC-6233-4072-ABB9-7633AC83437A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09BEC4BC-6233-4072-ABB9-7633AC83437A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09BEC4BC-6233-4072-ABB9-7633AC83437A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09BEC4BC-6233-4072-ABB9-7633AC83437A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

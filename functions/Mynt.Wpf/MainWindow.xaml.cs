@@ -1,17 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using System.Windows.Threading;
+using Mynt.Core.Bittrex;
+using Mynt.Core.Strategies;
+using Mynt.DataAccess.FileBasedStorage;
+using Mynt.Services;
 
 namespace Mynt.Wpf
 {
@@ -20,9 +13,25 @@ namespace Mynt.Wpf
     /// </summary>
     public partial class MainWindow : Window
     {
+        private DispatcherTimer timer = new DispatcherTimer { Interval = TimeSpan.FromMinutes(1) };
+
+        private SymbolInformationService symbolInformationService =
+            new SymbolInformationService(new BittrexApi(), new JsonCandleProvider("Data"));
+
         public MainWindow()
         {
             InitializeComponent();
+
+            timer.Tick += (s,e) => UpdateScreen();
+            timer.Start();
+
+            UpdateScreen();
+        }
+
+        private void UpdateScreen()
+        {
+            var historicalAdvicesModel = symbolInformationService.GetHistoricalAdvices(new[] { "btc-eth" }, new MacdSma());
+            historicalAdvices.ItemsSource = historicalAdvicesModel;
         }
     }
 }
