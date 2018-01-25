@@ -34,7 +34,7 @@ namespace Mynt.Services
             {
                 RefreshTime = DateTime.UtcNow,
                 Symbol = symbol,
-                Advices = advices
+                Advices = advices.Select(_ => _.TradeAdvice)
             };
         }
     }
