@@ -253,9 +253,12 @@
     <Compile Include="Interfaces\INotificationManager.cs" />
     <Compile Include="Interfaces\ITradingStrategyProvider.cs" />
     <Compile Include="Managers\ConnectionManager.cs" />
+    <Compile Include="Models\ITradeAdvice.cs" />
     <Compile Include="Models\MarketSummary.cs" />
     <Compile Include="Models\OpenOrder.cs" />
+    <Compile Include="Models\SimpleTradeAdvice.cs" />
     <Compile Include="Models\Ticker.cs" />
+    <Compile Include="Models\TimestampedTradeAdvice.cs" />
     <Compile Include="NotificationManagers\NotificationManager.cs" />
     <Compile Include="NotificationManagers\PushNotificationManager.cs" />
     <Compile Include="NotificationManagers\SlackNotificationManager.cs" />
