@@ -10,9 +10,9 @@ namespace Mynt.Core.Strategies
     {
         public string Name => "Awesome SMA";
         
-        public List<TradeAdvice> Prepare(List<Candle> candles)
+        public List<ITradeAdvice> Prepare(List<Candle> candles)
         {
-            var result = new List<TradeAdvice>();
+            var result = new List<ITradeAdvice>();
 
             var ao = candles.AwesomeOscillator();
             var smaShort = candles.Sma(20);
@@ -21,12 +21,12 @@ namespace Mynt.Core.Strategies
             for (int i = 0; i < candles.Count; i++)
             {
                 if (i == 0)
-                    result.Add(TradeAdvice.Hold);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
                 else if ((ao[i] > 0 && ao[i - 1] < 0 && smaShort[i] > smaLong[i]) ||
                     (ao[i] > 0 && smaShort[i] > smaLong[i] && smaShort[i - 1] < smaLong[i - 1]))
-                    result.Add(TradeAdvice.Buy);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Buy));
                 else
-                    result.Add(TradeAdvice.Hold);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
             }
 
             return result;

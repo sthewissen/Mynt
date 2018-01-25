@@ -12,9 +12,9 @@ namespace Mynt.Core.Strategies
     {
         public string Name => "RSI MACD Awesome";
         
-        public List<TradeAdvice> Prepare(List<Candle> candles)
+        public List<ITradeAdvice> Prepare(List<Candle> candles)
         {
-            var result = new List<TradeAdvice>();
+            var result = new List<ITradeAdvice>();
 
             var macd = candles.Macd(5,10,4);
             var rsi = candles.Rsi(16);
@@ -25,11 +25,11 @@ namespace Mynt.Core.Strategies
             for (int i = 0; i < candles.Count; i++)
             {       
                     if (macd.Hist[i] < 0 && ao[i] > 0 && rsi[i] < 45)
-                        result.Add(TradeAdvice.Buy);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Buy));
                     else if (macd.Hist[i] > 0 && ao[i] < 0 && rsi[i] > 45)
-                        result.Add(TradeAdvice.Sell);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Sell));
                     else
-                        result.Add(TradeAdvice.Hold);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
              }
 
             return result;

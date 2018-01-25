@@ -14,9 +14,9 @@ namespace Mynt.Core.Strategies
     {
         public string Name => "CCI Scalper";
 
-        public List<TradeAdvice> Prepare(List<Candle> candles)
+        public List<ITradeAdvice> Prepare(List<Candle> candles)
         {
-            var result = new List<TradeAdvice>();
+            var result = new List<ITradeAdvice>();
 
             if (candles.Count < 200)
                 throw new Exception("Need larger data set: (200 min).");
@@ -29,11 +29,11 @@ namespace Mynt.Core.Strategies
             for (int i = 0; i < candles.Count; i++)
             {
                 if (cci[i] > 0 && ema10[i] > ema21[i] && ema10[i] > ema50[i])
-                    result.Add(TradeAdvice.Buy);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Buy));
                 else if (cci[i] < 0 && ema10[i] < ema21[i] && ema10[i] < ema50[i])
-                    result.Add(TradeAdvice.Sell);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Sell));
                 else
-                    result.Add(TradeAdvice.Hold);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
             }
 
             return result;

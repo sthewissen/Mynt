@@ -11,9 +11,9 @@ namespace Mynt.Core.Strategies
     {
         public string Name => "Big Three";
         
-        public List<TradeAdvice> Prepare(List<Candle> candles)
+        public List<ITradeAdvice> Prepare(List<Candle> candles)
         {
-            var result = new List<TradeAdvice>();
+            var result = new List<ITradeAdvice>();
             
             var sma20 = candles.Sma(20);
             var sma40 = candles.Sma(40);
@@ -23,7 +23,7 @@ namespace Mynt.Core.Strategies
             {
                 if (i < 2)
                 {
-                    result.Add(TradeAdvice.Hold);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
                 }
                 else
                 {
@@ -46,11 +46,11 @@ namespace Mynt.Core.Strategies
                     var hitsAnSma = (sma80[i] < candles[i].High && sma80[i] > candles[i].Low);
 
                     if (lastIsGreen && previousIsRed && beforeIsGreen && allAboveSma && sma20[i] > sma40[i] && sma20[i] > sma80[i])
-                        result.Add(TradeAdvice.Buy);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Buy));
                     else if (hitsAnSma)
-                        result.Add(TradeAdvice.Sell);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Sell));
                     else
-                        result.Add(TradeAdvice.Hold);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
                 }
             }
 

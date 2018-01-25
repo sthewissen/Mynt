@@ -14,23 +14,23 @@ namespace Mynt.Core.Strategies
     {
         public string Name => "Power Ranger";
         
-        public List<TradeAdvice> Prepare(List<Candle> candles)
+        public List<ITradeAdvice> Prepare(List<Candle> candles)
         {
-            var result = new List<TradeAdvice>();
+            var result = new List<ITradeAdvice>();
             var stoch = candles.Stoch(10);
 
             for (int i = 0; i < candles.Count; i++)
             {
                 if (i < 1)
-                    result.Add(TradeAdvice.Hold);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
                 else
                 {
                     if ((stoch.K[i] > 20 && stoch.K[i - 1] < 20) || (stoch.D[i] > 20 && stoch.D[i - 1] < 20))
-                        result.Add(TradeAdvice.Buy);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Buy));
                     else if ((stoch.K[i] < 80 && stoch.K[i - 1] > 80) || (stoch.D[i] < 80 && stoch.D[i - 1] > 80))
-                        result.Add(TradeAdvice.Sell);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Sell));
                     else
-                        result.Add(TradeAdvice.Hold);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
                 }
             }
 

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Mynt.Core.Enums;
 using Mynt.Core.Models;
 
 namespace Mynt.Core.Interfaces
@@ -8,6 +7,6 @@ namespace Mynt.Core.Interfaces
     {
         string Name { get;  }
 
-        List<TradeAdvice> Prepare(List<Candle> candles);
+        List<ITradeAdvice> Prepare(List<Candle> candles);
     }
 }

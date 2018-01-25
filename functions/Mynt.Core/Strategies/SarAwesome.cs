@@ -15,9 +15,9 @@ namespace Mynt.Core.Strategies
     {
         public string Name => "SAR Awesome";
         
-        public List<TradeAdvice> Prepare(List<Candle> candles)
+        public List<ITradeAdvice> Prepare(List<Candle> candles)
         {
-            var result = new List<TradeAdvice>();
+            var result = new List<ITradeAdvice>();
 
             var sar = candles.Sar();
             var ema5 = candles.Ema(5);
@@ -38,15 +38,15 @@ namespace Mynt.Core.Strategies
                     var lastLow = lows[i];
 
                     if ((currentSar > lastHigh) && (priorSar > lastHigh) && (earlierSar > lastHigh) && ao[i] > 0 && ema5[i] < close[i])
-                        result.Add(TradeAdvice.Buy);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Buy));
                     else if ((currentSar < lastLow) && (priorSar < lastLow) && (earlierSar < lastLow) && ao[i] < 0 && ema5[i] > close[i])
-                        result.Add(TradeAdvice.Sell);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Sell));
                     else
-                        result.Add(TradeAdvice.Hold);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
                 }
                 else
                 {
-                    result.Add(0);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
                 }
             }
 

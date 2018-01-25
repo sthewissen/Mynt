@@ -13,9 +13,9 @@ namespace Mynt.Core.Strategies
     {
         public string Name => "EMA ADX MACD";
 
-        public List<TradeAdvice> Prepare(List<Candle> candles)
+        public List<ITradeAdvice> Prepare(List<Candle> candles)
         {
-            var result = new List<TradeAdvice>();
+            var result = new List<ITradeAdvice>();
 
             var ema4 = candles.Ema(4);
             var ema10 = candles.Ema(10);
@@ -26,13 +26,13 @@ namespace Mynt.Core.Strategies
             for (int i = 0; i < candles.Count; i++)
             {
                 if (i == 0)
-                    result.Add(TradeAdvice.Hold);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
                 else if (ema4[i] < ema10[i] && ema4[i - 1] > ema10[i] && macd.Macd[i] < 0 && plusDi[i] > minusDi[i])
-                    result.Add(TradeAdvice.Buy);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Buy));
                 else if (ema4[i] > ema10[i] && ema4[i - 1] < ema10[i] && macd.Macd[i] > 0 && plusDi[i] < minusDi[i])
-                    result.Add(TradeAdvice.Sell);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Sell));
                 else
-                    result.Add(TradeAdvice.Hold);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
             }
 
             return result;

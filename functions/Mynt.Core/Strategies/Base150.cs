@@ -13,9 +13,9 @@ namespace Mynt.Core.Strategies
     {
         public string Name => "Base 150";
         
-        public List<TradeAdvice> Prepare(List<Candle> candles)
+        public List<ITradeAdvice> Prepare(List<Candle> candles)
         {
-            var result = new List<TradeAdvice>();
+            var result = new List<ITradeAdvice>();
 
             var sma6 = candles.Sma(6);
             var sma25 = candles.Sma(25);
@@ -26,7 +26,7 @@ namespace Mynt.Core.Strategies
             {
                 if (i == 0)
                 {
-                    result.Add(TradeAdvice.Hold);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
                 }
                 else
                 {
@@ -38,7 +38,7 @@ namespace Mynt.Core.Strategies
                         || sma6[i - 1] < sma365[i]
                         || sma25[i - 1] < sma150[i]
                         || sma25[i - 1] < sma365[i]))
-                        result.Add(TradeAdvice.Buy);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Buy));
                     if (sma6[i] < sma150[i]
                         && sma6[i] < sma365[i]
                         && sma25[i] < sma150[i]
@@ -47,9 +47,9 @@ namespace Mynt.Core.Strategies
                         || sma6[i - 1] > sma365[i]
                         || sma25[i - 1] > sma150[i]
                         || sma25[i - 1] > sma365[i]))
-                        result.Add(TradeAdvice.Sell);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Sell));
                     else
-                        result.Add(TradeAdvice.Hold);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
                 }
             }
 

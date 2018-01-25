@@ -11,9 +11,9 @@ namespace Mynt.Core.Strategies
     {
         public string Name => "SAR Stoch";
         
-        public List<TradeAdvice> Prepare(List<Candle> candles)
+        public List<ITradeAdvice> Prepare(List<Candle> candles)
         {
-            var result = new List<TradeAdvice>();
+            var result = new List<ITradeAdvice>();
 
             var stoch = candles.Stoch(13);
             var stochFast = candles.StochFast(13);
@@ -62,15 +62,15 @@ namespace Mynt.Core.Strategies
                         fsar = -1;
 
                     if (fsar == -1 && (stoch.K[i] > 90 || stoch.D[i] > 90 || stochFast.K[i] > 90 || stochFast.D[i] > 90))
-                        result.Add(TradeAdvice.Sell);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Sell));
                     else if (fsar == 1 && (stoch.K[i] < 10 || stoch.D[i] < 10 || stochFast.K[i] < 10 || stochFast.D[i] < 10))
-                        result.Add(TradeAdvice.Buy);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Buy));
                     else
-                        result.Add(0);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
                 }
                 else
                 {
-                    result.Add(0);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
                 }
             }
 

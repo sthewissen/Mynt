@@ -14,9 +14,9 @@ namespace Mynt.Core.Strategies
     {
         public string Name => "BBand RSI";
         
-        public List<TradeAdvice> Prepare(List<Candle> candles)
+        public List<ITradeAdvice> Prepare(List<Candle> candles)
         {
-            var result = new List<TradeAdvice>();
+            var result = new List<ITradeAdvice>();
 
             var currentPrices = candles.Select(x => x.Close).ToList();
             var bbands = candles.Bbands(20);
@@ -25,13 +25,13 @@ namespace Mynt.Core.Strategies
             for (int i = 0; i < candles.Count; i++)
             {
                 if (i == 0)
-                    result.Add(TradeAdvice.Hold);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
                 else if (rsi[i] < 30 && currentPrices[i] < bbands.LowerBand[i])
-                    result.Add(TradeAdvice.Buy);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Buy));
                 else if (rsi[i] > 70)
-                    result.Add(TradeAdvice.Sell);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Sell));
                 else
-                    result.Add(TradeAdvice.Hold);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
             }
 
             return result;

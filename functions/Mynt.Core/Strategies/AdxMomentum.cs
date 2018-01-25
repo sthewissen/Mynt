@@ -13,9 +13,9 @@ namespace Mynt.Core.Strategies
     {
         public string Name => "ADX Momentum";
                 
-        public List<TradeAdvice> Prepare(List<Candle> candles)
+        public List<ITradeAdvice> Prepare(List<Candle> candles)
         {
-            var result = new List<TradeAdvice>();
+            var result = new List<ITradeAdvice>();
 
             var adx = candles.Adx(14);
             var diPlus = candles.PlusDI(25);
@@ -27,11 +27,11 @@ namespace Mynt.Core.Strategies
             {
 
                 if (adx[i] > 25 && mom[i] < 0 && diMinus[i] > 25 && diPlus[i] < diMinus[i])
-                    result.Add(TradeAdvice.Sell);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Sell));
                 else if (adx[i] > 25 && mom[i] > 0 && diPlus[i] > 25 && diPlus[i] > diMinus[i])
-                    result.Add(TradeAdvice.Buy);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Buy));
                 else
-                    result.Add(TradeAdvice.Hold);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
             }
 
             return result;

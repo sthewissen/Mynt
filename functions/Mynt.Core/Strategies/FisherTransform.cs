@@ -10,22 +10,22 @@ namespace Mynt.Core.Strategies
     {
         public string Name => "Fisher Transform";
         
-        public List<TradeAdvice> Prepare(List<Candle> candles)
+        public List<ITradeAdvice> Prepare(List<Candle> candles)
         {
-            var result = new List<TradeAdvice>();
+            var result = new List<ITradeAdvice>();
             var fishers = candles.Fisher(10);
             var ao = candles.AwesomeOscillator();
 
             for (int i = 0; i < candles.Count; i++)
             {
                 if (i == 0)
-                    result.Add(TradeAdvice.Hold);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
                 else if (fishers[i] < 0 && fishers[i - 1] > 0 && ao[i] < 0)
-                    result.Add(TradeAdvice.Buy);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Buy));
                 else if (fishers[i] == 1)
-                    result.Add(TradeAdvice.Sell);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Sell));
                 else
-                    result.Add(TradeAdvice.Hold);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
             }
 
             return result;

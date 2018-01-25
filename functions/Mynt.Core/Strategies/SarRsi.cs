@@ -14,9 +14,9 @@ namespace Mynt.Core.Strategies
     {
         public string Name => "SAR RSI";
         
-        public List<TradeAdvice> Prepare(List<Candle> candles)
+        public List<ITradeAdvice> Prepare(List<Candle> candles)
         {
-            var result = new List<TradeAdvice>();
+            var result = new List<ITradeAdvice>();
 
             var sar = candles.Sar();
             var rsi = candles.Rsi();
@@ -65,15 +65,15 @@ namespace Mynt.Core.Strategies
                         fsar = -1;
 
                     if (rsi[i] > 70 && fsar == -1)
-                        result.Add(TradeAdvice.Sell);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Sell));
                     else if (rsi[i] < 30 && fsar == 1)
-                        result.Add(TradeAdvice.Buy);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Buy));
                     else
-                        result.Add(TradeAdvice.Hold);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
                 }
                 else
                 {
-                    result.Add(0);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
                 }
             }
 

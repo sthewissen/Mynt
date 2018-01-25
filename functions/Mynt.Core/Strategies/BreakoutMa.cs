@@ -13,9 +13,9 @@ namespace Mynt.Core.Strategies
     {
         public string Name => "Breakout MA";
         
-        public List<TradeAdvice> Prepare(List<Candle> candles)
+        public List<ITradeAdvice> Prepare(List<Candle> candles)
         {
-            var result = new List<TradeAdvice>();
+            var result = new List<ITradeAdvice>();
 
             var sma20 = candles.Sma(20, CandleVariable.Low);
             var ema34 = candles.Ema(34);
@@ -24,11 +24,11 @@ namespace Mynt.Core.Strategies
             for (int i = 0; i < candles.Count; i++)
             {
                 if (ema34[i] > sma20[i] && adx[i] > 25)
-                    result.Add(TradeAdvice.Buy);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Buy));
                 else if (ema34[i] < sma20[i] && adx[i] > 25)
-                    result.Add(TradeAdvice.Sell);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Sell));
                 else
-                    result.Add(TradeAdvice.Hold);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
             }
 
             return result;

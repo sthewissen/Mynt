@@ -11,9 +11,9 @@ namespace Mynt.Core.Strategies
     {
         public string Name => "FreqTrade";
         
-        public List<TradeAdvice> Prepare(List<Candle> candles)
+        public List<ITradeAdvice> Prepare(List<Candle> candles)
         {
-            var result = new List<TradeAdvice>();
+            var result = new List<ITradeAdvice>();
 
             var sma = candles.Sma(100);
             var closes = candles.Select(x => x.Close).ToList();
@@ -31,11 +31,11 @@ namespace Mynt.Core.Strategies
             {
                 if (closes[i] < sma[i] && cci[i] < -100 && stoch.D[i] < 20 && fishers[i] < 0 &&
                     adx[i] > 20 && mfi[i] < 30 && tema[i] <= bbandsLower[i])
-                    result.Add(TradeAdvice.Buy);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Buy));
                 else if (fishers[i] == 1)
-                    result.Add(TradeAdvice.Sell);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Sell));
                 else
-                    result.Add(TradeAdvice.Hold);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
             }
 
             return result;

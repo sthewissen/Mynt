@@ -13,9 +13,9 @@ namespace Mynt.Core.Strategies
     {
         public string Name => "ADX Smas";
         
-        public List<TradeAdvice> Prepare(List<Candle> candles)
+        public List<ITradeAdvice> Prepare(List<Candle> candles)
         {
-            var result = new List<TradeAdvice>();
+            var result = new List<ITradeAdvice>();
 
             var sma6 = candles.Sma(3);
             var sma40 = candles.Sma(10);
@@ -25,7 +25,7 @@ namespace Mynt.Core.Strategies
             {
                 if (i == 0)
                 {
-                    result.Add(TradeAdvice.Hold);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
                 }
                 else
                 {
@@ -33,11 +33,11 @@ namespace Mynt.Core.Strategies
                     var fortyCross = ((sma40[i - 1] < sma6[i] && sma40[i] > sma6[i]) ? 1 : 0);
 
                     if (adx[i] > 25 && sixCross == 1)
-                        result.Add(TradeAdvice.Buy);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Buy));
                     else if (adx[i] < 25 && fortyCross == 1)
-                        result.Add(TradeAdvice.Sell);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Sell));
                     else
-                        result.Add(TradeAdvice.Hold);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
                 }
             }
 

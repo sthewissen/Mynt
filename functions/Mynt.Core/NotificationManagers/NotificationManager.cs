@@ -47,7 +47,7 @@ namespace Mynt.Core.NotificationManagers
                 try
                 {
                     var trend = await GetTrend(market.MarketName);
-                    if (trend.Count > 0 && trend.Last() == TradeAdvice.Buy)
+                    if (trend.Count > 0 && trend.Last().TradeAdvice == TradeAdvice.Buy)
                         // A match was made, buy that please!
                         results.Add(market.MarketName);
                 }
@@ -64,7 +64,7 @@ namespace Mynt.Core.NotificationManagers
         /// </summary>
         /// <param name="tradeMarket"></param>
         /// <returns></returns>
-        private async Task<List<TradeAdvice>> GetTrend(string tradeMarket)
+        private async Task<List<ITradeAdvice>> GetTrend(string tradeMarket)
         {
             var minimumDate = DateTime.UtcNow.AddHours(-120);
             var candles = await _api.GetTickerHistory(tradeMarket, minimumDate, Period.Hour);
@@ -73,7 +73,7 @@ namespace Mynt.Core.NotificationManagers
 
             // This is an outdated candle...
             if (signalDate < DateTime.UtcNow.AddMinutes(-120))
-                return new List<TradeAdvice>() { };
+                return new List<ITradeAdvice>() { };
 
             // This calculates a buy signal for each candle.
             var trend = _strategy.Prepare(candles.Where(x => x.Timestamp > minimumDate).ToList());

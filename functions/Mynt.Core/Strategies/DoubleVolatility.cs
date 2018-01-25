@@ -15,9 +15,9 @@ namespace Mynt.Core.Strategies
     {
         public string Name => "Double Volatility";
         
-        public List<TradeAdvice> Prepare(List<Candle> candles)
+        public List<ITradeAdvice> Prepare(List<Candle> candles)
         {
-            var result = new List<TradeAdvice>();
+            var result = new List<ITradeAdvice>();
 
             var sma5High = candles.Sma(5, CandleVariable.High);
             var sma20High = candles.Sma(20, CandleVariable.High);
@@ -29,13 +29,13 @@ namespace Mynt.Core.Strategies
             for (int i = 0; i < candles.Count; i++)
             {
                 if(i<1)
-                    result.Add(TradeAdvice.Hold);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
                 else if (sma5High[i] > sma20High[i] && rsi[i] > 65 && Math.Abs(opens[i] - closes[i]) / Math.Abs(opens[i-1] - closes[i-1]) < 2)
-                    result.Add(TradeAdvice.Buy);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Buy));
                 else if (sma5High[i] < sma20Low[i] && rsi[i] < 35)
-                    result.Add(TradeAdvice.Sell);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Sell));
                 else
-                    result.Add(TradeAdvice.Hold);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
             }
 
             return result;

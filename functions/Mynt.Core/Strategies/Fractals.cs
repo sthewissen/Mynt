@@ -11,7 +11,7 @@ namespace Mynt.Core.Strategies
     {
         public string Name => "Fractals";
 
-        public List<TradeAdvice> Prepare(List<Candle> candles)
+        public List<ITradeAdvice> Prepare(List<Candle> candles)
         {
             // Settings for this strat.
             var exitAfterBars = 3;
@@ -19,7 +19,7 @@ namespace Mynt.Core.Strategies
             var noRepainting = true;
 
             // Our lists to hold our values
-            var result = new List<TradeAdvice>();
+            var result = new List<ITradeAdvice>();
             var fractalPrice = new List<double>();
             var fractalAverage = new List<double>();
             var fractalTrend = new List<bool>();
@@ -36,7 +36,7 @@ namespace Mynt.Core.Strategies
                     fractalPrice.Add(0);
                     fractalAverage.Add(0);
                     fractalTrend.Add(false);
-                    result.Add(TradeAdvice.Hold);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
                 }
                 else
                 {
@@ -66,11 +66,11 @@ namespace Mynt.Core.Strategies
                     var tradeExit = fractalTrend[i - exitAfterBars] && fractalTrend[i] == false;
 
                     if (tradeExit)
-                        result.Add(TradeAdvice.Sell);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Sell));
                     else if (tradeEntry && ao[i]>0)
-                        result.Add(TradeAdvice.Buy);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Buy));
                     else
-                        result.Add(TradeAdvice.Hold);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
                 }
             }
 

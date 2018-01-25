@@ -12,9 +12,9 @@ namespace Mynt.Core.Strategies
     {
         public string Name => "Williams Vix Fix (Extended)";
         
-        public List<TradeAdvice> Prepare(List<Candle> candles)
+        public List<ITradeAdvice> Prepare(List<Candle> candles)
         {
-            var result = new List<TradeAdvice>();
+            var result = new List<ITradeAdvice>();
 
             var ao = candles.AwesomeOscillator();
             var close = candles.Select(x => x.Close).ToList();
@@ -85,7 +85,7 @@ namespace Mynt.Core.Strategies
             for (int i = 0; i < candles.Count; i++)
             {
                 if (i < ltLB)
-                    result.Add(TradeAdvice.Hold);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
                 else
                 {
                     //Filtered Bar Criteria
@@ -104,11 +104,11 @@ namespace Mynt.Core.Strategies
                                           (close[i] < close[i - ltLB] || close[i] < close[i - mtLB]) && filteredAggr;
 
                     if ((filteredAlert || aggressiveAlert))
-                        result.Add(TradeAdvice.Buy);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Buy));
                     else if (stochRsi.K[i] > 80 && stochRsi.K[i] > stochRsi.D[i] && stochRsi.K[i - 1] < stochRsi.D[i - 1] && ao[i] < 0 && ao[i - 1] > 0)
-                        result.Add(TradeAdvice.Sell);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Sell));
                     else
-                        result.Add(TradeAdvice.Hold);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
                 }
             }
 
