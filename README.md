@@ -17,6 +17,8 @@ This bot was first mentioned in [one of my blogposts].
 
 ![Build status](https://sthewissen.visualstudio.com/_apis/public/build/definitions/c865956c-413b-4c44-b678-45d3026ae0b0/11/badge)
 
+---
+
 ### Documentation
 
 * [Configuration](https://github.com/sthewissen/Mynt/wiki/Configuration)
