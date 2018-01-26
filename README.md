@@ -27,6 +27,8 @@ This bot was first mentioned in [one of my blogposts].
 * [Notifications](https://github.com/sthewissen/Mynt/wiki/Notifications)
 * [Backtesting](https://github.com/sthewissen/Mynt/wiki/Backtesting)
 
+---
+
 ### Additional tools used
 
 - Bittrex API wrapper - https://github.com/Coinio/Bittrex.Api.Client
