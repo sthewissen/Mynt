@@ -105,7 +105,7 @@ namespace Mynt.BackTester
                             if (trend[i].TradeAdvice == TradeAdvice.Sell || ShouldSell(trade, candles[i].Close, candles[i].Timestamp) != SellType.None)
                             {
                                 // Bittrex charges 0,25% transaction fee, so deduct that.
-                                var currentProfit = 0.995 * ((candles[i].Close - trade.OpenRate) / trade.OpenRate);
+                                var currentProfit = (candles[i].Close - trade.OpenRate) / trade.OpenRate - 0.005;
                                 results.Add(new BackTestResult { Currency = pair, Profit = currentProfit, Duration = i - buyStep });
                                 break;
                             }
@@ -172,7 +172,7 @@ namespace Mynt.BackTester
                                 {
                                     if (trend[i].TradeAdvice == TradeAdvice.Sell || ShouldSell(trade, candles[i].Close, candles[i].Timestamp) != SellType.None)
                                     {
-                                        var currentProfit = 0.995 * ((candles[i].Close - trade.OpenRate) / trade.OpenRate);
+										var currentProfit = (candles[i].Close - trade.OpenRate) / trade.OpenRate - 0.005;
                                         results.Add(new BackTestResult
                                         {
                                             Currency = pair,
