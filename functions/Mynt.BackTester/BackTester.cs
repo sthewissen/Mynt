@@ -77,42 +77,7 @@ namespace Mynt.BackTester
 
         private void BackTest(ITradingStrategy strategy)
         {
-            var results = new List<BackTestResult>();
-
-            // Go through our coinpairs and backtest them.
-            foreach (var pair in coinsToBuy)
-            {
-                var candleProvider = new JsonCandleProvider("Data");
-
-                // This creates a list of buy signals.
-                var candles = candleProvider.GetCandles(pair);
-                var trend = strategy.Prepare(candles);
-
-                for (int i = 0; i < trend.Count; i++)
-                {
-                    if (trend[i].TradeAdvice == TradeAdvice.Buy)
-                    {
-                        // This is a buy signal
-                        var trade = new Trade() { OpenRate = candles[i].Close, OpenDate = candles[i].Timestamp, Quantity = 1 };
-
-                        var buyStep = i;
-
-                        // Calculate win/lose forwards from buy point
-                        for (; i < trend.Count; i++)
-                        {
-                            // There are 2 ways we can sell, either through the strategy telling us to do so (-1)
-                            // or because other conditions such as the ROI or stoploss tell us to.
-                            if (trend[i].TradeAdvice == TradeAdvice.Sell || ShouldSell(trade, candles[i].Close, candles[i].Timestamp) != SellType.None)
-                            {
-                                // Bittrex charges 0,25% transaction fee, so deduct that.
-                                var currentProfit = (candles[i].Close - trade.OpenRate) / trade.OpenRate - 0.005;
-                                results.Add(new BackTestResult { Currency = pair, Profit = currentProfit, Duration = i - buyStep });
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
+            List<BackTestResult> results = RunBackTest(strategy);
 
             Console.WriteLine();
             Console.WriteLine($"\t=============== BACKTESTING REPORT {strategy.Name} ===============");
@@ -133,7 +98,6 @@ namespace Mynt.BackTester
 
         private void BackTestAll()
         {
-
             Console.WriteLine();
             Console.WriteLine(
                 $"\t=============== BACKTESTING REPORT ===============");
@@ -143,49 +107,7 @@ namespace Mynt.BackTester
             {
                 try
                 {
-                    var results = new List<BackTestResult>();
-
-                    foreach (var pair in coinsToBuy)
-                    {
-                        var dataString = File.ReadAllText($"Data/{pair}.json");
-
-                        // This creates a list of buy signals.
-                        var candles = JsonConvert.DeserializeObject<List<Core.Models.Candle>>(dataString);
-                        var trend = strategy.Prepare(candles);
-
-                        for (int i = 0; i < trend.Count; i++)
-                        {
-                            if (trend[i].TradeAdvice == TradeAdvice.Buy)
-                            {
-                                // This is a buy signal
-                                var trade = new Trade()
-                                {
-                                    OpenRate = candles[i].Close,
-                                    OpenDate = candles[i].Timestamp,
-                                    Quantity = 1
-                                };
-
-                                var buyStep = i;
-
-                                // Calculate win/lose forwards from buy point
-                                for (; i < trend.Count; i++)
-                                {
-                                    if (trend[i].TradeAdvice == TradeAdvice.Sell || ShouldSell(trade, candles[i].Close, candles[i].Timestamp) != SellType.None)
-                                    {
-										var currentProfit = (candles[i].Close - trade.OpenRate) / trade.OpenRate - 0.005;
-                                        results.Add(new BackTestResult
-                                        {
-                                            Currency = pair,
-                                            Profit = currentProfit,
-                                            Duration = i - buyStep
-                                        });
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
-
+                    List<BackTestResult> results = RunBackTest(strategy);
                     Console.Write($"\t{strategy.Name}:".PadRight(35, ' '));
                     PrintResults(results);
                 }
@@ -531,6 +453,48 @@ namespace Mynt.BackTester
 
 
             PrintResults(stratResults);
+        }
+
+        private List<BackTestResult> RunBackTest(ITradingStrategy strategy)
+        {
+            var results = new List<BackTestResult>();
+
+            // Go through our coinpairs and backtest them.
+            foreach (var pair in coinsToBuy)
+            {
+                var candleProvider = new JsonCandleProvider("Data");
+
+                // This creates a list of buy signals.
+                var candles = candleProvider.GetCandles(pair);
+                var trend = strategy.Prepare(candles);
+
+                for (int i = 0; i < trend.Count; i++)
+                {
+                    if (trend[i].TradeAdvice == TradeAdvice.Buy)
+                    {
+                        // This is a buy signal
+                        var trade = new Trade() { OpenRate = candles[i].Close, OpenDate = candles[i].Timestamp, Quantity = 1 };
+
+                        var buyStep = i;
+
+                        // Calculate win/lose forwards from buy point
+                        for (; i < trend.Count; i++)
+                        {
+                            // There are 2 ways we can sell, either through the strategy telling us to do so (-1)
+                            // or because other conditions such as the ROI or stoploss tell us to.
+                            if (trend[i].TradeAdvice == TradeAdvice.Sell || ShouldSell(trade, candles[i].Close, candles[i].Timestamp) != SellType.None)
+                            {
+                                // Bittrex charges 0,25% transaction fee, so deduct that.
+                                var currentProfit = (candles[i].Close - trade.OpenRate) / trade.OpenRate - 0.005;
+                                results.Add(new BackTestResult { Currency = pair, Profit = currentProfit, Duration = i - buyStep });
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return results;
         }
 
         private SellType ShouldSell(Trade trade, double currentRateBid, DateTime utcNow)
