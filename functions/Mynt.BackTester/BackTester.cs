@@ -95,16 +95,18 @@ namespace Mynt.BackTester
                         // This is a buy signal
                         var trade = new Trade() { OpenRate = candles[i].Close, OpenDate = candles[i].Timestamp, Quantity = 1 };
 
+                        var buyStep = i;
+
                         // Calculate win/lose forwards from buy point
-                        for (int j = i; j < trend.Count; j++)
+                        for (; i < trend.Count; i++)
                         {
                             // There are 2 ways we can sell, either through the strategy telling us to do so (-1)
                             // or because other conditions such as the ROI or stoploss tell us to.
-                            if (trend[j].TradeAdvice == TradeAdvice.Sell || ShouldSell(trade, candles[j].Close, candles[j].Timestamp) != SellType.None)
+                            if (trend[i].TradeAdvice == TradeAdvice.Sell || ShouldSell(trade, candles[i].Close, candles[i].Timestamp) != SellType.None)
                             {
                                 // Bittrex charges 0,25% transaction fee, so deduct that.
-                                var currentProfit = 0.995 * ((candles[j].Close - trade.OpenRate) / trade.OpenRate);
-                                results.Add(new BackTestResult { Currency = pair, Profit = currentProfit, Duration = j - i });
+                                var currentProfit = 0.995 * ((candles[i].Close - trade.OpenRate) / trade.OpenRate);
+                                results.Add(new BackTestResult { Currency = pair, Profit = currentProfit, Duration = i - buyStep });
                                 break;
                             }
                         }
@@ -163,17 +165,19 @@ namespace Mynt.BackTester
                                     Quantity = 1
                                 };
 
+                                var buyStep = i;
+
                                 // Calculate win/lose forwards from buy point
-                                for (int j = i; j < trend.Count; j++)
+                                for (; i < trend.Count; i++)
                                 {
-                                    if (trend[j].TradeAdvice == TradeAdvice.Sell || ShouldSell(trade, candles[j].Close, candles[j].Timestamp) != SellType.None)
+                                    if (trend[i].TradeAdvice == TradeAdvice.Sell || ShouldSell(trade, candles[i].Close, candles[i].Timestamp) != SellType.None)
                                     {
-                                        var currentProfit = 0.995 * ((candles[j].Close - trade.OpenRate) / trade.OpenRate);
+                                        var currentProfit = 0.995 * ((candles[i].Close - trade.OpenRate) / trade.OpenRate);
                                         results.Add(new BackTestResult
                                         {
                                             Currency = pair,
                                             Profit = currentProfit,
-                                            Duration = j - i
+                                            Duration = i - buyStep
                                         });
                                         break;
                                     }
