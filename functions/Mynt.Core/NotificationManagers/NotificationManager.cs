@@ -1,24 +1,24 @@
 ﻿using System;
-using System.Threading.Tasks;
-using Microsoft.Azure.NotificationHubs;
-using Mynt.Core.Interfaces;
 using System.Collections.Generic;
-using Mynt.Core.Api.Bittrex;
 using System.Linq;
+using System.Threading.Tasks;
+using Mynt.Core.Api;
+using Mynt.Core.Enums;
 using Mynt.Core.Extensions;
-using Mynt.Core.Api.Bittrex.Models;
+using Mynt.Core.Interfaces;
+using Mynt.Core.Models;
 
 namespace Mynt.Core.NotificationManagers
 {
     public class NotificationManager
     {
-        private readonly BittrexApi _api;
+        private readonly IExchangeApi _api;
         private readonly ITradingStrategy _strategy;
         private readonly Action<string> _log;
 
-        public NotificationManager(ITradingStrategy strategy, Action<string> log)
+        public NotificationManager(IExchangeApi api, ITradingStrategy strategy, Action<string> log)
         {
-            _api = new BittrexApi(true);
+            _api = api;
             _strategy = strategy;
             _log = log;
         }
@@ -47,7 +47,7 @@ namespace Mynt.Core.NotificationManagers
                 try
                 {
                     var trend = await GetTrend(market.MarketName);
-                    if (trend.Count > 0 && trend.Last() == 1)
+                    if (trend.Count > 0 && trend.Last().TradeAdvice == TradeAdvice.Buy)
                         // A match was made, buy that please!
                         results.Add(market.MarketName);
                 }
@@ -64,21 +64,19 @@ namespace Mynt.Core.NotificationManagers
         /// </summary>
         /// <param name="tradeMarket"></param>
         /// <returns></returns>
-        private async Task<List<int>> GetTrend(string tradeMarket)
+        private async Task<List<ITradeAdvice>> GetTrend(string tradeMarket)
         {
             var minimumDate = DateTime.UtcNow.AddHours(-120);
-            var candles = await _api.GetTickerHistory(tradeMarket, minimumDate.ToUnixTimestamp(), Period.Hour);
-
-            _strategy.Candles = candles.Where(x => x.Timestamp > minimumDate).ToList();
-
+            var candles = await _api.GetTickerHistory(tradeMarket, minimumDate, Period.Hour);
+            
             var signalDate = candles[candles.Count - 1].Timestamp;
 
             // This is an outdated candle...
             if (signalDate < DateTime.UtcNow.AddMinutes(-120))
-                return new List<int>() { };
+                return new List<ITradeAdvice>() { };
 
             // This calculates a buy signal for each candle.
-            var trend = _strategy.Prepare();
+            var trend = _strategy.Prepare(candles.Where(x => x.Timestamp > minimumDate).ToList());
 
             return trend;
         }

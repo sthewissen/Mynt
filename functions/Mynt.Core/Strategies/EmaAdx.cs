@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Mynt.Core.Enums;
 using Mynt.Core.Indicators;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
@@ -12,32 +13,25 @@ namespace Mynt.Core.Strategies
     public class EmaAdx : ITradingStrategy
     {
         public string Name => "EMA ADX";
-
-        public List<Candle> Candles { get; set; }
-
-        public EmaAdx()
+        
+        public List<ITradeAdvice> Prepare(List<Candle> candles)
         {
-            this.Candles = new List<Candle>();
-        }
+            var result = new List<ITradeAdvice>();
 
-        public List<int> Prepare()
-        {
-            var result = new List<int>();
+            var emaFast = candles.Ema(12);
+            var emaShort = candles.Ema(36);
+            var adx = candles.Adx();
 
-            var emaFast = Candles.Ema(12);
-            var emaShort = Candles.Ema(36);
-            var adx = Candles.Adx();
-
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
                 if (i == 0)
-                    result.Add(0);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
                 else if (emaFast[i] > emaShort[i] && emaFast[i - 1] < emaShort[i] && adx[i] < 20)
-                    result.Add(1);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Buy));
                 else if (emaFast[i] < emaShort[i] && emaFast[i - 1] > emaShort[i] && adx[i] >= 20)
-                    result.Add(-1);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Sell));
                 else
-                    result.Add(0);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
             }
 
             return result;

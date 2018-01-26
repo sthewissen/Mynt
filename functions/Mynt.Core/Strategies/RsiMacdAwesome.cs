@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Mynt.Core.Enums;
 using Mynt.Core.Indicators;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
@@ -10,32 +11,25 @@ namespace Mynt.Core.Strategies
     public class RsiMacdAwesome : ITradingStrategy
     {
         public string Name => "RSI MACD Awesome";
-
-        public List<Candle> Candles { get; set; }
-
-        public RsiMacdAwesome()
+        
+        public List<ITradeAdvice> Prepare(List<Candle> candles)
         {
-            this.Candles = new List<Candle>();
-        }
+            var result = new List<ITradeAdvice>();
 
-        public List<int> Prepare()
-        {
-            var result = new List<int>();
+            var macd = candles.Macd(5,10,4);
+            var rsi = candles.Rsi(16);
+            var ao = candles.AwesomeOscillator();
 
-            var macd = Candles.Macd(5,10,4);
-            var rsi = Candles.Rsi(16);
-            var ao = Candles.AwesomeOscillator();
+            var close = candles.Select(x => x.Close).ToList();
 
-            var close = Candles.Select(x => x.Close).ToList();
-
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {       
                     if (macd.Hist[i] < 0 && ao[i] > 0 && rsi[i] < 45)
-                        result.Add(1);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Buy));
                     else if (macd.Hist[i] > 0 && ao[i] < 0 && rsi[i] > 45)
-                        result.Add(-1);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Sell));
                     else
-                        result.Add(0);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
              }
 
             return result;

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Mynt.Core.Enums;
 using Mynt.Core.Indicators;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
@@ -12,33 +13,26 @@ namespace Mynt.Core.Strategies
     {
         public string Name => "EMA ADX MACD";
 
-        public List<Candle> Candles { get; set; }
-
-        public EmaAdxMacd()
+        public List<ITradeAdvice> Prepare(List<Candle> candles)
         {
-            this.Candles = new List<Candle>();
-        }
+            var result = new List<ITradeAdvice>();
 
-        public List<int> Prepare()
-        {
-            var result = new List<int>();
+            var ema4 = candles.Ema(4);
+            var ema10 = candles.Ema(10);
+            var plusDi = candles.PlusDI(28);
+            var minusDi = candles.MinusDI(28);
+            var macd = candles.Macd(5, 10, 4);
 
-            var ema4 = Candles.Ema(4);
-            var ema10 = Candles.Ema(10);
-            var plusDi = Candles.PlusDI(28);
-            var minusDi = Candles.MinusDI(28);
-            var macd = Candles.Macd(5, 10, 4);
-
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
-                if(i==0)
-                    result.Add(0);
+                if (i == 0)
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
                 else if (ema4[i] < ema10[i] && ema4[i - 1] > ema10[i] && macd.Macd[i] < 0 && plusDi[i] > minusDi[i])
-                    result.Add(1);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Buy));
                 else if (ema4[i] > ema10[i] && ema4[i - 1] < ema10[i] && macd.Macd[i] > 0 && plusDi[i] < minusDi[i])
-                    result.Add(-1);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Sell));
                 else
-                    result.Add(0);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
             }
 
             return result;

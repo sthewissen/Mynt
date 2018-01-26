@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Mynt.Core.Enums;
 using Mynt.Core.Indicators;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
@@ -12,8 +10,8 @@ namespace Mynt.Core.Strategies
     public class Fractals : ITradingStrategy
     {
         public string Name => "Fractals";
-        public List<Candle> Candles { get; set; }
-        public List<int> Prepare()
+
+        public List<ITradeAdvice> Prepare(List<Candle> candles)
         {
             // Settings for this strat.
             var exitAfterBars = 3;
@@ -21,16 +19,16 @@ namespace Mynt.Core.Strategies
             var noRepainting = true;
 
             // Our lists to hold our values
-            var result = new List<int>();
+            var result = new List<ITradeAdvice>();
             var fractalPrice = new List<double>();
             var fractalAverage = new List<double>();
             var fractalTrend = new List<bool>();
 
-            var ao = Candles.AwesomeOscillator();
-            var high = Candles.Select(x => x.High).ToList();
-            var highLowAvgs = Candles.Select(x => (x.High + x.Low) / 2).ToList();
+            var ao = candles.AwesomeOscillator();
+            var high = candles.Select(x => x.High).ToList();
+            var highLowAvgs = candles.Select(x => (x.High + x.Low) / 2).ToList();
 
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
                 // Calculate the price for this fractal
                 if (i < 4)
@@ -38,7 +36,7 @@ namespace Mynt.Core.Strategies
                     fractalPrice.Add(0);
                     fractalAverage.Add(0);
                     fractalTrend.Add(false);
-                    result.Add(0);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
                 }
                 else
                 {
@@ -68,11 +66,11 @@ namespace Mynt.Core.Strategies
                     var tradeExit = fractalTrend[i - exitAfterBars] && fractalTrend[i] == false;
 
                     if (tradeExit)
-                        result.Add(-1);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Sell));
                     else if (tradeEntry && ao[i]>0)
-                        result.Add(1);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Buy));
                     else
-                        result.Add(0);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
                 }
             }
 

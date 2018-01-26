@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Mynt.Core.Enums;
 using Mynt.Core.Indicators;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
@@ -11,30 +12,23 @@ namespace Mynt.Core.Strategies
     public class BreakoutMa : ITradingStrategy
     {
         public string Name => "Breakout MA";
-
-        public List<Models.Candle> Candles { get; set; }
-
-        public BreakoutMa()
+        
+        public List<ITradeAdvice> Prepare(List<Candle> candles)
         {
-            this.Candles = new List<Candle>();
-        }
+            var result = new List<ITradeAdvice>();
 
-        public List<int> Prepare()
-        {
-            var result = new List<int>();
+            var sma20 = candles.Sma(20, CandleVariable.Low);
+            var ema34 = candles.Ema(34);
+            var adx = candles.Adx(13);
 
-            var sma20 = Candles.Sma(20, CandleVariable.Low);
-            var ema34 = Candles.Ema(34);
-            var adx = Candles.Adx(13);
-
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
                 if (ema34[i] > sma20[i] && adx[i] > 25)
-                    result.Add(1);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Buy));
                 else if (ema34[i] < sma20[i] && adx[i] > 25)
-                    result.Add(-1);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Sell));
                 else
-                    result.Add(0);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
             }
 
             return result;

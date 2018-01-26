@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2002
+VisualStudioVersion = 15.0.27130.2024
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mynt.Functions", "Mynt.Functions\Mynt.Functions.csproj", "{30DE788A-0914-4842-9AC7-3A65E2397DB6}"
 EndProject
@@ -13,6 +13,24 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{9315B39C-C
 	ProjectSection(SolutionItems) = preProject
 		..\README.md = ..\README.md
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.Core.Bittrex", "Mynt.Core.Bittrex\Mynt.Core.Bittrex.csproj", "{626D9760-282C-4ADF-8C56-DBA91DE01E87}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.Core.Binance", "Mynt.Core.Binance\Mynt.Core.Binance.csproj", "{F34D0F30-7063-48BE-80A9-B7974A7ECF76}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.Core.Tests", "Mynt.Core.Tests\Mynt.Core.Tests.csproj", "{BA80095C-5B5B-466C-AE44-3A9DBC08E123}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.BackTester.Console", "Mynt.BackTester.Console\Mynt.BackTester.Console.csproj", "{8A0DA4E2-77CD-4712-ABEB-BDFA0F014AC6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.Wpf", "Mynt.Wpf\Mynt.Wpf.csproj", "{6D91E659-54FA-43E7-A1ED-C63ABE1B5F72}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.Extensibility", "Mynt.Extensibility\Mynt.Extensibility.csproj", "{71ABD5BD-E1CB-4820-8BEB-F34763ED0083}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.Services", "Mynt.Services\Mynt.Services.csproj", "{575EF25F-90B5-4266-9260-56B5E56269F6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.DataAccess.FileBasedStorage", "Mynt.DataAccess.FileBasedStorage\Mynt.DataAccess.FileBasedStorage.csproj", "{9B066863-B898-4D73-9BFE-433C1F3C5694}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.DataAccess.Interfaces", "Mynt.DataAccess.Interfaces\Mynt.DataAccess.Interfaces.csproj", "{09BEC4BC-6233-4072-ABB9-7633AC83437A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -32,6 +50,42 @@ Global
 		{E1879751-5218-46F9-9D5A-D52079FE58BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E1879751-5218-46F9-9D5A-D52079FE58BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E1879751-5218-46F9-9D5A-D52079FE58BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{626D9760-282C-4ADF-8C56-DBA91DE01E87}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{626D9760-282C-4ADF-8C56-DBA91DE01E87}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{626D9760-282C-4ADF-8C56-DBA91DE01E87}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{626D9760-282C-4ADF-8C56-DBA91DE01E87}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F34D0F30-7063-48BE-80A9-B7974A7ECF76}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F34D0F30-7063-48BE-80A9-B7974A7ECF76}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F34D0F30-7063-48BE-80A9-B7974A7ECF76}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F34D0F30-7063-48BE-80A9-B7974A7ECF76}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA80095C-5B5B-466C-AE44-3A9DBC08E123}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA80095C-5B5B-466C-AE44-3A9DBC08E123}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA80095C-5B5B-466C-AE44-3A9DBC08E123}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA80095C-5B5B-466C-AE44-3A9DBC08E123}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8A0DA4E2-77CD-4712-ABEB-BDFA0F014AC6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8A0DA4E2-77CD-4712-ABEB-BDFA0F014AC6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8A0DA4E2-77CD-4712-ABEB-BDFA0F014AC6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8A0DA4E2-77CD-4712-ABEB-BDFA0F014AC6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6D91E659-54FA-43E7-A1ED-C63ABE1B5F72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D91E659-54FA-43E7-A1ED-C63ABE1B5F72}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D91E659-54FA-43E7-A1ED-C63ABE1B5F72}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D91E659-54FA-43E7-A1ED-C63ABE1B5F72}.Release|Any CPU.Build.0 = Release|Any CPU
+		{71ABD5BD-E1CB-4820-8BEB-F34763ED0083}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71ABD5BD-E1CB-4820-8BEB-F34763ED0083}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{71ABD5BD-E1CB-4820-8BEB-F34763ED0083}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{71ABD5BD-E1CB-4820-8BEB-F34763ED0083}.Release|Any CPU.Build.0 = Release|Any CPU
+		{575EF25F-90B5-4266-9260-56B5E56269F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{575EF25F-90B5-4266-9260-56B5E56269F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{575EF25F-90B5-4266-9260-56B5E56269F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{575EF25F-90B5-4266-9260-56B5E56269F6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B066863-B898-4D73-9BFE-433C1F3C5694}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B066863-B898-4D73-9BFE-433C1F3C5694}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B066863-B898-4D73-9BFE-433C1F3C5694}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B066863-B898-4D73-9BFE-433C1F3C5694}.Release|Any CPU.Build.0 = Release|Any CPU
+		{09BEC4BC-6233-4072-ABB9-7633AC83437A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09BEC4BC-6233-4072-ABB9-7633AC83437A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09BEC4BC-6233-4072-ABB9-7633AC83437A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09BEC4BC-6233-4072-ABB9-7633AC83437A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

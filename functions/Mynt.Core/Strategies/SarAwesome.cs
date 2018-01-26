@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Mynt.Core.Enums;
 using Mynt.Core.Indicators;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
@@ -13,27 +14,20 @@ namespace Mynt.Core.Strategies
     public class SarAwesome : ITradingStrategy
     {
         public string Name => "SAR Awesome";
-
-        public List<Candle> Candles { get; set; }
-
-        public SarAwesome()
+        
+        public List<ITradeAdvice> Prepare(List<Candle> candles)
         {
-            this.Candles = new List<Candle>();
-        }
+            var result = new List<ITradeAdvice>();
 
-        public List<int> Prepare()
-        {
-            var result = new List<int>();
+            var sar = candles.Sar();
+            var ema5 = candles.Ema(5);
+            var ao = candles.AwesomeOscillator();
 
-            var sar = Candles.Sar();
-            var ema5 = Candles.Ema(5);
-            var ao = Candles.AwesomeOscillator();
+            var close = candles.Select(x => x.Close).ToList();
+            var highs = candles.Select(x => x.High).ToList();
+            var lows = candles.Select(x => x.Low).ToList();
 
-            var close = Candles.Select(x => x.Close).ToList();
-            var highs = Candles.Select(x => x.High).ToList();
-            var lows = Candles.Select(x => x.Low).ToList();
-
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
                 if (i >= 2)
                 {
@@ -44,15 +38,15 @@ namespace Mynt.Core.Strategies
                     var lastLow = lows[i];
 
                     if ((currentSar > lastHigh) && (priorSar > lastHigh) && (earlierSar > lastHigh) && ao[i] > 0 && ema5[i] < close[i])
-                        result.Add(1);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Buy));
                     else if ((currentSar < lastLow) && (priorSar < lastLow) && (earlierSar < lastLow) && ao[i] < 0 && ema5[i] > close[i])
-                        result.Add(-1);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Sell));
                     else
-                        result.Add(0);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
                 }
                 else
                 {
-                    result.Add(0);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
                 }
             }
 

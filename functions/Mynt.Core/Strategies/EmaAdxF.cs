@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Mynt.Core.Enums;
 using Mynt.Core.Indicators;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
@@ -15,34 +13,27 @@ namespace Mynt.Core.Strategies
     public class EmaAdxF : ITradingStrategy
     {
         public string Name => "EMA ADX F";
-
-        public List<Candle> Candles { get; set; }
-
-        public EmaAdxF()
+        
+        public List<ITradeAdvice> Prepare(List<Candle> candles)
         {
-            this.Candles = new List<Candle>();
-        }
+            var result = new List<ITradeAdvice>();
 
-        public List<int> Prepare()
-        {
-            var result = new List<int>();
+            var closes = candles.Select(x => x.Close).ToList();
+            var ema9 = candles.Ema(9);
+            var adx = candles.Adx(14);
+            var minusDI = candles.MinusDI(14);
+            var plusDI = candles.PlusDI(14);
 
-            var closes = Candles.Select(x => x.Close).ToList();
-            var ema9 = Candles.Ema(9);
-            var adx = Candles.Adx(14);
-            var minusDI = Candles.MinusDI(14);
-            var plusDI = Candles.PlusDI(14);
-
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
                 if (i == 0)
-                    result.Add(0);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
                 else if (ema9[i] < closes[i] && plusDI[i] > 20 && plusDI[i] > minusDI[i])
-                    result.Add(1);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Buy));
                 else if (ema9[i] > closes[i] && minusDI[i] > 20 && plusDI[i] < minusDI[i])
-                    result.Add(-1);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Sell));
                 else
-                    result.Add(0);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
             }
 
             return result;

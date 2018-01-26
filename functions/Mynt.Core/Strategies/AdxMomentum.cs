@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
+using Mynt.Core.Enums;
 using Mynt.Core.Indicators;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
@@ -12,33 +12,26 @@ namespace Mynt.Core.Strategies
     public class AdxMomentum : ITradingStrategy
     {
         public string Name => "ADX Momentum";
-
-        public List<Candle> Candles { get; set; }
-
-        public AdxMomentum()
+                
+        public List<ITradeAdvice> Prepare(List<Candle> candles)
         {
-            this.Candles = new List<Candle>();
-        }
+            var result = new List<ITradeAdvice>();
 
-        public List<int> Prepare()
-        {
-            var result = new List<int>();
+            var adx = candles.Adx(14);
+            var diPlus = candles.PlusDI(25);
+            var diMinus = candles.MinusDI(25);
+            var sar = candles.Sar();
+            var mom = candles.Mom(14);
 
-            var adx = Candles.Adx(14);
-            var diPlus = Candles.PlusDI(25);
-            var diMinus = Candles.MinusDI(25);
-            var sar = Candles.Sar();
-            var mom = Candles.Mom(14);
-
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
 
                 if (adx[i] > 25 && mom[i] < 0 && diMinus[i] > 25 && diPlus[i] < diMinus[i])
-                    result.Add(-1);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Sell));
                 else if (adx[i] > 25 && mom[i] > 0 && diPlus[i] > 25 && diPlus[i] > diMinus[i])
-                    result.Add(1);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Buy));
                 else
-                    result.Add(0);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
             }
 
             return result;

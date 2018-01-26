@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Mynt.Core.Enums;
 using Mynt.Core.Indicators;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
@@ -9,27 +10,20 @@ namespace Mynt.Core.Strategies
     public class SarStoch : ITradingStrategy
     {
         public string Name => "SAR Stoch";
-
-        public List<Candle> Candles { get; set; }
-
-        public SarStoch()
+        
+        public List<ITradeAdvice> Prepare(List<Candle> candles)
         {
-            this.Candles = new List<Candle>();
-        }
+            var result = new List<ITradeAdvice>();
 
-        public List<int> Prepare()
-        {
-            var result = new List<int>();
+            var stoch = candles.Stoch(13);
+            var stochFast = candles.StochFast(13);
+            var sar = candles.Sar(3);
+            var highs = candles.Select(x => x.High).ToList();
+            var lows = candles.Select(x => x.Low).ToList();
+            var closes = candles.Select(x => x.Close).ToList();
+            var opens = candles.Select(x => x.Open).ToList();
 
-            var stoch = Candles.Stoch(13);
-            var stochFast = Candles.StochFast(13);
-            var sar = Candles.Sar(3);
-            var highs = Candles.Select(x => x.High).ToList();
-            var lows = Candles.Select(x => x.Low).ToList();
-            var closes = Candles.Select(x => x.Close).ToList();
-            var opens = Candles.Select(x => x.Open).ToList();
-
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
                 if (i > 2)
                 {
@@ -68,15 +62,15 @@ namespace Mynt.Core.Strategies
                         fsar = -1;
 
                     if (fsar == -1 && (stoch.K[i] > 90 || stoch.D[i] > 90 || stochFast.K[i] > 90 || stochFast.D[i] > 90))
-                        result.Add(-1);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Sell));
                     else if (fsar == 1 && (stoch.K[i] < 10 || stoch.D[i] < 10 || stochFast.K[i] < 10 || stochFast.D[i] < 10))
-                        result.Add(1);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Buy));
                     else
-                        result.Add(0);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
                 }
                 else
                 {
-                    result.Add(0);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
                 }
             }
 

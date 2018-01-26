@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Mynt.Core.Enums;
 using Mynt.Core.Indicators;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
@@ -9,26 +10,19 @@ namespace Mynt.Core.Strategies
     public class SmaSar : ITradingStrategy
     {
         public string Name => "SMA SAR";
-
-        public List<Candle> Candles { get; set; }
-
-        public SmaSar()
+        
+        public List<ITradeAdvice> Prepare(List<Candle> candles)
         {
-            this.Candles = new List<Candle>();
-        }
+            var result = new List<ITradeAdvice>();
 
-        public List<int> Prepare()
-        {
-            var result = new List<int>();
+            var sma = candles.Sma(60);
+            var sar = candles.Sar();
+            var highs = candles.Select(x => x.High).ToList();
+            var lows = candles.Select(x => x.Low).ToList();
+            var closes = candles.Select(x => x.Close).ToList();
+            var opens = candles.Select(x => x.Open).ToList();
 
-            var sma = Candles.Sma(60);
-            var sar = Candles.Sar();
-            var highs = Candles.Select(x => x.High).ToList();
-            var lows = Candles.Select(x => x.Low).ToList();
-            var closes = Candles.Select(x => x.Close).ToList();
-            var opens = Candles.Select(x => x.Open).ToList();
-
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
                 if (i > 2)
                 {
@@ -67,15 +61,15 @@ namespace Mynt.Core.Strategies
                         fsar = -1;
 
                     if (closes[i] > sma[i] && fsar == 1)
-                        result.Add(1);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Buy));
                     else if (closes[i] < sma[i] && fsar == -1)
-                        result.Add(-1);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Sell));
                     else
-                        result.Add(0);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
                 }
                 else
                 {
-                    result.Add(0);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
                 }
             }
 

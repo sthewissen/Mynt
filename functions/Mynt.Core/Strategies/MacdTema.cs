@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Mynt.Core.Enums;
 using Mynt.Core.Indicators;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
@@ -12,32 +10,25 @@ namespace Mynt.Core.Strategies
     public class MacdTema : ITradingStrategy
     {
         public string Name => "MACD TEMA";
-
-        public List<Candle> Candles { get; set; }
-
-        public MacdTema()
+        
+        public List<ITradeAdvice> Prepare(List<Candle> candles)
         {
-            this.Candles = new List<Candle>();
-        }
+            var result = new List<ITradeAdvice>();
+            var macd = candles.Macd(12, 26, 9);
+            var tema = candles.Tema(50);
 
-        public List<int> Prepare()
-        {
-            var result = new List<int>();
-            var macd = Candles.Macd(12, 26, 9);
-            var tema = Candles.Tema(50);
+            var close = candles.Select(x => x.Close).ToList();
 
-            var close = Candles.Select(x => x.Close).ToList();
-
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
                 if (i == 0)
-                    result.Add(0);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
                 else if (tema[i] < close[i] && tema[i-1] > close[i-1] && macd.Macd[i] > 0 && macd.Macd[i-1] < 0 )
-                    result.Add(1);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Buy));
                 else if (tema[i] > close[i] && tema[i - 1] < close[i - 1] && macd.Macd[i] < 0 && macd.Macd[i - 1] > 0)
-                    result.Add(-1);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Sell));
                 else
-                    result.Add(0);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
             }
 
             return result;

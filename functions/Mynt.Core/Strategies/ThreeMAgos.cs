@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Mynt.Core.Enums;
 using Mynt.Core.Indicators;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
@@ -15,19 +13,19 @@ namespace Mynt.Core.Strategies
     public class ThreeMAgos : ITradingStrategy
     {
         public string Name => "Three MAgos";
-        public List<Candle> Candles { get; set; }
-        public List<int> Prepare()
-        {
-            var result = new List<int>();
 
-            var sma = Candles.Sma(15);
-            var ema = Candles.Ema(15);
-            var wma = Candles.Wma(15);
-            var closes = Candles.Select(x => x.Close).ToList();
+        public List<ITradeAdvice> Prepare(List<Candle> candles)
+        {
+            var result = new List<ITradeAdvice>();
+
+            var sma = candles.Sma(15);
+            var ema = candles.Ema(15);
+            var wma = candles.Wma(15);
+            var closes = candles.Select(x => x.Close).ToList();
 
             var bars = new List<string>();
 
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
                 if ((closes[i] > sma[i]) && (closes[i] > ema[i]) && (closes[i] > wma[i]))
                     bars.Add("green");
@@ -38,16 +36,16 @@ namespace Mynt.Core.Strategies
 
             }
             
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
                 if (i < 1)
-                    result.Add(0);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
                 else if (bars[i] == "blue" && bars[i - 1] == "red")
-                    result.Add(1);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Buy));
                 else if (bars[i] == "blue" && bars[i - 1] == "green")
-                    result.Add(-1);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Sell));
                 else
-                    result.Add(0);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
             }
 
             return result;

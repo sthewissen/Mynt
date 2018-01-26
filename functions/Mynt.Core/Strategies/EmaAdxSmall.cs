@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Mynt.Core.Enums;
 using Mynt.Core.Indicators;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
@@ -15,32 +16,25 @@ namespace Mynt.Core.Strategies
     public class EmaAdxSmall : ITradingStrategy
     {
         public string Name => "EMA ADX Small";
-
-        public List<Candle> Candles { get; set; }
-
-        public EmaAdxSmall()
+        
+        public List<ITradeAdvice> Prepare(List<Candle> candles)
         {
-            this.Candles = new List<Candle>();
-        }
+            var result = new List<ITradeAdvice>();
 
-        public List<int> Prepare()
-        {
-            var result = new List<int>();
+            var closes = candles.Select(x => x.Close).ToList();
+            var emaFast = candles.Ema(3);
+            var emaSlow = candles.Ema(10);
+            var minusDI = candles.MinusDI(14);
+            var plusDI = candles.PlusDI(14);
 
-            var closes = Candles.Select(x => x.Close).ToList();
-            var emaFast = Candles.Ema(3);
-            var emaSlow = Candles.Ema(10);
-            var minusDI = Candles.MinusDI(14);
-            var plusDI = Candles.PlusDI(14);
-
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
                 if (i == 0)
-                    result.Add(0);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
                 else if (emaFast[i] > emaSlow[i] && (emaFast[i - 1] < emaSlow[i - 1] || plusDI[i - 1] < minusDI[i - 1]) && plusDI[i] > 20 && plusDI[i] > minusDI[i])
-                    result.Add(1);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Buy));
                 else
-                    result.Add(0);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
             }
 
             return result;

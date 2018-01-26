@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Mynt.Core.Enums;
 using Mynt.Core.Indicators;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
@@ -11,28 +12,21 @@ namespace Mynt.Core.Strategies
     public class Base150 : ITradingStrategy
     {
         public string Name => "Base 150";
-
-        public List<Candle> Candles { get; set; }
-
-        public Base150()
+        
+        public List<ITradeAdvice> Prepare(List<Candle> candles)
         {
-            this.Candles = new List<Candle>();
-        }
+            var result = new List<ITradeAdvice>();
 
-        public List<int> Prepare()
-        {
-            var result = new List<int>();
+            var sma6 = candles.Sma(6);
+            var sma25 = candles.Sma(25);
+            var sma150 = candles.Sma(150);
+            var sma365 = candles.Sma(365);
 
-            var sma6 = Candles.Sma(6);
-            var sma25 = Candles.Sma(25);
-            var sma150 = Candles.Sma(150);
-            var sma365 = Candles.Sma(365);
-
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
                 if (i == 0)
                 {
-                    result.Add(0);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
                 }
                 else
                 {
@@ -44,7 +38,7 @@ namespace Mynt.Core.Strategies
                         || sma6[i - 1] < sma365[i]
                         || sma25[i - 1] < sma150[i]
                         || sma25[i - 1] < sma365[i]))
-                        result.Add(1);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Buy));
                     if (sma6[i] < sma150[i]
                         && sma6[i] < sma365[i]
                         && sma25[i] < sma150[i]
@@ -53,9 +47,9 @@ namespace Mynt.Core.Strategies
                         || sma6[i - 1] > sma365[i]
                         || sma25[i - 1] > sma150[i]
                         || sma25[i - 1] > sma365[i]))
-                        result.Add(-1);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Sell));
                     else
-                        result.Add(0);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
                 }
             }
 

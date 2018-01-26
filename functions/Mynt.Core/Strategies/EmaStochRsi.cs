@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Mynt.Core.Enums;
 using Mynt.Core.Indicators;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
@@ -8,27 +9,20 @@ namespace Mynt.Core.Strategies
     public class EmaStochRsi : ITradingStrategy
     {
         public string Name => "EMA Stoch RSI";
-
-        public List<Candle> Candles { get; set; }
-
-        public EmaStochRsi()
+        
+        public List<ITradeAdvice> Prepare(List<Candle> candles)
         {
-            this.Candles = new List<Candle>();
-        }
+            var result = new List<ITradeAdvice>();
 
-        public List<int> Prepare()
-        {
-            var result = new List<int>();
+            var stoch = candles.Stoch(14);
+            var ema5 = candles.Ema(5);
+            var ema10 = candles.Ema(10);
+            var rsi = candles.Rsi(14);
 
-            var stoch = Candles.Stoch(14);
-            var ema5 = Candles.Ema(5);
-            var ema10 = Candles.Ema(10);
-            var rsi = Candles.Rsi(14);
-
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
                 if (i < 1)
-                    result.Add(0);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
                 else
                 {
                     var slowk1 = stoch.K[i];
@@ -44,11 +38,11 @@ namespace Mynt.Core.Strategies
                     if (slowkp > 20 && slowdp > 20 && !kUp && !dUp) pointedDown = true;
 
                     if (ema5[i] >= ema10[i] && ema5[i - 1] < ema10[i] && rsi[i] > 50 && pointedUp)
-                        result.Add(1);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Buy));
                     else if (ema5[i] <= ema10[i] && ema5[i - 1] > ema10[i] && rsi[i] < 50 && pointedDown)
-                        result.Add(-1);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Sell));
                     else
-                        result.Add(0);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
                 }
             }
 

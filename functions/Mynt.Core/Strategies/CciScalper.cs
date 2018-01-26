@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Mynt.Core.Enums;
 using Mynt.Core.Indicators;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
@@ -12,33 +13,27 @@ namespace Mynt.Core.Strategies
     public class CciScalper : ITradingStrategy
     {
         public string Name => "CCI Scalper";
-        public List<Candle> Candles { get; set; }
 
-        public CciScalper()
+        public List<ITradeAdvice> Prepare(List<Candle> candles)
         {
-            this.Candles = new List<Candle>();
-        }
+            var result = new List<ITradeAdvice>();
 
-        public List<int> Prepare()
-        {
-            var result = new List<int>();
-
-            if (Candles.Count < 200)
+            if (candles.Count < 200)
                 throw new Exception("Need larger data set: (200 min).");
 
-            var cci = Candles.Cci(200);
-            var ema10 = Candles.Ema(10);
-            var ema21 = Candles.Ema(21);
-            var ema50 = Candles.Ema(50);
+            var cci = candles.Cci(200);
+            var ema10 = candles.Ema(10);
+            var ema21 = candles.Ema(21);
+            var ema50 = candles.Ema(50);
 
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
                 if (cci[i] > 0 && ema10[i] > ema21[i] && ema10[i] > ema50[i])
-                    result.Add(1);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Buy));
                 else if (cci[i] < 0 && ema10[i] < ema21[i] && ema10[i] < ema50[i])
-                    result.Add(-1);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Sell));
                 else
-                    result.Add(0);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
             }
 
             return result;

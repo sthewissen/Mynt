@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{10C20036-7AD4-4A18-A4FA-5662E0B121C4}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>Library</OutputType>
     <RootNamespace>Mynt.BackTester</RootNamespace>
     <AssemblyName>Mynt.BackTester</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
@@ -32,6 +32,9 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.AspNetCore.WebUtilities, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
@@ -135,8 +138,8 @@
       <HintPath>..\packages\System.IO.FileSystem.Primitives.4.3.0\lib\net46\System.IO.FileSystem.Primitives.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="System.Net.Http">
-      <HintPath>..\packages\System.Net.Http.4.1.0\lib\net46\System.Net.Http.dll</HintPath>
+    <Reference Include="System.Net.Http, Version=4.1.1.2, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Net.Http.4.3.3\lib\net46\System.Net.Http.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Net.Sockets">
@@ -230,8 +233,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BackTester.cs" />
     <Compile Include="BackTestResult.cs" />
-    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StrategyResult.cs" />
     <Compile Include="TableParser.cs" />
@@ -247,35 +250,17 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="Data\btc-edg.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Include="ExampleData\btc-dash.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Data\btc-etc.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Include="ExampleData\btc-eth.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Data\btc-eth.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Include="ExampleData\btc-neo.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Data\btc-ltc.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Data\btc-mtl.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Data\btc-neo.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Data\btc-omg.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Data\btc-pay.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Data\btc-pivx.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Data\btc-qtum.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Include="ExampleData\btc-xrp.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
   </ItemGroup>
@@ -283,6 +268,10 @@
     <ProjectReference Include="..\Mynt.Core\Mynt.Core.csproj">
       <Project>{e1879751-5218-46f9-9d5a-d52079fe58bd}</Project>
       <Name>Mynt.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Mynt.DataAccess.FileBasedStorage\Mynt.DataAccess.FileBasedStorage.csproj">
+      <Project>{9B066863-B898-4D73-9BFE-433C1F3C5694}</Project>
+      <Name>Mynt.DataAccess.FileBasedStorage</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

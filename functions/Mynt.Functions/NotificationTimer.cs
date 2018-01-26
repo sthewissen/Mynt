@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
+using Mynt.Core.Bittrex;
 using Mynt.Core.NotificationManagers;
 using Mynt.Core.Strategies;
 
@@ -14,7 +15,7 @@ namespace Mynt.Functions
         {
             try
             {
-                var trendManager = new NotificationManager(new AwesomeSma(), (a) => log.Info(a));
+                var trendManager = new NotificationManager(new BittrexApi(true), new AwesomeSma(), (a) => log.Info(a));
                 await trendManager.Process();
             }
             catch (Exception ex)

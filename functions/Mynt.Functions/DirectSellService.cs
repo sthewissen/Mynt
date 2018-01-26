@@ -1,20 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Azure.NotificationHubs;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
 using Microsoft.WindowsAzure.Storage.Table;
 using Mynt.Core;
+using Mynt.Core.Bittrex;
 using Mynt.Core.Managers;
 using Mynt.Core.Models;
 using Mynt.Core.NotificationManagers;
-using Mynt.Core.Strategies;
 using Mynt.Core.TradeManagers;
 using Mynt.Functions.Dto;
 using Newtonsoft.Json;
@@ -37,7 +34,7 @@ namespace Mynt.Functions
                 var activeTrade = tradeTable.CreateQuery<Trade>().Where(x => x.RowKey == order.Uuid).FirstOrDefault();
 
                 // Directly sell it off.
-                var tradeManager = new BittrexTradeManager(null, new PushNotificationManager(), (a) => log.Info(a));
+                var tradeManager = new GenericTradeManager(new BittrexApi(Constants.IsDryRunning), null, new PushNotificationManager(), (a) => log.Info(a));
                 await tradeManager.DirectSell(activeTrade);
     
                 tradeTable.Execute(TableOperation.Replace(activeTrade));

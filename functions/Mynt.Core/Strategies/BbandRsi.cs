@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using Mynt.Core.Enums;
 using Mynt.Core.Indicators;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
@@ -13,32 +13,25 @@ namespace Mynt.Core.Strategies
     public class BbandRsi : ITradingStrategy
     {
         public string Name => "BBand RSI";
-
-        public List<Candle> Candles { get; set; }
-
-        public BbandRsi()
+        
+        public List<ITradeAdvice> Prepare(List<Candle> candles)
         {
-            this.Candles = new List<Candle>();
-        }
+            var result = new List<ITradeAdvice>();
 
-        public List<int> Prepare()
-        {
-            var result = new List<int>();
-
-            var currentPrices = Candles.Select(x => x.Close).ToList();
-            var bbands = Candles.Bbands(20);
-            var rsi = Candles.Rsi(16);
+            var currentPrices = candles.Select(x => x.Close).ToList();
+            var bbands = candles.Bbands(20);
+            var rsi = candles.Rsi(16);
             
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
                 if (i == 0)
-                    result.Add(0);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
                 else if (rsi[i] < 30 && currentPrices[i] < bbands.LowerBand[i])
-                    result.Add(1);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Buy));
                 else if (rsi[i] > 70)
-                    result.Add(-1);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Sell));
                 else
-                    result.Add(0);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
             }
 
             return result;

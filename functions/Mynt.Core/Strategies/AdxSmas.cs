@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Mynt.Core.Enums;
 using Mynt.Core.Indicators;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
@@ -11,27 +12,20 @@ namespace Mynt.Core.Strategies
     public class AdxSmas : ITradingStrategy
     {
         public string Name => "ADX Smas";
-
-        public List<Candle> Candles { get; set; }
-
-        public AdxSmas()
+        
+        public List<ITradeAdvice> Prepare(List<Candle> candles)
         {
-            this.Candles = new List<Candle>();
-        }
+            var result = new List<ITradeAdvice>();
 
-        public List<int> Prepare()
-        {
-            var result = new List<int>();
+            var sma6 = candles.Sma(3);
+            var sma40 = candles.Sma(10);
+            var adx = candles.Adx(14);
 
-            var sma6 = Candles.Sma(3);
-            var sma40 = Candles.Sma(10);
-            var adx = Candles.Adx(14);
-
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
                 if (i == 0)
                 {
-                    result.Add(0);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
                 }
                 else
                 {
@@ -39,11 +33,11 @@ namespace Mynt.Core.Strategies
                     var fortyCross = ((sma40[i - 1] < sma6[i] && sma40[i] > sma6[i]) ? 1 : 0);
 
                     if (adx[i] > 25 && sixCross == 1)
-                        result.Add(1);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Buy));
                     else if (adx[i] < 25 && fortyCross == 1)
-                        result.Add(-1);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Sell));
                     else
-                        result.Add(0);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
                 }
             }
 
