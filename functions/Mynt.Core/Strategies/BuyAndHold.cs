@@ -18,5 +18,10 @@ namespace Mynt.Core.Strategies
             result.AddRange(holdAdvices.Select(_=> new SimpleTradeAdvice((TradeAdvice)_)));
             return result;
         }
+
+        public ITradeAdvice Forecast(List<Candle> candles)
+        {
+            return Prepare(candles).LastOrDefault();
+        }
     }
 }

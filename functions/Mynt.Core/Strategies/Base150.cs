@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Mynt.Core.Enums;
 using Mynt.Core.Indicators;
 using Mynt.Core.Interfaces;
@@ -54,6 +55,11 @@ namespace Mynt.Core.Strategies
             }
 
             return result;
+        }
+
+        public ITradeAdvice Forecast(List<Candle> candles)
+        {
+            return Prepare(candles).LastOrDefault();
         }
     }
 }

@@ -75,5 +75,10 @@ namespace Mynt.Core.Strategies
 
             return result;
         }
+
+        public ITradeAdvice Forecast(List<Candle> candles)
+        {
+            return Prepare(candles).LastOrDefault();
+        }
     }
 }

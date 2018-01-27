@@ -115,6 +115,11 @@ namespace Mynt.Core.Strategies
             return result;
         }
 
+        public ITradeAdvice Forecast(List<Candle> candles)
+        {
+            return Prepare(candles).LastOrDefault();
+        }
+
         private double GetStandardDeviation(List<double> doubleList)
         {
             double average = doubleList.Average();

@@ -102,5 +102,10 @@ namespace Mynt.Core.Strategies
             double sumOfDerivationAverage = sumOfDerivation / (doubleList.Count - 1);
             return Math.Sqrt(sumOfDerivationAverage - (average * average));
         }
+
+        public ITradeAdvice Forecast(List<Candle> candles)
+        {
+            return Prepare(candles).LastOrDefault();
+        }
     }
 }
