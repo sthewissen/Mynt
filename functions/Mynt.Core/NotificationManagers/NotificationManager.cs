@@ -46,12 +46,13 @@ namespace Mynt.Core.NotificationManagers
             {
                 try
                 {
-                    var trend = await GetTrend(market.MarketName);
-                    if (trend.Count > 0 && trend.Last().TradeAdvice == TradeAdvice.Buy)
+                    var advice = await GetAdvice(market.MarketName);
+                    if (advice != null && advice.TradeAdvice == TradeAdvice.Buy)
                         // A match was made, buy that please!
                         results.Add(market.MarketName);
                 }
-                catch {
+                catch
+                {
                     // Couldn't get a trend, no worries, move on.
                 }
             }
@@ -60,11 +61,11 @@ namespace Mynt.Core.NotificationManagers
         }
 
         /// <summary>
-        /// Retrieves a trend list for the given market.
+        /// Retrieves an advice (e.g. buy, sell, hold) for the given market.
         /// </summary>
         /// <param name="tradeMarket"></param>
         /// <returns></returns>
-        private async Task<List<ITradeAdvice>> GetTrend(string tradeMarket)
+        private async Task<ITradeAdvice> GetAdvice(string tradeMarket)
         {
             var minimumDate = DateTime.UtcNow.AddHours(-120);
             var candles = await _api.GetTickerHistory(tradeMarket, minimumDate, Period.Hour);
@@ -73,12 +74,12 @@ namespace Mynt.Core.NotificationManagers
 
             // This is an outdated candle...
             if (signalDate < DateTime.UtcNow.AddMinutes(-120))
-                return new List<ITradeAdvice>() { };
+                return null;
 
-            // This calculates a buy signal for each candle.
-            var trend = _strategy.Prepare(candles.Where(x => x.Timestamp > minimumDate).ToList());
+            // This calculates an advice for the next timestamp.
+            var advice = _strategy.Forecast(candles.Where(x => x.Timestamp > minimumDate).ToList());
 
-            return trend;
+            return advice;
         }
 
         public async Task Process()

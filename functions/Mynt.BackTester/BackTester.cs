@@ -482,10 +482,12 @@ namespace Mynt.BackTester
                         {
                             // There are 2 ways we can sell, either through the strategy telling us to do so (-1)
                             // or because other conditions such as the ROI or stoploss tell us to.
-                            if (trend[i].TradeAdvice == TradeAdvice.Sell || ShouldSell(trade, candles[i].Close, candles[i].Timestamp) != SellType.None)
+                            if (trend[i].TradeAdvice == TradeAdvice.Sell || i == trend.Count - 1
+                                || ShouldSell(trade, candles[i].Close, candles[i].Timestamp) != SellType.None)
                             {
-                                // Bittrex charges 0,25% transaction fee, so deduct that.
-                                var currentProfit = (candles[i].Close - trade.OpenRate) / trade.OpenRate - 0.005;
+                                // Bittrex charges 0.25% transaction fee
+                                // Binance charges 0.1% transaction fee, 0.05% if paid in BNB
+                                var currentProfit = (candles[i].Close - trade.OpenRate) / trade.OpenRate - 0.002;
                                 results.Add(new BackTestResult { Currency = pair, Profit = currentProfit, Duration = i - buyStep });
                                 break;
                             }
@@ -547,14 +549,22 @@ namespace Mynt.BackTester
             var color = results.Select(x => x.Profit).Sum() > 0 ? ConsoleColor.Green : ConsoleColor.Red;
 
             if (results.Count > 0)
+            {
+                var cumulativeProfits = results.GroupBy(_ => _.Currency).
+                    Select(_ => (_.Select(x => (1 + x.Profit)).Aggregate((a, x) => a * x) - 1) * 100);
+                var cumulativeProfit = cumulativeProfits.Average();
                 WriteColoredLine(
                     $"{(Convert.ToDouble(results.Count(x => x.Profit > 0)) / Convert.ToDouble(results.Count) * 100.0):0.00}%  |  " +
                     $"Made {results.Count} buys ({results.Count(x => x.Profit > 0)}/{results.Count(x => x.Profit < 0)}). " +
                     $"Average profit {(results.Select(x => x.Profit).Average() * 100):0.00}%. " +
                     $"Total profit was {(results.Select(x => x.Profit).Sum()):0.000}. " +
+                    $"Profit when reinvesting was {cumulativeProfit:0.00}%. " +
                     $"Average duration {(results.Select(x => x.Duration).Average() * 5):0.0} mins.", color);
+            }
             else
+            {
                 WriteColoredLine($"Made {results.Count} buys. ", ConsoleColor.Yellow);
+            }
         }
         
         #endregion

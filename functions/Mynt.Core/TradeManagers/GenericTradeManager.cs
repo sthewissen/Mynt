@@ -272,10 +272,10 @@ namespace Mynt.Core.TradeManagers
             {
                 _log($"Checking market {market}...");
 
-                var trend = await GetTrend(market);
+                var advice = await GetAdvice(market);
 
                 // If the last signal was a 1, we buy!
-                return trend.Last().TradeAdvice == TradeAdvice.Buy;
+                return advice != null && advice.TradeAdvice == TradeAdvice.Buy;
             }
             catch (Exception)
             {
@@ -311,20 +311,20 @@ namespace Mynt.Core.TradeManagers
             }
 
             var currentRate = await _api.GetTicker(trade.Market);
-            var trend = await GetTrend(trade.Market);
+            var advice = await GetAdvice(trade.Market);
 
-            if (trend.Last().TradeAdvice == TradeAdvice.Sell || ShouldSell(trade, currentRate.Bid, DateTime.UtcNow) != SellType.None)
+            if (advice !=null && (advice.TradeAdvice == TradeAdvice.Sell || ShouldSell(trade, currentRate.Bid, DateTime.UtcNow) != SellType.None))
             {
                 await ExecuteSell(trade, currentRate.Bid);
             }
         }
 
         /// <summary>
-        /// Retrieves a trend list for the given market.
+        /// Retrieves an advice (e.g. buy, sell, hold) for the given market.
         /// </summary>
         /// <param name="tradeMarket"></param>
         /// <returns></returns>
-        private async Task<List<ITradeAdvice>> GetTrend(string tradeMarket)
+        private async Task<ITradeAdvice> GetAdvice(string tradeMarket)
         {
             var minimumDate = DateTime.UtcNow.AddHours(-120);
             var candles = await _api.GetTickerHistory(tradeMarket, minimumDate, Core.Models.Period.Hour);
@@ -333,12 +333,12 @@ namespace Mynt.Core.TradeManagers
 
             // This is an outdated candle...
             if (signalDate < DateTime.UtcNow.AddMinutes(-120))
-                return new List<ITradeAdvice>() { };
+                return null;
 
-            // This calculates a buy signal for each candle.
-            var trend = _strategy.Prepare(candles.Where(x => x.Timestamp > minimumDate).ToList());
+            // This calculates an advice for the next timestamp.
+            var advice = _strategy.Forecast(candles.Where(x => x.Timestamp > minimumDate).ToList());
 
-            return trend;
+            return advice;
         }
 
         /// <summary>
