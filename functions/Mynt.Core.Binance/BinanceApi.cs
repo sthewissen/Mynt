@@ -6,23 +6,25 @@ using BinanceExchange.API.Client;
 using BinanceExchange.API.Models.Request;
 using BinanceExchange.API.Models.Response;
 using Mynt.Core.Api;
-using Mynt.Core.Binance.Models;
 using Mynt.Core.Models;
 
 namespace Mynt.Core.Binance
 {
     public class BinanceApi : IExchangeApi
     {
-        private readonly IBinanceClient _client;
+        private readonly BinanceClient client;
 
-        public BinanceApi(string apiKey, string secretKey)
+        private readonly bool isDryRunning;
+
+        public BinanceApi(string apiKey, string secretKey, bool isDryRunning = true)
         {
             // Initialise the general client with config
-            _client = new BinanceClient(new ClientConfiguration()
+            client = new BinanceClient(new ClientConfiguration()
             {
                 ApiKey = apiKey,
                 SecretKey = secretKey,
             });
+            this.isDryRunning = isDryRunning;
         }
         
         public async Task<string> Buy(string market, double quantity, double rate)
@@ -36,8 +38,13 @@ namespace Mynt.Core.Binance
                 Side = BinanceExchange.API.Enums.OrderSide.Buy
             };
 
-            var result = await _client.CreateOrder(request);
+            if (isDryRunning)
+            {
+                var emptyResult = await client.CreateTestOrder(request);
+                return "DRY_RUN_BUY";
+            }
 
+            var result = await client.CreateOrder(request);
             return result.ClientOrderId;
         }
 
@@ -51,24 +58,29 @@ namespace Mynt.Core.Binance
                 Type = BinanceExchange.API.Enums.OrderType.Limit,
                 Side = BinanceExchange.API.Enums.OrderSide.Sell
             };
+            
+            if (isDryRunning)
+            {
+                var emptyResult = await client.CreateTestOrder(request);
+                return "DRY_RUN_SELL";
+            }
 
-            var result = await _client.CreateOrder(request);
-
+            var result = await client.CreateOrder(request);
             return result.ClientOrderId;
         }
 
         public async Task<double> GetBalance(string currency)
         {
-            var result = await _client.GetAccountInformation();
+            var result = await client.GetAccountInformation();
             var currencyInformation = result.Balances.SingleOrDefault(_ => _.Asset == currency);
             return (double)(currencyInformation.Free + currencyInformation.Locked);
         }
 
         public async Task<List<MarketSummary>> GetMarketSummaries()
         {
-            var symbols = await _client.GetSymbolsPriceTicker();
+            var symbols = await client.GetSymbolsPriceTicker();
             var tasks = symbols.Select(async _ => Tuple.Create<string, SymbolPriceChangeTickerResponse, KlineCandleStickResponse>(
-                _.Symbol, await _client.GetDailyTicker(_.Symbol), await GetLastDaysCandle(_.Symbol)));
+                _.Symbol, await client.GetDailyTicker(_.Symbol), await GetLastDaysCandle(_.Symbol)));
             var tickers = await Task.WhenAll(tasks);
             return tickers.Select(_ =>
                 new MarketSummary
@@ -88,7 +100,7 @@ namespace Mynt.Core.Binance
         public async Task<List<OpenOrder>> GetOpenOrders(string market)
         {
             var request = new CurrentOpenOrdersRequest { Symbol = market  };
-            var result = await _client.GetCurrentOpenOrders(request);
+            var result = await client.GetCurrentOpenOrders(request);
 
             return result.Select(_ =>
                 new OpenOrder
@@ -108,7 +120,7 @@ namespace Mynt.Core.Binance
 
         public async Task<Ticker> GetTicker(string market)
         {
-            var result = await _client.GetDailyTicker(market);
+            var result = await client.GetDailyTicker(market);
 
             return new Ticker
             {
@@ -133,7 +145,7 @@ namespace Mynt.Core.Binance
                     EndTime = endTime
                 };
 
-                var candlesticksToAdd = await _client.GetKlinesCandlesticks(request);
+                var candlesticksToAdd = await client.GetKlinesCandlesticks(request);
                 candles.AddRange(candlesticksToAdd);
                 start = candlesticksToAdd.Count() == 0 ? DateTime.MaxValue : candlesticksToAdd.Max(_ => _.CloseTime);
             }
@@ -161,7 +173,7 @@ namespace Mynt.Core.Binance
                 EndTime= endTime,
                 Interval= BinanceExchange.API.Enums.KlineInterval.OneDay
             };
-            var result = await _client.GetKlinesCandlesticks(request);
+            var result = await client.GetKlinesCandlesticks(request);
             return result.SingleOrDefault();
         }
     }
