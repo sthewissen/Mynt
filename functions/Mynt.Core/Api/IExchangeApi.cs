@@ -17,6 +17,8 @@ namespace Mynt.Core.Api
 
         Task<List<OpenOrder>> GetOpenOrders(string market);
 
+        Task CancelOrder(string orderId, string market);
+
         Task<Ticker> GetTicker(string market);
 
         Task<List<Candle>> GetTickerHistory(string market, DateTime startDate, Period period);

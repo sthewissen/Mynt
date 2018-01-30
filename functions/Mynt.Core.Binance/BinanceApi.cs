@@ -118,6 +118,15 @@ namespace Mynt.Core.Binance
                 }).ToList();
         }
 
+        public async Task CancelOrder(string orderId, string market)
+        {
+            CancelOrderRequest request = new CancelOrderRequest
+            {
+                Symbol = market
+            };
+            await client.CancelOrder(request);
+        }
+
         public async Task<Ticker> GetTicker(string market)
         {
             var result = await client.GetDailyTicker(market);

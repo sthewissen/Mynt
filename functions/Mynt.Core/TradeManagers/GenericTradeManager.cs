@@ -24,7 +24,7 @@ namespace Mynt.Core.TradeManagers
         private double _oldDayBalance;
         private double _oldTotalBalance;
 
-        public GenericTradeManager(IExchangeApi api , ITradingStrategy strat, INotificationManager notificationManager, Action<string> log)
+        public GenericTradeManager(IExchangeApi api, ITradingStrategy strat, INotificationManager notificationManager, Action<string> log)
         {
             _api = api;
             _strategy = strat;
@@ -112,6 +112,17 @@ namespace Mynt.Core.TradeManagers
 
             if (batch.Count > 0) tradeTable.ExecuteBatch(batch);
             if (balanceBatch.Count > 0) balanceTable.ExecuteBatch(balanceBatch);
+        }
+
+        /// <summary>
+        /// Directly triggers a sell.
+        /// </summary>
+        /// <param name="trade"></param>
+        /// <returns></returns>
+        public async Task DirectSell(Trade trade)
+        {
+            var currentRate = await _api.GetTicker(trade.Market);
+            await ExecuteSell(trade, currentRate.Bid);
         }
 
         /// <summary>
@@ -313,7 +324,7 @@ namespace Mynt.Core.TradeManagers
             var currentRate = await _api.GetTicker(trade.Market);
             var advice = await GetAdvice(trade.Market);
 
-            if (advice !=null && (advice.TradeAdvice == TradeAdvice.Sell || ShouldSell(trade, currentRate.Bid, DateTime.UtcNow) != SellType.None))
+            if (advice != null && (advice.TradeAdvice == TradeAdvice.Sell || ShouldSell(trade, currentRate.Bid, DateTime.UtcNow) != SellType.None))
             {
                 await ExecuteSell(trade, currentRate.Bid);
             }
@@ -328,7 +339,7 @@ namespace Mynt.Core.TradeManagers
         {
             var minimumDate = DateTime.UtcNow.AddHours(-120);
             var candles = await _api.GetTickerHistory(tradeMarket, minimumDate, Core.Models.Period.Hour);
-            
+
             var signalDate = candles[candles.Count - 1].Timestamp;
 
             // This is an outdated candle...
@@ -339,17 +350,6 @@ namespace Mynt.Core.TradeManagers
             var advice = _strategy.Forecast(candles.Where(x => x.Timestamp > minimumDate).ToList());
 
             return advice;
-        }
-
-        /// <summary>
-        /// Directly triggers a sell.
-        /// </summary>
-        /// <param name="trade"></param>
-        /// <returns></returns>
-        public async Task DirectSell(Trade trade)
-        {
-            var currentRate = await _api.GetTicker(trade.Market);
-            await ExecuteSell(trade, currentRate.Bid);
         }
 
         /// <summary>

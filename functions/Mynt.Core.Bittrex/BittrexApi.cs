@@ -56,11 +56,11 @@ namespace Mynt.Core.Bittrex
             return result.Result.Uuid.ToString();
         }
 
-        public async Task CancelOrder(Guid orderId)
+        public async Task CancelOrder(string orderId, string market)
         {
             if (_dryRun) return;
 
-            var result = await _api.CancelOrder(orderId);
+            var result = await _api.CancelOrder(new Guid(orderId));
 
             if (!result.Success)
                 throw new Exception($"Bittrex API failure {result.Message}");
