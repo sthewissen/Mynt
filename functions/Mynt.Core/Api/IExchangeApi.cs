@@ -11,7 +11,7 @@ namespace Mynt.Core.Api
 
         Task<string> Sell(string market, double quantity, double rate);
 
-        Task<double> GetBalance(string currency);
+        Task<AccountBalance> GetBalance(string currency);
 
         Task<List<MarketSummary>> GetMarketSummaries();
 

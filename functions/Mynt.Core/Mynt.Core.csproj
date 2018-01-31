@@ -254,6 +254,7 @@
     <Compile Include="Interfaces\INotificationManager.cs" />
     <Compile Include="Interfaces\ITradingStrategyProvider.cs" />
     <Compile Include="Managers\ConnectionManager.cs" />
+    <Compile Include="Models\AccountBalance.cs" />
     <Compile Include="Models\ITradeAdvice.cs" />
     <Compile Include="Models\MarketSummary.cs" />
     <Compile Include="Models\OpenOrder.cs" />

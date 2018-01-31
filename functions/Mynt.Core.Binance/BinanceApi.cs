@@ -113,11 +113,11 @@ namespace Mynt.Core.Binance
             return result.ClientOrderId;
         }
 
-        public async Task<double> GetBalance(string currency)
+        public async Task<AccountBalance> GetBalance(string currency)
         {
             var result = await client.GetAccountInformation();
             var currencyInformation = result.Balances.SingleOrDefault(_ => _.Asset == currency);
-            return (double)(currencyInformation.Free + currencyInformation.Locked);
+            return new AccountBalance(currencyInformation.Asset, (double)currencyInformation.Free, (double)currencyInformation.Locked);
         }
 
         public async Task<List<MarketSummary>> GetMarketSummaries()
@@ -139,6 +139,26 @@ namespace Mynt.Core.Binance
                     PrevDay = (double)_.Item3.Open,
                     Volume = (double)_.Item2.Volume,
                 }).ToList();
+        }
+
+        public async Task<double> GetTotalValueInBtc()
+        {
+            var result = await client.GetAccountInformation();
+            var total = 0.0;
+            foreach (var balance in result.Balances)
+            {
+                if (balance.Asset.Equals("BTC", StringComparison.OrdinalIgnoreCase))
+                {
+                    total += (double)(balance.Free + balance.Locked);
+                }
+                else
+                {
+                    var ticket = await client.GetDailyTicker($"{balance.Asset}BTC");
+                    total += (double)((balance.Free + balance.Locked) * ticket.LastPrice);
+                }
+            }
+
+            return total;
         }
 
         public async Task<List<OpenOrder>> GetOpenOrders(string market)

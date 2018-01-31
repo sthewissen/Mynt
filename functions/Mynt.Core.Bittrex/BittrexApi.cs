@@ -66,16 +66,16 @@ namespace Mynt.Core.Bittrex
                 throw new Exception($"Bittrex API failure {result.Message}");
         }
 
-        public async Task<double> GetBalance(string currency)
+        public async Task<Core.Models.AccountBalance> GetBalance(string currency)
         {
-            if (_dryRun) return 999.99;
+            if (_dryRun) return new Core.Models.AccountBalance(currency, 999.99, 0);
 
             var result = await _api.GetBalance(currency);
 
             if(!result.Success)
                 throw new Exception($"Bittrex API failure {result.Message}");
 
-            return result.Result.Balance;
+            return new Core.Models.AccountBalance(result.Result.Currency, result.Result.Available, result.Result.Pending);
         }
 
         public async Task<List<Market>> GetMarkets()

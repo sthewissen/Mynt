@@ -216,7 +216,7 @@ namespace Mynt.Core.TradeManagers
             var currentBtcBalance = await _api.GetBalance("BTC");
 
             // Do we even have enough funds to invest?
-            if (currentBtcBalance < Constants.AmountOfBtcToInvestPerTrader)
+            if (currentBtcBalance.Available < Constants.AmountOfBtcToInvestPerTrader)
                 throw new Exception("Insufficient BTC funds to perform a trade.");
 
             // Retrieve our current markets
@@ -360,7 +360,7 @@ namespace Mynt.Core.TradeManagers
             // Get available balance
             var currency = trade.Market.Split('-')[1];
             var balance = await _api.GetBalance(currency);
-            await ExecuteSellOrder(trade, currentRateBid, balance);
+            await ExecuteSellOrder(trade, currentRateBid, balance.Available);
         }
 
         /// <summary>
