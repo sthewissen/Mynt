@@ -47,6 +47,28 @@ namespace Mynt.Core.Binance
             var result = await client.CreateOrder(request);
             return result.ClientOrderId;
         }
+        
+        public async Task<string> BuyWithStopLimit(string market, double quantity, double rate, double limit)
+        {
+            var request = new CreateOrderRequest
+            {
+                Symbol = market,
+                Quantity = (decimal)quantity,
+                Price = rate,
+                StopPrice = (decimal)limit,
+                Type = BinanceExchange.API.Enums.OrderType.StopLossLimit,
+                Side = BinanceExchange.API.Enums.OrderSide.Buy
+            };
+
+            if (isDryRunning)
+            {
+                var emptyResult = await client.CreateTestOrder(request);
+                return "DRY_RUN_BUY";
+            }
+
+            var result = await client.CreateOrder(request);
+            return result.ClientOrderId;
+        }
 
         public async Task<string> Sell(string market, double quantity, double rate)
         {
@@ -56,6 +78,28 @@ namespace Mynt.Core.Binance
                 Quantity = (decimal)quantity,
                 Price = rate,
                 Type = BinanceExchange.API.Enums.OrderType.Limit,
+                Side = BinanceExchange.API.Enums.OrderSide.Sell
+            };
+
+            if (isDryRunning)
+            {
+                var emptyResult = await client.CreateTestOrder(request);
+                return "DRY_RUN_SELL";
+            }
+
+            var result = await client.CreateOrder(request);
+            return result.ClientOrderId;
+        }
+
+        public async Task<string> SellWithStopLimit(string market, double quantity, double rate, double limit)
+        {
+            var request = new CreateOrderRequest
+            {
+                Symbol = market,
+                Quantity = (decimal)quantity,
+                Price = rate,
+                StopPrice = (decimal)limit,
+                Type = BinanceExchange.API.Enums.OrderType.StopLossLimit,
                 Side = BinanceExchange.API.Enums.OrderSide.Sell
             };
             

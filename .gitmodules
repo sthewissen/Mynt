@@ -1,0 +1,3 @@
+[submodule "BinanceDotNet"]
+	path = BinanceDotNet
+	url = https://github.com/jgsnijders/BinanceDotNet.git

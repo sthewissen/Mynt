@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2010
+VisualStudioVersion = 15.0.27130.2026
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mynt.Functions", "Mynt.Functions\Mynt.Functions.csproj", "{30DE788A-0914-4842-9AC7-3A65E2397DB6}"
 EndProject
@@ -33,6 +33,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.DataAccess.Interfaces", "Mynt.DataAccess.Interfaces\Mynt.DataAccess.Interfaces.csproj", "{09BEC4BC-6233-4072-ABB9-7633AC83437A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.WindowsService", "Mynt.WindowsService\Mynt.WindowsService.csproj", "{939D07BD-43D5-4791-8857-AC76D1CED3EB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BinanceDotNet", "BinanceDotNet", "{F190AA91-1B7E-4F01-9FAD-D80B9D782692}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BinanceExchange.API", "..\BinanceDotNet\BinanceExchange.API\BinanceExchange.API.csproj", "{6BF614FD-E2A7-4C5D-ACDE-729BEC683764}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -92,9 +96,16 @@ Global
 		{939D07BD-43D5-4791-8857-AC76D1CED3EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{939D07BD-43D5-4791-8857-AC76D1CED3EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{939D07BD-43D5-4791-8857-AC76D1CED3EB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6BF614FD-E2A7-4C5D-ACDE-729BEC683764}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6BF614FD-E2A7-4C5D-ACDE-729BEC683764}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6BF614FD-E2A7-4C5D-ACDE-729BEC683764}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6BF614FD-E2A7-4C5D-ACDE-729BEC683764}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{6BF614FD-E2A7-4C5D-ACDE-729BEC683764} = {F190AA91-1B7E-4F01-9FAD-D80B9D782692}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {21241D70-FED4-4D2B-A54A-1E76D83D751E}
