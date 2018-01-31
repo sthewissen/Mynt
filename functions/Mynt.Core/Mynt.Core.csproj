@@ -222,6 +222,7 @@
     <Compile Include="Api\BlockChain\IBlockChainApi.cs" />
     <Compile Include="Api\BlockChain\Models\Prices.cs" />
     <Compile Include="Api\IExchangeApi.cs" />
+    <Compile Include="Configuration.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Enums\EnumExtensions.cs" />
     <Compile Include="Enums\TradeAdvice.cs" />
