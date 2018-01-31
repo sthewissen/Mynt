@@ -21,7 +21,12 @@ namespace Mynt.DataAccess.FileBasedStorage
 
         public List<Candle> GetCandles(string symbol)
         {
-            var dataString = File.ReadAllText($"{folder}/{symbol}.json");            
+            string filePath = $"{folder}/{symbol}.json";
+
+            if (!File.Exists(filePath))            
+                throw new FileNotFoundException($"The .json '{filePath}' file used to load the candles from was not found.");            
+
+            var dataString = File.ReadAllText(filePath);
             var candles = JsonConvert.DeserializeObject<List<Candle>>(dataString);
             return candles;
         }
