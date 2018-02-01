@@ -17,12 +17,12 @@ namespace Mynt.Core.TradeManagers
         private readonly INotificationManager _notification;
         private readonly ITradingStrategy _strategy;
         private readonly Action<string> _log;
-        private Balance _totalBalance;
-        private Balance _dayBalance;
-        private bool _totalBalanceExists;
-        private bool _dayBalanceExists;
-        private double _oldDayBalance;
-        private double _oldTotalBalance;
+        //private Balance _totalBalance;
+        //private Balance _dayBalance;
+        //private bool _totalBalanceExists;
+        //private bool _dayBalanceExists;
+        //private double _oldDayBalance;
+        //private double _oldTotalBalance;
 
         public GenericTradeManager(IExchangeApi api, ITradingStrategy strat, INotificationManager notificationManager, Action<string> log)
         {
@@ -41,23 +41,19 @@ namespace Mynt.Core.TradeManagers
         {
             // Get our current trades.
             var tradeTable = await ConnectionManager.GetTableConnection(Constants.OrderTableName, Constants.IsDryRunning);
-            var balanceTable = await ConnectionManager.GetTableConnection(Constants.BalanceTableName,
-                Constants.IsDryRunning);
+            // var balanceTable = await ConnectionManager.GetTableConnection(Constants.BalanceTableName, Constants.IsDryRunning);
             var activeTrades = tradeTable.CreateQuery<Trade>().Where(x => x.IsOpen).ToList();
 
             // Create two batches that we can use to update our tables.
             var batch = new TableBatchOperation();
-            var balanceBatch = new TableBatchOperation();
+            // var balanceBatch = new TableBatchOperation();
 
             // Can't use FirstOrDefault directly because Linq for Table Storage doesn't support it.
-            _totalBalance = balanceTable.CreateQuery<Balance>().Where(x => x.RowKey == "TOTAL").FirstOrDefault();
-            _dayBalance =
-                balanceTable.CreateQuery<Balance>()
-                    .Where(x => x.RowKey == DateTime.UtcNow.ToString("yyyyMMdd"))
-                    .FirstOrDefault();
+            // _totalBalance = balanceTable.CreateQuery<Balance>().Where(x => x.RowKey == "TOTAL").FirstOrDefault();
+            // _dayBalance = balanceTable.CreateQuery<Balance>().Where(x => x.RowKey == DateTime.UtcNow.ToString("yyyyMMdd")).FirstOrDefault();
 
             // Create both the balances if they don't exist yet.
-            CreateBalancesIfNotExists(balanceBatch);
+            // CreateBalancesIfNotExists(balanceBatch);
 
             // Handle our active trades.
             foreach (var trade in activeTrades)
@@ -107,11 +103,11 @@ namespace Mynt.Core.TradeManagers
             _log($"Currently handling {activeTrades.Count} trades.");
 
             // If these actually changed make a roundtrip to the server to set them.
-            if (_dayBalanceExists && _oldDayBalance != _dayBalance.Profit) balanceBatch.Add(TableOperation.Replace(_dayBalance));
-            if (_totalBalanceExists && _oldTotalBalance != _totalBalance.Profit) balanceBatch.Add(TableOperation.Replace(_totalBalance));
+            //if (_dayBalanceExists && _oldDayBalance != _dayBalance.Profit) balanceBatch.Add(TableOperation.Replace(_dayBalance));
+            //if (_totalBalanceExists && _oldTotalBalance != _totalBalance.Profit) balanceBatch.Add(TableOperation.Replace(_totalBalance));
 
-            if (batch.Count > 0) tradeTable.ExecuteBatch(batch);
-            if (balanceBatch.Count > 0) balanceTable.ExecuteBatch(balanceBatch);
+            //if (batch.Count > 0) tradeTable.ExecuteBatch(batch);
+            //if (balanceBatch.Count > 0) balanceTable.ExecuteBatch(balanceBatch);
         }
 
         /// <summary>
@@ -125,51 +121,51 @@ namespace Mynt.Core.TradeManagers
             await ExecuteSell(trade, currentRate.Bid);
         }
 
-        /// <summary>
-        /// Creates our total and daily balance records in the Azure Table Storage.
-        /// </summary>
-        /// <param name="balanceBatch"></param>
-        private void CreateBalancesIfNotExists(TableBatchOperation balanceBatch)
-        {
-            _totalBalanceExists = _totalBalance != null;
-            _dayBalanceExists = _dayBalance != null;
+        ///// <summary>
+        ///// Creates our total and daily balance records in the Azure Table Storage.
+        ///// </summary>
+        ///// <param name="balanceBatch"></param>
+        //private void CreateBalancesIfNotExists(TableBatchOperation balanceBatch)
+        //{
+        //    _totalBalanceExists = _totalBalance != null;
+        //    _dayBalanceExists = _dayBalance != null;
 
-            if (_totalBalance == null)
-            {
-                _totalBalance = new Balance()
-                {
-                    LastUpdated = DateTime.UtcNow,
-                    PartitionKey = "BALANCE",
-                    RowKey = "TOTAL",
-                    TotalBalance = Constants.MaxNumberOfConcurrentTrades * Constants.AmountOfBtcToInvestPerTrader,
-                    Profit = 0
-                };
+        //    if (_totalBalance == null)
+        //    {
+        //        _totalBalance = new Balance()
+        //        {
+        //            LastUpdated = DateTime.UtcNow,
+        //            PartitionKey = "BALANCE",
+        //            RowKey = "TOTAL",
+        //            TotalBalance = Constants.MaxNumberOfConcurrentTrades * Constants.AmountOfBtcToInvestPerTrader,
+        //            Profit = 0
+        //        };
 
-                balanceBatch.Add(TableOperation.Insert(_totalBalance));
-            }
-            else
-            {
-                _oldTotalBalance = _totalBalance.Profit;
-            }
+        //        balanceBatch.Add(TableOperation.Insert(_totalBalance));
+        //    }
+        //    else
+        //    {
+        //        _oldTotalBalance = _totalBalance.Profit;
+        //    }
 
-            if (_dayBalance == null)
-            {
-                _dayBalance = new Balance()
-                {
-                    BalanceDate = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day),
-                    LastUpdated = DateTime.UtcNow,
-                    PartitionKey = "BALANCE",
-                    RowKey = DateTime.UtcNow.ToString("yyyyMMdd"),
-                    Profit = 0
-                };
+        //    if (_dayBalance == null)
+        //    {
+        //        _dayBalance = new Balance()
+        //        {
+        //            BalanceDate = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day),
+        //            LastUpdated = DateTime.UtcNow,
+        //            PartitionKey = "BALANCE",
+        //            RowKey = DateTime.UtcNow.ToString("yyyyMMdd"),
+        //            Profit = 0
+        //        };
 
-                balanceBatch.Add(TableOperation.Insert(_dayBalance));
-            }
-            else
-            {
-                _oldDayBalance = _dayBalance.Profit;
-            }
-        }
+        //        balanceBatch.Add(TableOperation.Insert(_dayBalance));
+        //    }
+        //    else
+        //    {
+        //        _oldDayBalance = _dayBalance.Profit;
+        //    }
+        //}
 
         /// <summary>
         /// Starts finding an actual strade.
@@ -338,8 +334,13 @@ namespace Mynt.Core.TradeManagers
         private async Task<ITradeAdvice> GetAdvice(string tradeMarket)
         {
             var minimumDate = DateTime.UtcNow.AddHours(-120);
+            var candleDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.UtcNow.Day, DateTime.Now.Hour, 0, 0, 0);
             var candles = await _api.GetTickerHistory(tradeMarket, minimumDate, Core.Models.Period.Hour);
 
+            // We eliminate all candles that aren't needed and the last one (if it's the current running candle).
+            candles = candles.Where(x => x.Timestamp > minimumDate && x.Timestamp < candleDate).ToList();
+
+            // Get the date for the last candle we have left.
             var signalDate = candles[candles.Count - 1].Timestamp;
 
             // This is an outdated candle...
@@ -347,7 +348,7 @@ namespace Mynt.Core.TradeManagers
                 return null;
 
             // This calculates an advice for the next timestamp.
-            var advice = _strategy.Forecast(candles.Where(x => x.Timestamp > minimumDate).ToList());
+            var advice = _strategy.Forecast(candles);
 
             return advice;
         }
@@ -448,12 +449,12 @@ namespace Mynt.Core.TradeManagers
                 trade.CloseRate != null && trade.OpenOrderId == null)
             {
                 // Set our balances straight.
-                _dayBalance.Profit += trade.CloseProfit.Value;
-                _totalBalance.Profit += trade.CloseProfit.Value;
-                _totalBalance.TotalBalance += trade.CloseProfit.Value;
+                //_dayBalance.Profit += trade.CloseProfit.Value;
+                //_totalBalance.Profit += trade.CloseProfit.Value;
+                //_totalBalance.TotalBalance += trade.CloseProfit.Value;
 
-                _dayBalance.LastUpdated = DateTime.UtcNow;
-                _totalBalance.LastUpdated = DateTime.UtcNow;
+                //_dayBalance.LastUpdated = DateTime.UtcNow;
+                //_totalBalance.LastUpdated = DateTime.UtcNow;
 
                 trade.IsOpen = false;
 
