@@ -15,6 +15,8 @@ namespace Mynt.Core.Api
 
         Task<List<MarketSummary>> GetMarketSummaries();
 
+        Task<Order> GetOrder(string orderId, string market);
+
         Task<List<OpenOrder>> GetOpenOrders(string market);
 
         Task CancelOrder(string orderId, string market);

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Mynt.Core.Bittrex.Models;
+using Mynt.Core.Enums;
 
 namespace Mynt.Core.Bittrex
 {
@@ -61,5 +62,35 @@ namespace Mynt.Core.Bittrex
                     throw new ArgumentException($"{period} is an unknown value for Period");
             }
         }
+
+        public static OrderSide ToOrderSide(this string input)
+        {
+            if (input.ToLower().Contains("buy"))
+            {
+                return OrderSide.Buy;
+            }
+            if (input.ToLower().Contains("sell"))
+            {
+                return OrderSide.Sell;
+            }
+
+            throw new ArgumentException("'{input}' cannot be mapped an OrderSide");
+        }
+
+        public static OrderType ToOrderType(this string input)
+        {
+            if (input.Equals("BUY", StringComparison.OrdinalIgnoreCase) ||
+                input.Equals("SELL", StringComparison.OrdinalIgnoreCase))
+            {
+                return OrderType.Market;
+            }
+            if (input.ToLower().Contains("limit"))
+            {
+                return OrderType.Limit;
+            }
+
+            throw new ArgumentException("'{input}' cannot be mapped an OrderType");
+        }
+
     }
 }

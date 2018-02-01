@@ -97,6 +97,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BinanceApi.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="Models\KlineCandleStick.cs" />
     <Compile Include="Models\KlineInterval.cs" />
     <Compile Include="Models\KlinesCandlesticksConfiguration.cs" />
@@ -112,7 +113,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\BinanceDotNet\BinanceExchange.API\BinanceExchange.API.csproj">
-      <Project>{a312e878-bc5a-4b2a-a4a4-7502d0bae85d}</Project>
+      <Project>{84ae6016-8b5c-4da4-a2e5-985483771e48}</Project>
       <Name>BinanceExchange.API</Name>
     </ProjectReference>
     <ProjectReference Include="..\Mynt.Core\Mynt.Core.csproj">

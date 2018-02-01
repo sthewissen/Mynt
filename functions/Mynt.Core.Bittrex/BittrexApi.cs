@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Mynt.Core.Api;
 using Mynt.Core.Bittrex.Models;
+using Mynt.Core.Enums;
 using Mynt.Core.Extensions;
 using Mynt.Core.Models;
 
@@ -108,6 +109,31 @@ namespace Mynt.Core.Bittrex
                     PrevDay = _.PrevDay,
                     Volume = _.Volume
                 }).ToList();
+        }
+
+        public async Task<Order> GetOrder(string orderId, string market)
+        {
+            if (_dryRun) return new Order();
+
+            var result = await _api.GetOrder(new Guid(orderId));
+
+            if (!result.Success)
+                throw new Exception($"Bittrex API failure {result.Message}");
+
+            return new Order
+            {
+                ExecutedQuantity = result.Result.Quantity - result.Result.QuantityRemaining,
+                OrderId = result.Result.OrderUuid.ToString(),
+                OriginalQuantity = result.Result.Quantity,
+                Price = result.Result.Price,
+                Status = (OrderStatus) (-1), // Not supported yet.
+                Side = result.Result.OrderType.ToOrderSide(),
+                StopPrice = result.Result.Limit,
+                Symbol = result.Result.Exchange,
+                Time = result.Result.TimeStamp,
+                TimeInForce = result.Result.ImmediateOrCancel ? Enums.TimeInForce.ImmediateOrCancel : Enums.TimeInForce.GoodTilCanceled,
+                Type = result.Result.OrderType.ToOrderType()
+            };
         }
 
         public async Task<List<Core.Models.OpenOrder>> GetOpenOrders(string market)

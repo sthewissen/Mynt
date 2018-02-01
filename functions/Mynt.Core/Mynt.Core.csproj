@@ -224,7 +224,11 @@
     <Compile Include="Api\IExchangeApi.cs" />
     <Compile Include="Configuration.cs" />
     <Compile Include="Constants.cs" />
+    <Compile Include="Enums\OrderSide.cs" />
     <Compile Include="Enums\EnumExtensions.cs" />
+    <Compile Include="Enums\OrderStatus.cs" />
+    <Compile Include="Enums\OrderType.cs" />
+    <Compile Include="Enums\TimeInForce.cs" />
     <Compile Include="Enums\TradeAdvice.cs" />
     <Compile Include="Extensions\DateTimeExtensions.cs" />
     <Compile Include="Indicators\DerivativeOscillator.cs" />
@@ -255,9 +259,11 @@
     <Compile Include="Interfaces\ITradingStrategyProvider.cs" />
     <Compile Include="Managers\ConnectionManager.cs" />
     <Compile Include="Models\AccountBalance.cs" />
+    <Compile Include="Models\CreditPosition.cs" />
     <Compile Include="Models\ITradeAdvice.cs" />
     <Compile Include="Models\MarketSummary.cs" />
     <Compile Include="Models\OpenOrder.cs" />
+    <Compile Include="Models\Order.cs" />
     <Compile Include="Models\SimpleTradeAdvice.cs" />
     <Compile Include="Models\Ticker.cs" />
     <Compile Include="Models\TimestampedTradeAdvice.cs" />
@@ -324,6 +330,7 @@
     <Compile Include="Strategies\SmaCrossover.cs" />
     <Compile Include="Strategies\WvfExtended.cs" />
     <Compile Include="TradeManagers\GenericTradeManager.cs" />
+    <Compile Include="TradeManagers\PorfolioLedger.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

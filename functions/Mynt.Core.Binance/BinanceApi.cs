@@ -45,7 +45,7 @@ namespace Mynt.Core.Binance
             }
 
             var result = await client.CreateOrder(request);
-            return result.ClientOrderId;
+            return result.OrderId.ToString();
         }
         
         public async Task<string> BuyWithStopLimit(string market, double quantity, double rate, double limit)
@@ -68,7 +68,7 @@ namespace Mynt.Core.Binance
             }
 
             var result = await client.CreateOrder(request);
-            return result.ClientOrderId;
+            return result.OrderId.ToString();
         }
 
         public async Task<string> Sell(string market, double quantity, double rate)
@@ -89,7 +89,7 @@ namespace Mynt.Core.Binance
             }
 
             var result = await client.CreateOrder(request);
-            return result.ClientOrderId;
+            return result.OrderId.ToString();
         }
 
         public async Task<string> SellWithStopLimit(string market, double quantity, double rate, double limit)
@@ -112,7 +112,7 @@ namespace Mynt.Core.Binance
             }
 
             var result = await client.CreateOrder(request);
-            return result.ClientOrderId;
+            return result.OrderId.ToString();
         }
 
         public async Task<AccountBalance> GetBalance(string currency)
@@ -141,6 +141,33 @@ namespace Mynt.Core.Binance
                     PrevDay = (double)_.Item3.Open,
                     Volume = (double)_.Item2.Volume,
                 }).ToList();
+        }
+
+        public async Task<Order> GetOrder(string orderId, string market)
+        {
+            long longId;
+            if (!long.TryParse(orderId, out longId))
+            {
+                throw new ArgumentException("'orderId' should be of type long but cannot be parsed");
+            }
+
+            var request = new QueryOrderRequest { Symbol = market, OrderId = longId };
+            var result = await client.QueryOrder(request);
+
+            return new Order
+            {
+                ExecutedQuantity = (double)result.ExecutedQuantity,
+                OrderId = result.OrderId.ToString(),
+                OriginalQuantity = (double)result.OriginalQuantity,
+                Price = (double)result.Price,
+                Side = result.Side.ToCoreEquivalent(),
+                Status = result.Status.ToCoreEquivalent(),
+                StopPrice = (double)result.StopPrice,
+                Symbol = result.Symbol,
+                Time = result.Time,
+                TimeInForce = result.TimeInForce.ToCoreEquivalent(),
+                Type = result.Type.ToCoreEquivalent()
+            };
         }
 
         public async Task<double> GetTotalValueInBtc()
