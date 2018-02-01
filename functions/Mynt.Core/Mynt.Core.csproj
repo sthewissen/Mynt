@@ -261,8 +261,8 @@
     <Compile Include="Models\SimpleTradeAdvice.cs" />
     <Compile Include="Models\Ticker.cs" />
     <Compile Include="Models\TimestampedTradeAdvice.cs" />
+    <Compile Include="NotificationManagers\DiscordNotificationManager.cs" />
     <Compile Include="NotificationManagers\NotificationManager.cs" />
-    <Compile Include="NotificationManagers\PushNotificationManager.cs" />
     <Compile Include="NotificationManagers\SlackNotificationManager.cs" />
     <Compile Include="Models\Balance.cs" />
     <Compile Include="Models\Candle.cs" />
@@ -273,6 +273,7 @@
     <Compile Include="Models\SellType.cs" />
     <Compile Include="Models\Trade.cs" />
     <Compile Include="Models\Opportunity.cs" />
+    <Compile Include="NotificationManagers\TelegramNotificationManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Strategies\AdxMomentum.cs" />
     <Compile Include="Strategies\AdxSmas.cs" />

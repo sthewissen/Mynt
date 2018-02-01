@@ -9,36 +9,41 @@ namespace Mynt.Core.NotificationManagers
 {
     public class TelegramNotificationManager : INotificationManager
     {
-        
-        private readonly string TelegramWebhookUrl = "https://api.telegram.org/botTOKEN/sendMessage";
-        
+
+        private readonly string TelegramWebhookUrl = "https://api.telegram.org/bot{BOT.TOKEN}/sendMessage";
+
         public async Task<bool> SendNotification(string message)
         {
             try
             {
-            var httpClient = new HttpClient();
+                var httpClient = new HttpClient();
 
-            Dictionary<string, string> dictionary = new Dictionary<string, string>();
-            dictionary.Add("chat_id", "CHATID");
-            dictionary.Add("text", message);
-            string json = JsonConvert.SerializeObject(dictionary);
+                Dictionary<string, string> dictionary = new Dictionary<string, string>
+                {
+                    {"chat_id", "CHATID"},
+                    {"parse_mode", "Markdown"},
+                    {"text", message}
+                };
 
-            var requestData = new StringContent(json, Encoding.UTF8, "application/json");
+                string json = JsonConvert.SerializeObject(dictionary);
 
-            var response = await httpClient.PostAsync(string.Format(TelegramWebhookUrl), requestData);
+                json = json.Replace(@"\\n", @"\n");
 
-            return true;
+                var requestData = new StringContent(json, Encoding.UTF8, "application/json");
+                var response = await httpClient.PostAsync(string.Format(TelegramWebhookUrl), requestData);
+
+                return true;
             }
             catch
             {
-            return false;
+                return false;
             }
         }
 
         public async Task<bool> SendTemplatedNotification(string template, params object[] parameters)
         {
             var finalMessage = string.Format(template, parameters);
-           return await SendNotification(finalMessage);
+            return await SendNotification(finalMessage);
         }
     }
 }
