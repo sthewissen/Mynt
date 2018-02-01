@@ -334,8 +334,13 @@ namespace Mynt.Core.TradeManagers
         private async Task<ITradeAdvice> GetAdvice(string tradeMarket)
         {
             var minimumDate = DateTime.UtcNow.AddHours(-120);
+            var candleDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.UtcNow.Day, DateTime.Now.Hour, 0, 0, 0);
             var candles = await _api.GetTickerHistory(tradeMarket, minimumDate, Core.Models.Period.Hour);
 
+            // We eliminate all candles that aren't needed and the last one (if it's the current running candle).
+            candles = candles.Where(x => x.Timestamp > minimumDate && x.Timestamp < candleDate).ToList();
+
+            // Get the date for the last candle we have left.
             var signalDate = candles[candles.Count - 1].Timestamp;
 
             // This is an outdated candle...
@@ -343,7 +348,7 @@ namespace Mynt.Core.TradeManagers
                 return null;
 
             // This calculates an advice for the next timestamp.
-            var advice = _strategy.Forecast(candles.Where(x => x.Timestamp > minimumDate).ToList());
+            var advice = _strategy.Forecast(candles);
 
             return advice;
         }
