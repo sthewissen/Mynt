@@ -56,6 +56,7 @@ namespace Mynt.Core.Binance
                 Quantity = (decimal)quantity,
                 Price = rate,
                 StopPrice = (decimal)limit,
+                TimeInForce = BinanceExchange.API.Enums.TimeInForce.GTC,
                 Type = BinanceExchange.API.Enums.OrderType.StopLossLimit,
                 Side = BinanceExchange.API.Enums.OrderSide.Buy
             };
@@ -99,6 +100,7 @@ namespace Mynt.Core.Binance
                 Quantity = (decimal)quantity,
                 Price = rate,
                 StopPrice = (decimal)limit,
+                TimeInForce = BinanceExchange.API.Enums.TimeInForce.GTC,
                 Type = BinanceExchange.API.Enums.OrderType.StopLossLimit,
                 Side = BinanceExchange.API.Enums.OrderSide.Sell
             };
