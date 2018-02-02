@@ -46,6 +46,7 @@ namespace Mynt.Core
         public void AddOpenOrder(string orderId, string market)
         {
             openOrders.Add((orderId, market));
+            log.Info($"Added order with order ID {orderId} (market {market})");
         }
 
         public async void Update()
@@ -85,7 +86,7 @@ namespace Mynt.Core
             }
         }
 
-        private void UpdateCreditPosition(Mynt.Core.Models.Order order)
+        private void UpdateCreditPosition(Order order)
         {
             var creditPosition = creditPositions.SingleOrDefault(_ => _.Symbol == order.Symbol);
             if (creditPosition != null)
