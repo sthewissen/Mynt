@@ -1,9 +1,13 @@
 ﻿using System;
+using System.Reflection;
+using log4net;
 
 namespace Mynt.Core.Models
 {
     public class CreditPosition
     {
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
         private readonly string symbol;
 
         private readonly double fee;
@@ -25,13 +29,15 @@ namespace Mynt.Core.Models
         {
             // Decreased the credit
             btcCredit -= quantity * rate * (1 + fee);
+            log.Info($"Registered a buy for {symbol}. Substracted {quantity * rate * (1 + fee)} from the credit. New BTC credit: {btcCredit}");
         }
 
         public void RegisterSell(double quantity, double rate)
         {
             // Increased the credit
             btcCredit += quantity * rate * (1 - fee);
-            throw new NotImplementedException();
+            log.Info($"Registered a sell for {symbol}. Added {quantity * rate * (1 - fee)} to the credit. New BTC credit: {btcCredit}");
+
         }
     }
 }

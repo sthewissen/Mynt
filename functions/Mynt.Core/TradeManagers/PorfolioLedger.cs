@@ -1,14 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
+using log4net;
 using Mynt.Core.Api;
+using Mynt.Core.Enums;
 using Mynt.Core.Models;
 
 namespace Mynt.Core
 {
     public class PorfolioLedger
     {
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        
         private readonly IExchangeApi api;
 
         private IEnumerable<CreditPosition> creditPositions;
@@ -53,22 +58,25 @@ namespace Mynt.Core
                 if (order == null)
                 {
                     openOrders.Remove(item);
+                    log.Info($"Removed order with order ID {item.Item1} (market {item.Item2}) because cannot be found");
                     break;
                 }
 
                 switch (order.Status)
                 {
-                    case Mynt.Core.Enums.OrderStatus.Canceled:
-                    case Mynt.Core.Enums.OrderStatus.Expired:
-                    case Mynt.Core.Enums.OrderStatus.PendingCancel:
-                    case Mynt.Core.Enums.OrderStatus.Rejected:
+                    case OrderStatus.Canceled:
+                    case OrderStatus.Expired:
+                    case OrderStatus.PendingCancel:
+                    case OrderStatus.Rejected:
                         // Just remove the order.
                         openOrders.Remove(item);
+                        log.Info($"Removed order with order ID {item.Item1} (market {item.Item2}) because its status is {order.Status}");
                         break;
-                    case Mynt.Core.Enums.OrderStatus.Filled:
+                    case OrderStatus.Filled:
                         // Update the credit position and remove the order.
                         UpdateCreditPosition(order);
                         openOrders.Remove(item);
+                        log.Info($"Removed order with order ID {item.Item1} (market {item.Item2}) because because its status is {order.Status}");
                         break;
                     default:
                         // Do nothing.
@@ -82,7 +90,7 @@ namespace Mynt.Core
             var creditPosition = creditPositions.SingleOrDefault(_ => _.Symbol == order.Symbol);
             if (creditPosition != null)
             {
-                if (order.Side == Mynt.Core.Enums.OrderSide.Buy)
+                if (order.Side == OrderSide.Buy)
                 {
                     creditPosition.RegisterBuy(order.ExecutedQuantity, order.Price);
                 }
@@ -104,6 +112,7 @@ namespace Mynt.Core
                 var creditPosition = new CreditPosition(entry.Item1, 0.0005, btcCredit); // TODO: Make fee configurable.
 
                 creditPositions.Add(creditPosition);
+                log.Info($"Create credit position for {entry.Item1} (balance {balance.Balance * ticker.Last} BTC). BTC credit: {btcCredit}");
             }
 
             return creditPositions;
