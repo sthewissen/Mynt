@@ -33,7 +33,7 @@ namespace Mynt.Core.Binance
             {
                 Symbol = market,
                 Quantity = (decimal)quantity,
-                Price = rate,
+                Price = (decimal)rate,
                 Type = BinanceExchange.API.Enums.OrderType.Limit,
                 Side = BinanceExchange.API.Enums.OrderSide.Buy
             };
@@ -54,7 +54,7 @@ namespace Mynt.Core.Binance
             {
                 Symbol = market,
                 Quantity = (decimal)quantity,
-                Price = rate,
+                Price = (decimal)rate,
                 StopPrice = (decimal)limit,
                 TimeInForce = BinanceExchange.API.Enums.TimeInForce.GTC,
                 Type = BinanceExchange.API.Enums.OrderType.StopLossLimit,
@@ -77,7 +77,7 @@ namespace Mynt.Core.Binance
             {
                 Symbol = market,
                 Quantity = (decimal)quantity,
-                Price = rate,
+                Price = (decimal)rate,
                 Type = BinanceExchange.API.Enums.OrderType.Limit,
                 Side = BinanceExchange.API.Enums.OrderSide.Sell
             };
@@ -98,7 +98,7 @@ namespace Mynt.Core.Binance
             {
                 Symbol = market,
                 Quantity = (decimal)quantity,
-                Price = rate,
+                Price = (decimal)rate,
                 StopPrice = (decimal)limit,
                 TimeInForce = BinanceExchange.API.Enums.TimeInForce.GTC,
                 Type = BinanceExchange.API.Enums.OrderType.StopLossLimit,

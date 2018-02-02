@@ -30,6 +30,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="BinanceExchange.API, Version=4.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\BinanceDotNet.4.2.0\lib\net461\BinanceExchange.API.dll</HintPath>
+    </Reference>
     <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
     </Reference>
@@ -112,10 +115,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\BinanceDotNet\BinanceExchange.API\BinanceExchange.API.csproj">
-      <Project>{84ae6016-8b5c-4da4-a2e5-985483771e48}</Project>
-      <Name>BinanceExchange.API</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Mynt.Core\Mynt.Core.csproj">
       <Project>{e1879751-5218-46f9-9d5a-d52079fe58bd}</Project>
       <Name>Mynt.Core</Name>
