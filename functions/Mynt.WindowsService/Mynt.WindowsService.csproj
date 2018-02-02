@@ -87,6 +87,10 @@
       <Project>{e1879751-5218-46f9-9d5a-d52079fe58bd}</Project>
       <Name>Mynt.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Mynt.Extensibility\Mynt.Extensibility.csproj">
+      <Project>{71abd5bd-e1cb-4820-8beb-f34763ed0083}</Project>
+      <Name>Mynt.Extensibility</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

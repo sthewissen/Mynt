@@ -1,4 +1,5 @@
 ﻿using Mynt.Core;
+using Mynt.Extensibility;
 using Quartz;
 using Quartz.Impl;
 using System;
@@ -60,26 +61,42 @@ namespace Mynt.WindowsService
 
         private static async Task InitAndStartScheduler()
         {
+            var analysisJobType = PluginLoader.GetType<IJob>(AppSettings.Get<string>("AnalysisJobType"));
+            var tradeJobType = PluginLoader.GetType<IJob>(AppSettings.Get<string>("TradeJobType"));
+
             // First we must get a reference to a scheduler
             var schedulerFactory = new StdSchedulerFactory();
             scheduler = await schedulerFactory.GetScheduler();
 
             // define the job and tie it to our HelloJob class
-            IJobDetail job = JobBuilder.Create<TradeJob>()
-                .WithIdentity("TradeJob", "TradingGroup")                  
+            IJobDetail analysisJob = JobBuilder.Create(analysisJobType)
+                .WithIdentity("AnalysisTradeJob", "TradingGroup")
+                .Build();
+
+            IJobDetail tradeJob = JobBuilder.Create(tradeJobType)
+                .WithIdentity("TradeJob", "TradingGroup")
                 .Build();
 
             // Every 5 minutes, 10 seconds after the minute == "10 0/5 * * * ?".
             // Every 10 seconds (for debug purposes) == "0/10 * * * * ?"
             string cronTrigger = System.Configuration.ConfigurationManager.AppSettings["TradeJobCronTrigger"];
-            ITrigger trigger = TriggerBuilder.Create()
+            ITrigger analysisTrigger = TriggerBuilder.Create()
+                .WithIdentity("AnalysisJobTrigger", "TradingGroup")
+                .WithCronSchedule(cronTrigger)
+                .Build();
+            ITrigger tradeTrigger = TriggerBuilder.Create()
                 .WithIdentity("TradeJobTrigger", "TradingGroup")
-                .WithCronSchedule(cronTrigger)                 
+                .WithCronSchedule(cronTrigger)
                 .Build();
 
+            var dictionary = new Dictionary<IJobDetail, IReadOnlyCollection<ITrigger>>();
+            dictionary.Add(analysisJob, new HashSet<ITrigger>() { analysisTrigger });
+            dictionary.Add(tradeJob, new HashSet<ITrigger>() { tradeTrigger });
+
             // Tell quartz to schedule the job using our trigger
-            await scheduler.ScheduleJob(job, trigger);
-            log.Debug($"{job.Key} will run at: {trigger.GetNextFireTimeUtc() ?? DateTime.MinValue:r}");
+            await scheduler.ScheduleJobs(dictionary, true);
+            log.Debug($"{analysisJob.Key} will run at: {analysisTrigger.GetNextFireTimeUtc() ?? DateTime.MinValue:r}");
+            log.Debug($"{tradeJob.Key} will run at: {tradeTrigger.GetNextFireTimeUtc() ?? DateTime.MinValue:r}");
 
             // Start up the scheduler (nothing can actually run until the
             // scheduler has been started)
