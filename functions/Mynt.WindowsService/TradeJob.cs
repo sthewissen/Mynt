@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Mynt.Core.Binance;
 
 namespace Mynt.WindowsService
 {
@@ -27,10 +28,10 @@ namespace Mynt.WindowsService
             log.Info($"Ready to shuffle your g0ldz!");
 
             // Call the Bittrex Trade manager with the strategy of our choosing.
-            var manager = new GenericTradeManager(new BittrexApi(Constants.IsDryRunning), new BigThree(), new TelegramNotificationManager(), (a) => log.Info(a));
+            var manager = new GenericTradeManager(new BittrexApi(), new BigThree(), null, (a) => log.Info(a));
 
             // Call the process method to start processing the current situation.
-            manager.Process().GetAwaiter().GetResult();
+            manager.CheckForBuySignals().GetAwaiter().GetResult();
 
             return Task.FromResult(true);
         }

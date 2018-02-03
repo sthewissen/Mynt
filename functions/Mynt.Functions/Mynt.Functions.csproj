@@ -3,6 +3,7 @@
     <TargetFramework>net462</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Binance.Net" Version="2.2.5" />
     <PackageReference Include="Microsoft.Azure.NotificationHubs" Version="1.0.9" />
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="1.0.7" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />

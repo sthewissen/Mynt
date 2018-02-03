@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using BinanceExchange.API.Client;
-using BinanceExchange.API.Models.Request;
-using BinanceExchange.API.Models.Response;
+using Binance.Net;
+using BinanceNet = Binance.Net;
+using Binance.Net.Objects;
 using Mynt.Core.Api;
 using Mynt.Core.Models;
 
@@ -12,171 +12,167 @@ namespace Mynt.Core.Binance
 {
     public class BinanceApi : IExchangeApi
     {
-        private readonly BinanceClient client;
-
-        private readonly bool isDryRunning;
+        private readonly BinanceClient _client;
+        private readonly bool _isDryRunning;
+        private BinanceExchangeInfo _exchangeInfo;
 
         public BinanceApi(bool isDryRunning = true)
         {
             // Initialise the general client with config
-            client = new BinanceClient(new ClientConfiguration()
+            _client = new BinanceClient(Constants.BinanceApiKey, Constants.BinanceApiSecret)
             {
-                ApiKey = Constants.BinanceApiKey,
-                SecretKey = Constants.BinanceApiSecret,
-            });
-            this.isDryRunning = isDryRunning;
+                TradeRulesBehaviour = TradeRulesBehaviour.AutoComply
+            };
+
+            this._isDryRunning = isDryRunning;
         }
-        
+
         public async Task<string> Buy(string market, double quantity, double rate)
         {
-            var request = new CreateOrderRequest
+            if (_isDryRunning)
             {
-                Symbol = market,
-                Quantity = (decimal)quantity,
-                Price = (decimal)rate,
-                Type = BinanceExchange.API.Enums.OrderType.Limit,
-                Side = BinanceExchange.API.Enums.OrderSide.Buy
-            };
-
-            if (isDryRunning)
-            {
-                var emptyResult = await client.CreateTestOrder(request);
+                var emptyResult = await _client.PlaceTestOrderAsync(market, OrderSide.Buy, OrderType.Limit, (decimal)quantity, null, (decimal)rate, TimeInForce.GoodTillCancel);
                 return "DRY_RUN_BUY";
             }
 
-            var result = await client.CreateOrder(request);
-            return result.OrderId.ToString();
+            var result = await _client.PlaceOrderAsync(market, OrderSide.Buy, OrderType.Limit, (decimal)quantity, null, (decimal)rate, TimeInForce.GoodTillCancel);
+
+            if (!result.Success) throw new Exception(result.Error.Message);
+
+            return result.Data.OrderId.ToString();
         }
-        
+
         public async Task<string> BuyWithStopLimit(string market, double quantity, double rate, double limit)
         {
-            var request = new CreateOrderRequest
+            if (_isDryRunning)
             {
-                Symbol = market,
-                Quantity = (decimal)quantity,
-                Price = (decimal)rate,
-                StopPrice = (decimal)limit,
-                TimeInForce = BinanceExchange.API.Enums.TimeInForce.GTC,
-                Type = BinanceExchange.API.Enums.OrderType.StopLossLimit,
-                Side = BinanceExchange.API.Enums.OrderSide.Buy
-            };
-
-            if (isDryRunning)
-            {
-                var emptyResult = await client.CreateTestOrder(request);
+                var emptyResult = await _client.PlaceTestOrderAsync(market, OrderSide.Buy, OrderType.Limit, (decimal)quantity, null, (decimal)rate, TimeInForce.GoodTillCancel, (decimal)limit);
                 return "DRY_RUN_BUY";
             }
 
-            var result = await client.CreateOrder(request);
-            return result.OrderId.ToString();
+            var result = await _client.PlaceOrderAsync(market, OrderSide.Buy, OrderType.Limit, (decimal)quantity, null, (decimal)rate, TimeInForce.GoodTillCancel, (decimal)limit);
+
+            if (!result.Success) throw new Exception(result.Error.Message);
+
+            return result.Data.OrderId.ToString();
         }
 
         public async Task<string> Sell(string market, double quantity, double rate)
         {
-            var request = new CreateOrderRequest
+            if (_isDryRunning)
             {
-                Symbol = market,
-                Quantity = (decimal)quantity,
-                Price = (decimal)rate,
-                Type = BinanceExchange.API.Enums.OrderType.Limit,
-                Side = BinanceExchange.API.Enums.OrderSide.Sell
-            };
-
-            if (isDryRunning)
-            {
-                var emptyResult = await client.CreateTestOrder(request);
+                var emptyResult = await _client.PlaceTestOrderAsync(market, OrderSide.Sell, OrderType.Limit, (decimal)quantity, null, (decimal)rate, TimeInForce.GoodTillCancel);
                 return "DRY_RUN_SELL";
             }
 
-            var result = await client.CreateOrder(request);
-            return result.OrderId.ToString();
+            var result = await _client.PlaceOrderAsync(market, OrderSide.Sell, OrderType.Limit, (decimal)quantity, null, (decimal)rate, TimeInForce.GoodTillCancel);
+
+            if (!result.Success) throw new Exception(result.Error.Message);
+
+            return result.Data.OrderId.ToString();
         }
 
         public async Task<string> SellWithStopLimit(string market, double quantity, double rate, double limit)
         {
-            var request = new CreateOrderRequest
+            if (_isDryRunning)
             {
-                Symbol = market,
-                Quantity = (decimal)quantity,
-                Price = (decimal)rate,
-                StopPrice = (decimal)limit,
-                TimeInForce = BinanceExchange.API.Enums.TimeInForce.GTC,
-                Type = BinanceExchange.API.Enums.OrderType.StopLossLimit,
-                Side = BinanceExchange.API.Enums.OrderSide.Sell
-            };
-            
-            if (isDryRunning)
-            {
-                var emptyResult = await client.CreateTestOrder(request);
+                var emptyResult = await _client.PlaceTestOrderAsync(market, OrderSide.Sell, OrderType.Limit, (decimal)quantity, null, (decimal)rate, TimeInForce.GoodTillCancel, (decimal)limit);
                 return "DRY_RUN_SELL";
             }
 
-            var result = await client.CreateOrder(request);
-            return result.OrderId.ToString();
+            var result = await _client.PlaceOrderAsync(market, OrderSide.Sell, OrderType.Limit, (decimal)quantity, null, (decimal)rate, TimeInForce.GoodTillCancel, (decimal)limit);
+
+            if (!result.Success) throw new Exception(result.Error.Message);
+
+            return result.Data.OrderId.ToString();
         }
 
         public async Task<AccountBalance> GetBalance(string currency)
         {
-            if (isDryRunning) return new AccountBalance(currency, 999.99, 0);
+            if (_isDryRunning) return new AccountBalance(currency, 999.99, 0);
 
-            var result = await client.GetAccountInformation();
-            var currencyInformation = result.Balances.SingleOrDefault(_ => _.Asset == currency);
+            var result = await _client.GetAccountInfoAsync();
+
+            if (!result.Success) throw new Exception(result.Error.Message);
+
+            var currencyInformation = result.Data.Balances.SingleOrDefault(_ => _.Asset == currency);
             return new AccountBalance(currencyInformation.Asset, (double)currencyInformation.Free, (double)currencyInformation.Locked);
         }
 
         public async Task<List<MarketSummary>> GetMarketSummaries()
         {
-            var symbols = await client.GetSymbolsPriceTicker();
-            var tasks = symbols.Select(async _ => Tuple.Create<string, SymbolPriceChangeTickerResponse, KlineCandleStickResponse>(
-                _.Symbol, await client.GetDailyTicker(_.Symbol), await GetLastDaysCandle(_.Symbol)));
-            var tickers = await Task.WhenAll(tasks);
-            return tickers.Select(_ =>
-                new MarketSummary
+            var symbols = await _client.Get24HPricesListAsync();
+
+            if (!symbols.Success) throw new Exception(symbols.Error.Message);
+
+            var result = new List<MarketSummary>();
+
+            foreach(var _ in symbols.Data)
+            {
+                var info = await GetSymbolInfo(_.Symbol);
+                result.Add(new MarketSummary()
                 {
-                    Ask= (double)_.Item2.AskPrice,
-                    BaseVolume = (double)_.Item3.TakerBuyQuoteAssetVolume,
-                    Bid = (double)_.Item2.BidPrice,
-                    High = (double)_.Item3.High,
-                    Last=(double)_.Item3.Close,
-                    Low = (double)_.Item3.Low,
-                    MarketName = _.Item1,
-                    PrevDay = (double)_.Item3.Open,
-                    Volume = (double)_.Item2.Volume,
-                }).ToList();
+                    Ask = (double)_.AskPrice,
+                    // TODO: BaseVolume = (double)_.QuoteVolume,
+                    BaseVolume = (double)_.Volume/2.0,
+                    QuoteCurrency = info.QuoteAsset,
+                    BaseCurrency = info.BaseAsset,
+                    Volume = (double)_.Volume,
+                    MarketName = _.Symbol,
+                    Bid = (double)_.BidPrice,
+                    High = (double)_.HighPrice,
+                    Low = (double)_.LowPrice,
+                    Last = (double)_.LastPrice
+                });
+            }
+
+            return result;
         }
 
         public async Task<Order> GetOrder(string orderId, string market)
         {
-            long longId;
-            if (!long.TryParse(orderId, out longId))
+            int longId;
+
+            if (!int.TryParse(orderId, out longId))
             {
                 throw new ArgumentException("'orderId' should be of type long but cannot be parsed");
             }
+            
+            var result = await _client.GetAllOrdersAsync(market, longId);
+            
+            if (!result.Success) throw new Exception(result.Error.Message);
 
-            var request = new QueryOrderRequest { Symbol = market, OrderId = longId };
-            var result = await client.QueryOrder(request);
-
-            return new Order
+            if (result.Data.Any())
             {
-                ExecutedQuantity = (double)result.ExecutedQuantity,
-                OrderId = result.OrderId.ToString(),
-                OriginalQuantity = (double)result.OriginalQuantity,
-                Price = (double)result.Price,
-                Side = result.Side.ToCoreEquivalent(),
-                Status = result.Status.ToCoreEquivalent(),
-                StopPrice = (double)result.StopPrice,
-                Symbol = result.Symbol,
-                Time = result.Time,
-                TimeInForce = result.TimeInForce.ToCoreEquivalent(),
-                Type = result.Type.ToCoreEquivalent()
-            };
+                var order = result.Data.FirstOrDefault();
+
+                return new Order
+                {
+                    ExecutedQuantity = (double)order.ExecutedQuantity,
+                    OrderId = order.OrderId.ToString(),
+                    OriginalQuantity = (double)order.OriginalQuantity,
+                    Price = (double)order.Price,
+                    Side = order.Side.ToCoreEquivalent(),
+                    Status = order.Status.ToCoreEquivalent(),
+                    StopPrice = (double)order.StopPrice,
+                    Symbol = order.Symbol,
+                    Time = order.Time,
+                    TimeInForce = order.TimeInForce.ToCoreEquivalent(),
+                    Type = order.Type.ToCoreEquivalent()
+                };
+            }
+
+            return null;
         }
 
         public async Task<double> GetTotalValueInBtc()
         {
-            var result = await client.GetAccountInformation();
+            var result = await _client.GetAccountInfoAsync();
             var total = 0.0;
-            foreach (var balance in result.Balances)
+
+            if (!result.Success) throw new Exception(result.Error.Message);
+
+            foreach (var balance in result.Data.Balances)
             {
                 if (balance.Asset.Equals("BTC", StringComparison.OrdinalIgnoreCase))
                 {
@@ -184,8 +180,11 @@ namespace Mynt.Core.Binance
                 }
                 else
                 {
-                    var ticket = await client.GetDailyTicker($"{balance.Asset}BTC");
-                    total += (double)((balance.Free + balance.Locked) * ticket.LastPrice);
+                    var ticket = await _client.Get24HPriceAsync($"{balance.Asset}BTC");
+
+                    if (!ticket.Success) throw new Exception(ticket.Error.Message);
+
+                    total += (double)((balance.Free + balance.Locked) * ticket.Data.AskPrice);
                 }
             }
 
@@ -194,15 +193,16 @@ namespace Mynt.Core.Binance
 
         public async Task<List<OpenOrder>> GetOpenOrders(string market)
         {
-            var request = new CurrentOpenOrdersRequest { Symbol = market  };
-            var result = await client.GetCurrentOpenOrders(request);
+            var result = await _client.GetOpenOrdersAsync(market);
+            
+            if (!result.Success) throw new Exception(result.Error.Message);
 
-            return result.Select(_ =>
+            return result.Data.Select(_ =>
                 new OpenOrder
                 {
-                    CancelInitiated = (_.Status == BinanceExchange.API.Enums.OrderStatus.Cancelled || _.Status == BinanceExchange.API.Enums.OrderStatus.PendingCancel),
+                    CancelInitiated = (_.Status == OrderStatus.Canceled || _.Status == OrderStatus.PendingCancel),
                     Exchange = _.Symbol,
-                    ImmediateOrCancel = (_.TimeInForce == BinanceExchange.API.Enums.TimeInForce.IOC),
+                    ImmediateOrCancel = (_.TimeInForce == TimeInForce.ImmediateOrCancel),
                     Limit = (double)_.StopPrice,
                     OrderType = $"{_.Type.ToString()}_{_.Side.ToString()}".ToUpper(),
                     OrderUuid = _.OrderId.ToString(),
@@ -215,22 +215,40 @@ namespace Mynt.Core.Binance
 
         public async Task CancelOrder(string orderId, string market)
         {
-            CancelOrderRequest request = new CancelOrderRequest
+            long longId;
+
+            if (!long.TryParse(orderId, out longId))
             {
-                Symbol = market
-            };
-            await client.CancelOrder(request);
+                throw new ArgumentException("'orderId' should be of type long but cannot be parsed");
+            }
+
+            await _client.CancelOrderAsync(market, longId);
+        }
+
+        public async Task<BinanceSymbol> GetSymbolInfo(string symbol)
+        {
+            if (_exchangeInfo == null)
+            {
+                var result = await _client.GetExchangeInfoAsync();
+                if (!result.Success) throw new Exception(result.Error.Message);
+                _exchangeInfo = result.Data;
+            }
+
+            return _exchangeInfo.Symbols.FirstOrDefault(x => x.SymbolName == symbol);
         }
 
         public async Task<Ticker> GetTicker(string market)
         {
-            var result = await client.GetDailyTicker(market);
+            var result = await _client.Get24HPriceAsync(market);
+
+            if (!result.Success) throw new Exception(result.Error.Message);
 
             return new Ticker
             {
-                Ask = (double)result.AskPrice,
-                Bid = (double)result.BidPrice,
-                Last = (double)result.LastPrice
+                Ask = (double)result.Data.AskPrice,
+                Bid = (double)result.Data.BidPrice,
+                Last = (double)result.Data.LastPrice,
+                Volume = (double)result.Data.Volume
             };
         }
 
@@ -238,47 +256,39 @@ namespace Mynt.Core.Binance
         {
             var endTime = DateTime.UtcNow;
             var start = startDate;
-            var candles =new List<KlineCandleStickResponse>();
+            var candles = new List<BinanceKline>();
+
             while (start < endTime)
             {
-                var request = new GetKlinesCandlesticksRequest
-                {
-                    Symbol = market,
-                    Interval = (BinanceExchange.API.Enums.KlineInterval)period,
-                    StartTime = start,
-                    EndTime = endTime
-                };
+                var candlesticksToAdd = await _client.GetKlinesAsync(market, (KlineInterval) period, start, endTime);
+                
+                if (!candlesticksToAdd.Success) throw new Exception(candlesticksToAdd.Error.Message);
 
-                var candlesticksToAdd = await client.GetKlinesCandlesticks(request);
-                candles.AddRange(candlesticksToAdd);
-                start = candlesticksToAdd.Count() == 0 ? DateTime.MaxValue : candlesticksToAdd.Max(_ => _.CloseTime);
+                candles.AddRange(candlesticksToAdd.Data);
+                start = !candlesticksToAdd.Data.Any() ? DateTime.MaxValue : candlesticksToAdd.Data.Max(_ => _.CloseTime);
             }
 
             return candles.Select(_ =>
                 new Candle
                 {
                     Close = (double)_.Close,
-                    High=(double)_.High,
-                    Low=(double)_.Low,
-                    Open=(double)_.Open,
-                    Timestamp=_.OpenTime
+                    High = (double)_.High,
+                    Low = (double)_.Low,
+                    Open = (double)_.Open,
+                    Timestamp = _.OpenTime
                 }
             ).ToList();
         }
 
-        private async Task<KlineCandleStickResponse> GetLastDaysCandle(string symbol)
+        private async Task<BinanceKline> GetLastDaysCandle(string symbol)
         {
             var endTime = DateTime.UtcNow;
             var startTime = endTime.AddDays(-1);
-            var request = new GetKlinesCandlesticksRequest
-            {
-                Symbol=symbol,
-                StartTime = startTime,
-                EndTime= endTime,
-                Interval= BinanceExchange.API.Enums.KlineInterval.OneDay
-            };
-            var result = await client.GetKlinesCandlesticks(request);
-            return result.SingleOrDefault();
+            var result = await _client.GetKlinesAsync(symbol, KlineInterval.OneDay, startTime, endTime);
+
+            if (!result.Success) throw new Exception(result.Error.Message);
+
+            return result.Data.SingleOrDefault();
         }
     }
 }
