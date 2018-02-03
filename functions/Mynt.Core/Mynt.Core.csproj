@@ -263,6 +263,7 @@
     <Compile Include="Managers\ConnectionManager.cs" />
     <Compile Include="Models\AccountBalance.cs" />
     <Compile Include="Models\CreditPosition.cs" />
+    <Compile Include="Models\CurrencyPair.cs" />
     <Compile Include="Models\ITradeAdvice.cs" />
     <Compile Include="Models\MarketSummary.cs" />
     <Compile Include="Models\OpenOrder.cs" />

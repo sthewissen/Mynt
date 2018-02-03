@@ -2,9 +2,8 @@
 <!-- Use this file to overwrite any settings of the App.config, intended for development -->
 <appSettings>
   <add key="OverwritingExample" value="Retrieved from appSettingsOverwrites.config"/>
-  <add key="AnalysisJobType" value="Mynt.WindowsService.TradeJob"/>
+    <add key="JobType" value="Mynt.WindowsService.TradeJob"/>
   <add key="AnalysisJobCronTrigger" value="0/10 * * * * ?"/>
-  <add key="TradeJobType" value="Mynt.WindowsService.TradeJob"/>
   <add key="TradeJobCronTrigger" value="0/10 * * * * ?"/>
   <add key="RequestDebuggerOnStartup" value="true"/>
 </appSettings>
