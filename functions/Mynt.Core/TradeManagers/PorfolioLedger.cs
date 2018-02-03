@@ -13,19 +13,19 @@ namespace Mynt.Core
     public class PorfolioLedger
     {
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        
+
         private readonly IExchangeApi api;
 
         private IEnumerable<CreditPosition> creditPositions;
 
         private IList<(string, string)> openOrders = new List<(string, string)>();
 
-        public PorfolioLedger(IExchangeApi api, IEnumerable<string> tradableSymbols, double initialBudget):
-            this(api, tradableSymbols.Select(_=>(_,initialBudget)))
+        public PorfolioLedger(IExchangeApi api, IEnumerable<CurrencyPair> pairs, double initialBudget) :
+            this(api, pairs.Select(_ => (_, initialBudget)))
         {
         }
 
-        public PorfolioLedger(IExchangeApi api, IEnumerable<(string, double)> entries)
+        public PorfolioLedger(IExchangeApi api, IEnumerable<(CurrencyPair, double)> entries)
         {
             this.api = api;
             var task = CreateCreditPositions(api, entries);
@@ -51,7 +51,7 @@ namespace Mynt.Core
 
         public async void Update()
         {
-            for (int index = openOrders.Count - 1; index >=0; index--)
+            for (int index = openOrders.Count - 1; index >= 0; index--)
             {
                 var item = openOrders[index];
                 var order = await api.GetOrder(item.Item1, item.Item2);
@@ -102,15 +102,16 @@ namespace Mynt.Core
             }
         }
 
-        private async static Task<IEnumerable<CreditPosition>> CreateCreditPositions(IExchangeApi api, IEnumerable<(string, double)> entries)
+        private async static Task<IEnumerable<CreditPosition>> CreateCreditPositions(IExchangeApi api, IEnumerable<(CurrencyPair, double)> entries)
         {
             IList<CreditPosition> creditPositions = new List<CreditPosition>();
-            foreach ((string,double) entry in entries)
+            foreach (var entry in entries)
             {
-                var ticker = await api.GetTicker(entry.Item1);
-                var balance = await api.GetBalance(entry.Item1);
+                var symbol = $"{entry.Item1.BaseCurrency}{entry.Item1.QuoteCurrency}";
+                var ticker = await api.GetTicker(symbol);
+                var balance = await api.GetBalance(entry.Item1.BaseCurrency);
                 var btcCredit = entry.Item2 - balance.Balance * ticker.Last;
-                var creditPosition = new CreditPosition(entry.Item1, 0.0005, btcCredit); // TODO: Make fee configurable.
+                var creditPosition = new CreditPosition(symbol, 0.0005, btcCredit); // TODO: Make fee configurable.
 
                 creditPositions.Add(creditPosition);
                 log.Info($"Create credit position for {entry.Item1} (balance {balance.Balance * ticker.Last} BTC). BTC credit: {btcCredit}");

@@ -46,11 +46,11 @@ namespace Mynt.Core.Binance
         {
             if (_isDryRunning)
             {
-                var emptyResult = await _client.PlaceTestOrderAsync(market, OrderSide.Buy, OrderType.Limit, (decimal)quantity, null, (decimal)rate, TimeInForce.GoodTillCancel, (decimal)limit);
+                var emptyResult = await _client.PlaceTestOrderAsync(market, OrderSide.Buy, OrderType.StopLossLimit, (decimal)quantity, null, (decimal)rate, TimeInForce.GoodTillCancel, (decimal)limit);
                 return $"DRY_RUN_BUY_{DateTime.UtcNow.Ticks}";
             }
 
-            var result = await _client.PlaceOrderAsync(market, OrderSide.Buy, OrderType.Limit, (decimal)quantity, null, (decimal)rate, TimeInForce.GoodTillCancel, (decimal)limit);
+            var result = await _client.PlaceOrderAsync(market, OrderSide.Buy, OrderType.StopLossLimit, (decimal)quantity, null, (decimal)rate, TimeInForce.GoodTillCancel, (decimal)limit);
 
             if (!result.Success) throw new Exception(result.Error.Message);
 
@@ -76,11 +76,11 @@ namespace Mynt.Core.Binance
         {
             if (_isDryRunning)
             {
-                var emptyResult = await _client.PlaceTestOrderAsync(market, OrderSide.Sell, OrderType.Limit, (decimal)quantity, null, (decimal)rate, TimeInForce.GoodTillCancel, (decimal)limit);
+                var emptyResult = await _client.PlaceTestOrderAsync(market, OrderSide.Sell, OrderType.StopLossLimit, (decimal)quantity, null, (decimal)rate, TimeInForce.GoodTillCancel, (decimal)limit);
                 return $"DRY_RUN_SELL_{DateTime.UtcNow.Ticks}";
             }
 
-            var result = await _client.PlaceOrderAsync(market, OrderSide.Sell, OrderType.Limit, (decimal)quantity, null, (decimal)rate, TimeInForce.GoodTillCancel, (decimal)limit);
+            var result = await _client.PlaceOrderAsync(market, OrderSide.Sell, OrderType.StopLossLimit, (decimal)quantity, null, (decimal)rate, TimeInForce.GoodTillCancel, (decimal)limit);
 
             if (!result.Success) throw new Exception(result.Error.Message);
 
@@ -89,8 +89,6 @@ namespace Mynt.Core.Binance
 
         public async Task<AccountBalance> GetBalance(string currency)
         {
-            if (_isDryRunning) return new AccountBalance(currency, 999.99, 0);
-
             var result = await _client.GetAccountInfoAsync();
 
             if (!result.Success) throw new Exception(result.Error.Message);
