@@ -14,14 +14,14 @@ namespace Mynt.Core
         public const string BittrexApiSecret = "";
 
         // Binance settings
-        public const string BinanceApiKey = "";
-        public const string BinanceApiSecret = "";
+        public const string BinanceApiKey = "Ar5p04dWxD7d5zwjY2gxLFsP5fqwMLsgeTa88u6wKdD90GpnvP2TcP6wuZ626a3V";
+        public const string BinanceApiSecret = "kB4RDe9athM9CMaCNhdLXVDkoxNotgDaPxuD9d3qPOgIlYsOsy3tEIo4H5jXxsvA";
 
         // Azure settings
-        public const string TableStorageConnectionString = "";
+        public const string TableStorageConnectionString = "DefaultEndpointsProtocol=https;AccountName=myntbot;AccountKey=HKO9NqXdekDrwLLJUP+m9hDeIZzKMzUugm7XfsKAWPguHr7rXuTHhQiT/16FaYMrHpmUD17jkMa1YnbR2+1Atg==;BlobEndpoint=https://myntbot.blob.core.windows.net/;QueueEndpoint=https://myntbot.queue.core.windows.net/;TableEndpoint=https://myntbot.table.core.windows.net/;FileEndpoint=https://myntbot.file.core.windows.net/;";
 
         public const string OrderTableName = "orders";
-        public const string BalanceTableName = "balance";
+        public const string TraderTableName = "traders";
 
         // Trade settings
         public const int MaxNumberOfConcurrentTrades = 2;
@@ -34,7 +34,7 @@ namespace Mynt.Core
         // Setting this to 0 means we will not look at volume and only look at our AlwaysTradeList. 
         // Setting this to any value higher than 0 means we will get a list of markets currently
         // trading a volume above this value and analyze those for buy signals.
-        public const int MinimumAmountOfVolume = 400;
+        public const int MinimumAmountOfVolume = 200;
 
         // Sets the bidding price. A value of 0.0 will use the ask price, 1.0 will use the last price and values between 
         // those interpolate between ask and last price. Using the ask price will guarantee quick success in bid, but

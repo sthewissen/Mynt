@@ -1,0 +1,3 @@
+[submodule "Binance.Net"]
+	path = Binance.Net
+	url = https://github.com/sthewissen/Binance.Net.git

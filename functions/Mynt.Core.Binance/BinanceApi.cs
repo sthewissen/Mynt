@@ -113,8 +113,7 @@ namespace Mynt.Core.Binance
                 result.Add(new MarketSummary()
                 {
                     Ask = (double)_.AskPrice,
-                    // TODO: BaseVolume = (double)_.QuoteVolume,
-                    BaseVolume = (double)_.Volume/2.0,
+                    BaseVolume = (double)_.QuoteVolume,
                     QuoteCurrency = info.QuoteAsset,
                     BaseCurrency = info.BaseAsset,
                     Volume = (double)_.Volume,

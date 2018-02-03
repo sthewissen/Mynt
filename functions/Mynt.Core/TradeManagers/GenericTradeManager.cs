@@ -17,7 +17,8 @@ namespace Mynt.Core.TradeManagers
         private readonly INotificationManager _notification;
         private readonly ITradingStrategy _strategy;
         private readonly Action<string> _log;
-        private CloudTable _tradeTable;
+        private CloudTable _orderTable;
+        private CloudTable _traderTable;
 
         public GenericTradeManager(IExchangeApi api, ITradingStrategy strat, INotificationManager notificationManager, Action<string> log)
         {
@@ -35,47 +36,65 @@ namespace Mynt.Core.TradeManagers
         public async Task CheckForBuySignals()
         {
             // Get our current trades.
-            _tradeTable = await ConnectionManager.GetTableConnection(Constants.OrderTableName, Constants.IsDryRunning);
+            _orderTable = await ConnectionManager.GetTableConnection(Constants.OrderTableName, Constants.IsDryRunning);
+            _traderTable = await ConnectionManager.GetTableConnection(Constants.TraderTableName, Constants.IsDryRunning);
 
-            var activeTrades = _tradeTable.CreateQuery<Trade>().Where(x => x.IsOpen).ToList();
-            var currentTraders = _tradeTable.CreateQuery<Trader>().ToList();
+            var activeTrades = _orderTable.CreateQuery<Trade>().Where(x => x.IsOpen).ToList();
+            var currentTraders = _traderTable.CreateQuery<Trader>().ToList();
 
             // Create our trader records if they don't exist yet.
             if (currentTraders.Count == 0) await CreateTradersIfNoneExist();
 
             // Create a batch that we can use to update our table.
-            var tradeBatch = new TableBatchOperation();
+            var orderBatch = new TableBatchOperation();
             var traderBatch = new TableBatchOperation();
 
             // Get a list of traders that are currently standing there doing nothing...
-            var freeTraders = _tradeTable.CreateQuery<Trader>().Where(x => !x.IsBusy).ToList();
+            var freeTraders = _traderTable.CreateQuery<Trader>().Where(x => !x.IsBusy).ToList();
 
-            // Only create trades for our free traders
-            for (int i = 0; i < freeTraders.Count; i++)
+            if (freeTraders.Count > 0)
             {
                 // We have slots open!
-                var trade = await FindTrade(activeTrades, freeTraders[i]);
+                var trades = await FindTrades(activeTrades);
 
-                // We found a trade and have set it all up!
-                if (trade != null)
+                if(trades.Count > 0)
                 {
-                    // Send a notification that we found something suitable
-                    _log($"New trade signal {trade.Market}...");
-                    await SendNotification($"Buying {trade.Market} at {trade.OpenRate:0.0000000 BTC} ({trade.Quantity:0.0000} units)");
+                    // Depending on what we have more of we create trades.
+                    var loopCount = freeTraders.Count >= trades.Count ? trades.Count : freeTraders.Count;
 
-                    // Update the trader to busy
-                    freeTraders[i].LastUpdated = DateTime.UtcNow;
-                    freeTraders[i].IsBusy = true;
-                    traderBatch.Add(TableOperation.Replace(freeTraders[i]));
+                    // Only create trades for our free traders
+                    for (int i = 0; i < loopCount; i++)
+                    {
+                        // Get our Bitcoin balance from the exchange
+                        var currentBtcBalance = await _api.GetBalance("BTC");
 
-                    // Add this to activeTrades so we don't trigger the same.
-                    activeTrades.Add(trade);
-                    tradeBatch.Add(TableOperation.Insert(trade));
+                        // Do we even have enough funds to invest?
+                        if (currentBtcBalance.Available < freeTraders[i].CurrentBalance)
+                            throw new Exception("Insufficient BTC funds to perform a trade.");
+
+                        var order = await CreateBuyOrder(freeTraders[i], trades[i]);
+
+                        // We found a trade and have set it all up!
+                        if (order != null)
+                        {
+                            // Send a notification that we found something suitable
+                            _log($"New trade signal {order.Market}...");
+                            await SendNotification($"Buying {order.Market} at {order.OpenRate:0.0000000 BTC} ({order.Quantity:0.0000} units)");
+
+                            // Update the trader to busy
+                            freeTraders[i].LastUpdated = DateTime.UtcNow;
+                            freeTraders[i].IsBusy = true;
+                            traderBatch.Add(TableOperation.Replace(freeTraders[i]));
+                            
+                            // Create the trade record as well
+                            orderBatch.Add(TableOperation.Insert(order));
+                        }
+                    }
                 }
-            }
 
-            if (traderBatch.Count > 0) await _tradeTable.ExecuteBatchAsync(traderBatch);
-            if (tradeBatch.Count > 0) await _tradeTable.ExecuteBatchAsync(tradeBatch);
+                if (traderBatch.Count > 0) await _traderTable.ExecuteBatchAsync(traderBatch);
+                if (orderBatch.Count > 0) await _orderTable.ExecuteBatchAsync(orderBatch);
+            }
 
             //while (activeTrades.Count < Constants.MaxNumberOfConcurrentTrades)
             //{
@@ -159,7 +178,7 @@ namespace Mynt.Core.TradeManagers
             }
 
             // Add our trader records
-            if (tableBatch.Count > 0) await _tradeTable.ExecuteBatchAsync(tableBatch);
+            if (tableBatch.Count > 0) await _traderTable.ExecuteBatchAsync(tableBatch);
         }
 
         ///// <summary>
@@ -178,19 +197,12 @@ namespace Mynt.Core.TradeManagers
         /// if one pair triggers the buy signal a new trade record gets created.
         /// </summary>
         /// <param name="trades"></param>
-        /// <param name="freeTrader"></param>
         /// <returns></returns>
-        private async Task<Trade> FindTrade(List<Trade> trades, Trader freeTrader)
+        private async Task<List<string>> FindTrades(List<Trade> trades)
         {
-            // Get our Bitcoin balance from the exchange
-            var currentBtcBalance = await _api.GetBalance("BTC");
-
-            // Do we even have enough funds to invest?
-            if (currentBtcBalance.Available < freeTrader.CurrentBalance)
-                throw new Exception("Insufficient BTC funds to perform a trade.");
-
             // Retrieve our current markets
             var markets = await _api.GetMarketSummaries();
+            var pairs = new List<string>();
 
             // Check if there are markets matching our volume.
             markets = markets.Where(x => (x.BaseVolume > Constants.MinimumAmountOfVolume || Constants.AlwaysTradeList.Contains(x.MarketName)) && 
@@ -203,26 +215,18 @@ namespace Mynt.Core.TradeManagers
             // Remove items that are on our blacklist.
             foreach (var market in Constants.MarketBlackList)
                 markets.RemoveAll(x => x.MarketName == market);
-
-            // Check the buy signal!
-            string pair = null;
-
+            
             // Prioritize markets with high volume.
             foreach (var market in markets.Distinct().OrderByDescending(x => x.BaseVolume).ToList())
             {
                 if (await GetBuySignal(market.MarketName))
                 {
                     // A match was made, buy that please!
-                    pair = market.MarketName;
-                    break;
+                    pairs.Add(market.MarketName);
                 }
             }
-
-            // No pairs found. Return.
-            if (pair == null) return null;
-
-            // We found something, create a buy order for it
-            return await CreateBuyOrder(freeTrader, pair);
+            
+            return pairs;
         }
 
         /// <summary>
@@ -245,7 +249,7 @@ namespace Mynt.Core.TradeManagers
 
             // Get the order ID, this is the most important because we need this to check
             // up on our trade. We update the data below later when the final data is present.
-            var orderId = await _api.Buy(pair, openRate, amount);
+            var orderId = await _api.Buy(pair, amount, openRate);
 
             return new Trade()
             {
