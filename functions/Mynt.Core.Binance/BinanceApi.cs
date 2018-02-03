@@ -16,13 +16,13 @@ namespace Mynt.Core.Binance
 
         private readonly bool isDryRunning;
 
-        public BinanceApi(string apiKey, string secretKey, bool isDryRunning = true)
+        public BinanceApi(bool isDryRunning = true)
         {
             // Initialise the general client with config
             client = new BinanceClient(new ClientConfiguration()
             {
-                ApiKey = apiKey,
-                SecretKey = secretKey,
+                ApiKey = Constants.BinanceApiKey,
+                SecretKey = Constants.BinanceApiSecret,
             });
             this.isDryRunning = isDryRunning;
         }
@@ -117,6 +117,8 @@ namespace Mynt.Core.Binance
 
         public async Task<AccountBalance> GetBalance(string currency)
         {
+            if (isDryRunning) return new AccountBalance(currency, 999.99, 0);
+
             var result = await client.GetAccountInformation();
             var currencyInformation = result.Balances.SingleOrDefault(_ => _.Asset == currency);
             return new AccountBalance(currencyInformation.Asset, (double)currencyInformation.Free, (double)currencyInformation.Locked);

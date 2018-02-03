@@ -29,14 +29,14 @@ namespace Mynt.Core.Bittrex
 
         private readonly string _apiVersion = "v1.1";
 
-        public BittrexClient(string baseAddress, string apiKey, string apiSecret)
+        public BittrexClient(string apiKey, string apiSecret)
         {
             _httpClient = new HttpClient();
 
             _apiKey = apiKey;
             _apiSecret = apiSecret;
 
-            _baseAddress = baseAddress;
+            _baseAddress = "https://www.bittrex.com/api";
             _publicNewBaseUrl = $"{_baseAddress}/v2.0/pub/market";
             _publicBaseUrl = $"{_baseAddress}/{_apiVersion}/public";
             _accountBaseUrl = $"{_baseAddress}/{_apiVersion}/account";

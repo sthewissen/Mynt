@@ -7,22 +7,25 @@ namespace Mynt.Core
     {
         public const bool IsDryRunning = true;
 
-        // Bittrex settings
         public const string BlockChainApiRoot = "https://blockchain.info";
-        public const string BittrexApiRoot = "https://www.bittrex.com/api";
+
+        // Bittrex settings
         public const string BittrexApiKey = "";
         public const string BittrexApiSecret = "";
 
+        // Binance settings
+        public const string BinanceApiKey = "";
+        public const string BinanceApiSecret = "";
+
         // Azure settings
-        public const string ConnectionString = "";
-        public const string NotificationAccessKey = "";
-        public const string NotificationHubName = "";
+        public const string TableStorageConnectionString = "";
+
         public const string OrderTableName = "orders";
         public const string BalanceTableName = "balance";
 
         // Trade settings
         public const int MaxNumberOfConcurrentTrades = 2;
-        public const double AmountOfBtcToInvestPerTrader = 0.01860324;
+        public const double AmountOfBtcToInvestPerTrader = 0.01;
         public const double TransactionFeePercentage = 0.0025;
 
         // If we go below this profit percentage, we sell immediately.

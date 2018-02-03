@@ -18,7 +18,7 @@ namespace Mynt.Core.Bittrex
         public BittrexApi(bool dryrun = true)
         {
             _dryRun = dryrun;
-            _api = new BittrexClient(Constants.BittrexApiRoot, Constants.BittrexApiKey, Constants.BittrexApiSecret);
+            _api = new BittrexClient(Constants.BittrexApiKey, Constants.BittrexApiSecret);
             Task.Factory.StartNew(CheckMarketExistance);
         }
 

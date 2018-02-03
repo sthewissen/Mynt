@@ -9,7 +9,7 @@ namespace Mynt.Core.Managers
     {
         public static async Task<CloudTable> GetTableConnection(string tableName, bool dryRun)
         {
-            var account = CloudStorageAccount.Parse(Constants.ConnectionString);
+            var account = CloudStorageAccount.Parse(Constants.TableStorageConnectionString);
             var tableClient = account.CreateCloudTableClient();
             var table = tableClient.GetTableReference(tableName + (dryRun ? "DryRun" : ""));
             await table.CreateIfNotExistsAsync();
