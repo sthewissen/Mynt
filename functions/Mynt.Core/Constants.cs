@@ -14,11 +14,11 @@ namespace Mynt.Core
         public const string BittrexApiSecret = "";
 
         // Binance settings
-        public const string BinanceApiKey = "Ar5p04dWxD7d5zwjY2gxLFsP5fqwMLsgeTa88u6wKdD90GpnvP2TcP6wuZ626a3V";
-        public const string BinanceApiSecret = "kB4RDe9athM9CMaCNhdLXVDkoxNotgDaPxuD9d3qPOgIlYsOsy3tEIo4H5jXxsvA";
+        public const string BinanceApiKey = "";
+        public const string BinanceApiSecret = "";
 
         // Azure settings
-        public const string TableStorageConnectionString = "DefaultEndpointsProtocol=https;AccountName=myntbot;AccountKey=HKO9NqXdekDrwLLJUP+m9hDeIZzKMzUugm7XfsKAWPguHr7rXuTHhQiT/16FaYMrHpmUD17jkMa1YnbR2+1Atg==;BlobEndpoint=https://myntbot.blob.core.windows.net/;QueueEndpoint=https://myntbot.queue.core.windows.net/;TableEndpoint=https://myntbot.table.core.windows.net/;FileEndpoint=https://myntbot.file.core.windows.net/;";
+        public const string TableStorageConnectionString = "";
 
         public const string OrderTableName = "orders";
         public const string TraderTableName = "traders";
