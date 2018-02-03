@@ -94,63 +94,6 @@ namespace Mynt.Core.TradeManagers
                 if (traderBatch.Count > 0) await _traderTable.ExecuteBatchAsync(traderBatch);
                 if (orderBatch.Count > 0) await _orderTable.ExecuteBatchAsync(orderBatch);
             }
-
-            //while (activeTrades.Count < Constants.MaxNumberOfConcurrentTrades)
-            //{
-
-            //    else
-            //    {
-            //        // No more trade to be found, kill it.
-            //        break;
-            //    }
-            //}
-
-            //// Handle our active trades.
-            //foreach (var trade in activeTrades)
-            //{
-            //    var orders = await _api.GetOpenOrders(trade.Market);
-
-            //    if (orders.Any(x => x.OrderUuid.ToString() == trade.OpenOrderId))
-            //    {
-            //        // There's already an open order for this trade.
-            //        // This means we're still buying it.
-            //        _log($"Already an open order for trade {trade.OpenOrderId}");
-            //    }
-            //    else
-            //    {
-            //        trade.OpenOrderId = null;
-
-            //        // No open order with the order ID of the trade.
-            //        // Check if this trade can be closed
-            //        if (!await CloseTradeIfFulfilled(trade))
-            //        {
-            //            // Check if we can sell our current pair
-            //            await HandleTrade(trade);
-            //        }
-
-            //        batch.Add(TableOperation.Replace(trade));
-            //    }
-            //}
-
-            //// If we have less active trades than we can handle, find a new one.
-            //while (activeTrades.Count < Constants.MaxNumberOfConcurrentTrades)
-            //{
-            //    var trade = await StartTrade(activeTrades, batch);
-
-            //    if (trade != null)
-            //    {
-            //        // Add this to activeTrades so we don't trigger the same.
-            //        activeTrades.Add(trade);
-            //        batch.Add(TableOperation.Insert(trade));
-            //    }
-            //    else
-            //    {
-            //        // No more trade to be found, kill it.
-            //        break;
-            //    }
-            //}
-
-            //_log($"Currently handling {activeTrades.Count} trades."); 
         }
 
         public async Task CheckForSellSignals()
@@ -168,11 +111,8 @@ namespace Mynt.Core.TradeManagers
             // Secondly we check if currently selling trades can be marked as sold if they're filled.
             activeTrades = await UpdateOpenSellOrders(busyTraders, activeTrades);
 
-            // Third, our current holdings need to be checked if one of these has hit its sell targets...
-            foreach (var trade in activeTrades.Where(x => x.OpenOrderId == null && x.IsOpen))
-            {
-                // These are trades that are not being bought or sold, so these need to be checked for sell conditions.
-            }
+            // Third, our current trades need to be checked if one of these has hit its sell targets...
+            await CheckForSellConditions(activeTrades);
         }
 
         /// <summary>
@@ -201,153 +141,6 @@ namespace Mynt.Core.TradeManagers
             // Add our trader records
             if (tableBatch.Count > 0) await _traderTable.ExecuteBatchAsync(tableBatch);
         }
-
-        ///// <summary>
-        ///// Directly triggers a sell.
-        ///// </summary>
-        ///// <param name="trade"></param>
-        ///// <returns></returns>
-        //public async Task DirectSell(Trade trade)
-        //{
-        //    var currentRate = await _api.GetTicker(trade.Market);
-        //    await ExecuteSell(trade, currentRate.Bid);
-        //}
-
-        ///// <summary>
-        /////  Sells the current pair if the threshold is reached and updates the trade record.
-        ///// </summary>
-        ///// <param name="trade"></param>
-        //private async Task HandleTrade(Trade trade)
-        //{
-        //    if (!trade.IsOpen)
-        //    {
-        //        // Trying to handle a closed trade...
-        //        throw new Exception($"Trying to handle a closed trade {trade.Market} | PK: {trade.PartitionKey}");
-        //    }
-
-        //    var currentRate = await _api.GetTicker(trade.Market);
-        //    var advice = await GetAdvice(trade.Market);
-
-        //    if (advice != null && (advice.TradeAdvice == TradeAdvice.Sell || ShouldSell(trade, currentRate.Bid, DateTime.UtcNow) != SellType.None))
-        //    {
-        //        await ExecuteSell(trade, currentRate.Bid);
-        //    }
-        //}
-
-
-
-        ///// <summary>
-        ///// Executes a sell for the given trade and current rate.
-        ///// </summary>
-        //private async Task ExecuteSell(Trade trade, double currentRateBid)
-        //{
-        //    // Get available balance
-        //    var currency = trade.Market.Split('-')[1];
-        //    var balance = await _api.GetBalance(currency);
-        //    await ExecuteSellOrder(trade, currentRateBid, balance.Available);
-        //}
-
-        ///// <summary>
-        ///// Executes a sell for the given trade and updated the entity.
-        ///// </summary>
-        ///// <param name="trade"></param>
-        ///// <param name="currentRateBid">Rate to sell for</param>
-        ///// <param name="balance">Amount to sell for</param>
-        ///// <returns>Current profit as percentage</returns>
-        //private async Task<double> ExecuteSellOrder(Trade trade, double currentRateBid, double balance)
-        //{
-        //    // Calculate our profit.
-        //    var investment = (trade.StakeAmount * (1 - Constants.TransactionFeePercentage));
-        //    var sales = (trade.Quantity * currentRateBid) - (trade.Quantity * currentRateBid * Constants.TransactionFeePercentage);
-        //    var profit = 100 * ((sales - investment) / investment);
-
-        //    // Sell the thing.
-        //    var orderId = await _api.Sell(trade.Market, balance, currentRateBid);
-
-        //    trade.CloseRate = currentRateBid;
-        //    trade.CloseProfitPercentage = profit;
-        //    trade.CloseProfit = sales - investment;
-        //    trade.CloseDate = DateTime.UtcNow;
-        //    trade.OpenOrderId = orderId;
-        //    trade.SellOrderId = orderId;
-
-        //    return profit;
-        //}
-
-        ///// <summary>
-        ///// Based on earlier trade and current price and configuration, decides whether bot should sell.
-        ///// </summary>
-        ///// <param name="trade"></param>
-        ///// <param name="currentRateBid"></param>
-        ///// <param name="utcNow"></param>
-        ///// <returns>True if bot should sell at current rate.</returns>
-        //private SellType ShouldSell(Trade trade, double currentRateBid, DateTime utcNow)
-        //{
-        //    var currentProfit = (currentRateBid - trade.OpenRate) / trade.OpenRate;
-
-        //    _log($"Should sell {trade.Market}? Profit: {(currentProfit * 100):0.00}%...");
-
-        //    // Let's not do a stoploss for now...
-        //    if (currentProfit < Constants.StopLossPercentage)
-        //    {
-        //        _log($"Stop loss hit: {Constants.StopLossPercentage}");
-        //        return SellType.StopLoss;
-        //    }
-
-        //    if (currentProfit < trade.StopLossAnchor)
-        //        return SellType.StopLossAnchor;
-
-        //    // Set a stop loss anchor to minimize losses.
-        //    foreach (var item in Constants.StopLossAnchors)
-        //    {
-        //        if (currentProfit > item)
-        //            trade.StopLossAnchor = item - 0.01;
-        //    }
-
-        //    // Check if time matches and current rate is above threshold
-        //    foreach (var item in Constants.ReturnOnInvestment)
-        //    {
-        //        var timeDiff = (utcNow - trade.OpenDate).TotalSeconds / 60;
-
-        //        if (timeDiff > item.Duration && currentProfit > item.Profit)
-        //        {
-        //            _log($"Timer hit: {timeDiff} mins, profit {item.Profit:0.00}%");
-        //            return SellType.Timed;
-        //        }
-        //    }
-
-        //    return SellType.None;
-        //}
-
-        ///// <summary>
-        ///// Checks if the trade is closable, and if so it is being closed.
-        ///// </summary>
-        ///// <param name="trade"></param>
-        ///// <returns></returns>
-        //private async Task<bool> CloseTradeIfFulfilled(Trade trade)
-        //{
-        //    // If we don't have an open order and the close rate is already set,
-        //    // we can close this trade.
-        //    if (trade.CloseProfit != null && trade.CloseProfitPercentage != null && trade.CloseDate != null &&
-        //        trade.CloseRate != null && trade.OpenOrderId == null)
-        //    {
-        //        // Set our balances straight.
-        //        //_dayBalance.Profit += trade.CloseProfit.Value;
-        //        //_totalBalance.Profit += trade.CloseProfit.Value;
-        //        //_totalBalance.TotalBalance += trade.CloseProfit.Value;
-
-        //        //_dayBalance.LastUpdated = DateTime.UtcNow;
-        //        //_totalBalance.LastUpdated = DateTime.UtcNow;
-
-        //        trade.IsOpen = false;
-
-        //        await SendNotification($"Sold {trade.Market} at {trade.CloseRate:0.0000000 BTC} with a profit of {trade.CloseProfitPercentage:0.00}%");
-
-        //        return true;
-        //    }
-
-        //    return false;
-        //}
 
         #region BUY side
 
@@ -530,11 +323,88 @@ namespace Mynt.Core.TradeManagers
         #region SELL side
 
         /// <summary>
-        /// Updates the sell orders by checking with the exchange what status they are currently.
+        /// Checks the current active trades if they need to be sold.
         /// </summary>
         /// <param name="activeTrades"></param>
         /// <returns></returns>
-        private async Task<List<Trade>>  UpdateOpenSellOrders(List<Trader> busyTraders, List<Trade> activeTrades)
+        private async Task CheckForSellConditions(List<Trade> activeTrades)
+        {
+            // There are trades that have an open order ID set & no sell order id set
+            // that means its a buy trade that is waiting to get bought. See if we can update that first.
+            var orderBatch = new TableBatchOperation();
+            
+            foreach (var trade in activeTrades.Where(x => x.OpenOrderId == null && x.IsOpen))
+            {
+                // These are trades that are not being bought or sold at the moment so these need to be checked for sell conditions.
+                var ticker = await _api.GetTicker(trade.Market);
+                var sellType = ShouldSell(trade, ticker.Bid, DateTime.UtcNow);
+
+                if (sellType != SellType.None)
+                {
+                    var orderId = await _api.Sell(trade.Market, trade.Quantity, ticker.Bid);
+
+                    trade.CloseRate = ticker.Bid;
+                    trade.OpenOrderId = orderId;
+                    trade.SellOrderId = orderId;
+                    trade.SellType = sellType;
+
+                    orderBatch.Add(TableOperation.Replace(trade));
+                }
+            }
+            
+            if (orderBatch.Count > 0) await _orderTable.ExecuteBatchAsync(orderBatch);
+        }
+
+        /// <summary>
+        /// Based on earlier trade and current price and configuration, decides whether bot should sell.
+        /// </summary>
+        /// <param name="trade"></param>
+        /// <param name="currentRateBid"></param>
+        /// <param name="utcNow"></param>
+        /// <returns>True if bot should sell at current rate.</returns>
+        private SellType ShouldSell(Trade trade, double currentRateBid, DateTime utcNow)
+        {
+            var currentProfit = (currentRateBid - trade.OpenRate) / trade.OpenRate;
+
+            _log($"Should sell {trade.Market}? Profit: {(currentProfit * 100):0.00}%...");
+
+            // Let's not do a stoploss for now...
+            if (currentProfit < Constants.StopLossPercentage)
+            {
+                _log($"Stop loss hit: {Constants.StopLossPercentage}");
+                return SellType.StopLoss;
+            }
+
+            if (currentProfit < trade.StopLossAnchor)
+                return SellType.StopLossAnchor;
+
+            // Set a stop loss anchor to minimize losses.
+            foreach (var item in Constants.StopLossAnchors)
+            {
+                if (currentProfit > item)
+                    trade.StopLossAnchor = item - 0.01;
+            }
+
+            // Check if time matches and current rate is above threshold
+            foreach (var item in Constants.ReturnOnInvestment)
+            {
+                var timeDiff = (utcNow - trade.OpenDate).TotalSeconds / 60;
+
+                if (timeDiff > item.Duration && currentProfit > item.Profit)
+                {
+                    _log($"Timer hit: {timeDiff} mins, profit {item.Profit:0.00}%");
+                    return SellType.Timed;
+                }
+            }
+
+            return SellType.None;
+        }
+
+        /// <summary>
+        /// Updates the sell orders by checking with the exchange what status they are currently.
+        /// </summary>
+        /// <returns></returns>
+        private async Task<List<Trade>> UpdateOpenSellOrders(List<Trader> busyTraders, List<Trade> activeTrades)
         {
             // There are trades that have an open order ID set & sell order id set
             // that means its a sell trade that is waiting to get sold. See if we can update that first.
