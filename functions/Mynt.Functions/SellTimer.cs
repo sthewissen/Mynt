@@ -1,18 +1,16 @@
 using System;
-using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
+using Mynt.Core.Binance;
 using Mynt.Core.Strategies;
 using Mynt.Core.TradeManagers;
-using Mynt.Core.Binance;
 
 namespace Mynt.Functions
 {
-    public static class BuyTimer
+    public static class SellTimer
     {
-        // This function runs every hour at 1 minute and 10 seconds past the hour (e.g. 14:01:10, 15:01:10).
-        [FunctionName("BuyTimer")]
-        public static async Task Run([TimerTrigger("10 1 * * * *")]TimerInfo myTimer, TraceWriter log)
+        [FunctionName("SellTimer")]
+        public static void Run([TimerTrigger("0 */5 * * * *")]TimerInfo myTimer, TraceWriter log)
         {
             try
             {
@@ -20,8 +18,8 @@ namespace Mynt.Functions
 
                 // Call the Bittrex Trade manager with the strategy of our choosing.
                 var manager = new GenericTradeManager(
-                    new BinanceApi(), 
-                    new TheScalper(), 
+                    new BinanceApi(),
+                    new TheScalper(),
                     null, (a) => log.Info(a)
                 );
 
