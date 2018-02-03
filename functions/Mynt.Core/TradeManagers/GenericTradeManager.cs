@@ -206,7 +206,7 @@ namespace Mynt.Core.TradeManagers
 
             // Check if there are markets matching our volume.
             markets = markets.Where(x => (x.BaseVolume > Constants.MinimumAmountOfVolume || Constants.AlwaysTradeList.Contains(x.MarketName)) && 
-            x.QuoteCurrency.ToUpper() == "BTC").ToList();
+            x.CurrencyPair.QuoteCurrency.ToUpper() == "BTC").ToList();
 
             // Remove existing trades from the list to check.
             foreach (var trade in trades)

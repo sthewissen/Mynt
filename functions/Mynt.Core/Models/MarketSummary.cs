@@ -8,8 +8,7 @@ namespace Mynt.Core.Models
     /// </summary>
     public class MarketSummary
     {
-        public string BaseCurrency { get; set; }
-        public string QuoteCurrency { get; set; }
+        public CurrencyPair CurrencyPair { get; set; }
         public string MarketName { get; set; }
         public double High { get; set; }
         public double Low { get; set; }

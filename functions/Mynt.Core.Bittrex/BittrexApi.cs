@@ -106,8 +106,7 @@ namespace Mynt.Core.Bittrex
                     Last = _.Last,
                     Low = _.Low,
                     MarketName = _.MarketName,
-                    BaseCurrency = _.MarketName.Split('_')[0],
-                    QuoteCurrency = _.MarketName.Split('_')[1],
+                    CurrencyPair = new CurrencyPair() { BaseCurrency = _.MarketName.Split('_')[1], QuoteCurrency = _.MarketName.Split('_')[0] },
                     PrevDay = _.PrevDay,
                     Volume = _.Volume
                 }).ToList();
