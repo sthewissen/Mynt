@@ -5,6 +5,8 @@ namespace Mynt.Core.Models
 {
     public class Trade : TableEntity
     {
+        public string TraderId { get; set; }
+
         public string Market { get; set; }
 
         public double OpenRate { get; set; }

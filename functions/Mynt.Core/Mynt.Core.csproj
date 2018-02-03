@@ -270,10 +270,10 @@
     <Compile Include="Models\SimpleTradeAdvice.cs" />
     <Compile Include="Models\Ticker.cs" />
     <Compile Include="Models\TimestampedTradeAdvice.cs" />
+    <Compile Include="Models\Trader.cs" />
     <Compile Include="NotificationManagers\DiscordNotificationManager.cs" />
     <Compile Include="NotificationManagers\NotificationManager.cs" />
     <Compile Include="NotificationManagers\SlackNotificationManager.cs" />
-    <Compile Include="Models\Balance.cs" />
     <Compile Include="Models\Candle.cs" />
     <Compile Include="Models\CandleVariable.cs" />
     <Compile Include="Models\MarketData.cs" />
@@ -325,6 +325,7 @@
     <Compile Include="Strategies\SmaSar.cs" />
     <Compile Include="Strategies\SmaStochRsi.cs" />
     <Compile Include="Strategies\StochAdx.cs" />
+    <Compile Include="Strategies\TheScalper.cs" />
     <Compile Include="Strategies\ThreeMAgos.cs" />
     <Compile Include="Strategies\RsiBbands.cs" />
     <Compile Include="Providers\CoreTradingStrategyProvider.cs" />
