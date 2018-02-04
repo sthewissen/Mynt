@@ -12,10 +12,11 @@ namespace Mynt.Core.Strategies
 
         public List<ITradeAdvice> Prepare(List<Candle> candles)
         {
-            var result = new List<ITradeAdvice>();
-            result.Add(new SimpleTradeAdvice(TradeAdvice.Buy));
+            var result = new List<ITradeAdvice> {new SimpleTradeAdvice(TradeAdvice.Buy)};
             var holdAdvices = new int[candles.Count - 1];
+
             result.AddRange(holdAdvices.Select(_=> new SimpleTradeAdvice((TradeAdvice)_)));
+
             return result;
         }
 

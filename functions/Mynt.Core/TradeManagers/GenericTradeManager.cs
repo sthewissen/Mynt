@@ -302,7 +302,7 @@ namespace Mynt.Core.TradeManagers
         {
             var minimumDate = DateTime.UtcNow.AddHours(-120);
             var candleDate = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day, DateTime.UtcNow.Hour, 0, 0, 0);
-            var candles = await _api.GetTickerHistory(tradeMarket, minimumDate, Core.Models.Period.Hour);
+            var candles = await _api.GetTickerHistory(tradeMarket, minimumDate, Period.Hour);
 
             // We eliminate all candles that aren't needed and the last one (if it's the current running candle).
             candles = candles.Where(x => x.Timestamp > minimumDate && x.Timestamp < candleDate).ToList();

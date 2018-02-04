@@ -21,42 +21,42 @@ namespace Mynt.Core.Bittrex
             }).ToList();
         }
 
-        public static Core.Models.Period ToCoreEquivalent(this Period period)
+        public static Core.Enums.Period ToCoreEquivalent(this Bittrex.Models.Period period)
         {
             switch (period)
             {
-                case Period.Day:
-                    return Core.Models.Period.Day;
-                case Period.FiveMin:
-                    return Core.Models.Period.FiveMinutes;
-                case Period.Hour:
-                    return Core.Models.Period.Hour;
-                case Period.OneMin:
-                    return Core.Models.Period.Minute;
-                case Period.ThirtyMin:
-                    return Core.Models.Period.HalfAnHour;
+                case Bittrex.Models.Period.Day:
+                    return Core.Enums.Period.Day;
+                case Bittrex.Models.Period.FiveMin:
+                    return Core.Enums.Period.FiveMinutes;
+                case Bittrex.Models.Period.Hour:
+                    return Core.Enums.Period.Hour;
+                case Bittrex.Models.Period.OneMin:
+                    return Core.Enums.Period.Minute;
+                case Bittrex.Models.Period.ThirtyMin:
+                    return Core.Enums.Period.HalfAnHour;
                 default:
                     throw new ArgumentException($"{period} is an unknown value for Period");
             }             
         }
         
-        public static Period ToBittrexEquivalent(this Core.Models.Period period)
+        public static Bittrex.Models.Period ToBittrexEquivalent(this Core.Enums.Period period)
         {
             switch (period)
             {
-                case Core.Models.Period.Day:
-                    return Period.Day;
-                case Core.Models.Period.FiveMinutes:
-                    return Period.FiveMin;
-                case Core.Models.Period.HalfAnHour:
-                    return Period.ThirtyMin;
-                case Core.Models.Period.Hour:
-                    return Period.Hour;
-                case Core.Models.Period.Minute:
-                    return Period.OneMin;
-                case Core.Models.Period.FourHours:
-                case Core.Models.Period.QuarterOfAnHour:
-                case Core.Models.Period.TwoHours:
+                case Core.Enums.Period.Day:
+                    return Bittrex.Models.Period.Day;
+                case Core.Enums.Period.FiveMinutes:
+                    return Bittrex.Models.Period.FiveMin;
+                case Core.Enums.Period.HalfAnHour:
+                    return Bittrex.Models.Period.ThirtyMin;
+                case Core.Enums.Period.Hour:
+                    return Bittrex.Models.Period.Hour;
+                case Core.Enums.Period.Minute:
+                    return Bittrex.Models.Period.OneMin;
+                case Core.Enums.Period.FourHours:
+                case Core.Enums.Period.QuarterOfAnHour:
+                case Core.Enums.Period.TwoHours:
                     throw new ArgumentException($"{period} has no mapping");
                 default:
                     throw new ArgumentException($"{period} is an unknown value for Period");

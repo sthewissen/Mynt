@@ -194,7 +194,7 @@ namespace Mynt.Core.Bittrex
             return result.Result;
         }
 
-        public async Task<List<Core.Models.Candle>> GetTickerHistory(string market, DateTime startDate, Core.Models.Period period = Core.Models.Period.FiveMinutes)
+        public async Task<List<Core.Models.Candle>> GetTickerHistory(string market, DateTime startDate, Core.Enums.Period period = Core.Enums.Period.FiveMinutes)
         {
             var result = await _api.GetTickerHistory(market, startDate.ToUnixTimestamp(), period.ToBittrexEquivalent());
 

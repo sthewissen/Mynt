@@ -1,4 +1,5 @@
 ﻿using System;
+using Binance.Net.Objects;
 using BinanceNet = Binance.Net;
 using Mynt.Core.Enums;
 
@@ -102,6 +103,56 @@ namespace Mynt.Core.Binance
             }
 
             throw new ArgumentException($"{input} is an unknown TimeInForce");
+        }
+
+        public static Core.Enums.Period ToCoreEquivalent(this KlineInterval period)
+        {
+            switch (period)
+            {
+                case KlineInterval.OneDay:
+                    return Core.Enums.Period.Day;
+                case KlineInterval.FiveMinutes:
+                    return Core.Enums.Period.FiveMinutes;
+                case KlineInterval.OneHour:
+                    return Core.Enums.Period.Hour;
+                case KlineInterval.OneMinute:
+                    return Core.Enums.Period.Minute;
+                case KlineInterval.ThirtyMinutes:
+                    return Core.Enums.Period.HalfAnHour;
+                case KlineInterval.FourHour:
+                    return Core.Enums.Period.FourHours;
+                case KlineInterval.TwoHour:
+                    return Core.Enums.Period.TwoHours;
+                case KlineInterval.FiveteenMinutes:
+                    return Core.Enums.Period.QuarterOfAnHour;
+                default:
+                    throw new ArgumentException($"{period} is an unknown value for Period");
+            }
+        }
+
+        public static KlineInterval ToBinanceEquivalent(this Core.Enums.Period period)
+        {
+            switch (period)
+            {
+                case Core.Enums.Period.Day:
+                    return KlineInterval.OneDay;
+                case Core.Enums.Period.FiveMinutes:
+                    return KlineInterval.FiveMinutes;
+                case Core.Enums.Period.HalfAnHour:
+                    return KlineInterval.ThirtyMinutes;
+                case Core.Enums.Period.Hour:
+                    return KlineInterval.OneHour;
+                case Core.Enums.Period.Minute:
+                    return KlineInterval.OneMinute;
+                case Core.Enums.Period.FourHours:
+                    return KlineInterval.FourHour;
+                case Core.Enums.Period.QuarterOfAnHour:
+                    return KlineInterval.FiveteenMinutes;
+                case Core.Enums.Period.TwoHours:
+                    return KlineInterval.TwoHour;
+                default:
+                    throw new ArgumentException($"{period} is an unknown value for Period");
+            }
         }
 
         public static BinanceNet.Objects.OrderType ToBinanceEquivalent(this Enums.OrderType input)

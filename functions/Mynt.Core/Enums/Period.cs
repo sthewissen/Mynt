@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Mynt.Core.Models
+namespace Mynt.Core.Enums
 {
     public enum Period
     {

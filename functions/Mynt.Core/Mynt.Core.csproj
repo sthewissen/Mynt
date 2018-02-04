@@ -278,7 +278,7 @@
     <Compile Include="Models\Candle.cs" />
     <Compile Include="Models\CandleVariable.cs" />
     <Compile Include="Models\MarketData.cs" />
-    <Compile Include="Models\Period.cs" />
+    <Compile Include="Enums\Period.cs" />
     <Compile Include="Models\ProfitType.cs" />
     <Compile Include="Models\SellType.cs" />
     <Compile Include="Models\Trade.cs" />

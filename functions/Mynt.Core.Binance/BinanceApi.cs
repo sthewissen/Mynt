@@ -6,7 +6,12 @@ using Binance.Net;
 using BinanceNet = Binance.Net;
 using Binance.Net.Objects;
 using Mynt.Core.Api;
+using Mynt.Core.Enums;
 using Mynt.Core.Models;
+using OrderSide = Binance.Net.Objects.OrderSide;
+using OrderStatus = Binance.Net.Objects.OrderStatus;
+using OrderType = Binance.Net.Objects.OrderType;
+using TimeInForce = Binance.Net.Objects.TimeInForce;
 
 namespace Mynt.Core.Binance
 {
@@ -256,7 +261,7 @@ namespace Mynt.Core.Binance
 
             while (start < endTime)
             {
-                var candlesticksToAdd = await _client.GetKlinesAsync(market, (KlineInterval) period, start, endTime);
+                var candlesticksToAdd = await _client.GetKlinesAsync(market, period.ToBinanceEquivalent(), start, endTime);
                 
                 if (!candlesticksToAdd.Success) throw new Exception(candlesticksToAdd.Error.Message);
 

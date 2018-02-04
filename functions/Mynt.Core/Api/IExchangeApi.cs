@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Mynt.Core.Enums;
 using Mynt.Core.Models;
 
 namespace Mynt.Core.Api
