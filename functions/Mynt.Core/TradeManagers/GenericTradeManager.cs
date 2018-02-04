@@ -190,7 +190,7 @@ namespace Mynt.Core.TradeManagers
             var pairs = new List<string>();
 
             // Check if there are markets matching our volume.
-            markets = markets.Where(x => (x.BaseVolume > Constants.MinimumAmountOfVolume || Constants.AlwaysTradeList.Contains(x.MarketName)) &&
+            markets = markets.Where(x => (x.BaseVolume > Constants.MinimumAmountOfVolume || Constants.AlwaysTradeList.Contains(x.CurrencyPair.BaseCurrency)) &&
             x.CurrencyPair.QuoteCurrency.ToUpper() == "BTC").ToList();
 
             // Remove existing trades from the list to check.
@@ -199,7 +199,7 @@ namespace Mynt.Core.TradeManagers
 
             // Remove items that are on our blacklist.
             foreach (var market in Constants.MarketBlackList)
-                markets.RemoveAll(x => x.MarketName == market);
+                markets.RemoveAll(x => x.CurrencyPair.BaseCurrency == market);
 
             // Prioritize markets with high volume.
             foreach (var market in markets.Distinct().OrderByDescending(x => x.BaseVolume).ToList())
@@ -375,15 +375,15 @@ namespace Mynt.Core.TradeManagers
                 return SellType.StopLoss;
             }
 
-            if (currentProfit < trade.StopLossAnchor)
-                return SellType.StopLossAnchor;
+            //if (currentProfit < trade.StopLossAnchor)
+            //    return SellType.StopLossAnchor;
 
-            // Set a stop loss anchor to minimize losses.
-            foreach (var item in Constants.StopLossAnchors)
-            {
-                if (currentProfit > item)
-                    trade.StopLossAnchor = item - 0.01;
-            }
+            //// Set a stop loss anchor to minimize losses.
+            //foreach (var item in Constants.StopLossAnchors)
+            //{
+            //    if (currentProfit > item)
+            //        trade.StopLossAnchor = item - 0.01;
+            //}
 
             // Check if time matches and current rate is above threshold
             foreach (var item in Constants.ReturnOnInvestment)
