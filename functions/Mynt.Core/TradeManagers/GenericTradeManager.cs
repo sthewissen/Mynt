@@ -301,7 +301,7 @@ namespace Mynt.Core.TradeManagers
         private async Task<ITradeAdvice> GetAdvice(string tradeMarket)
         {
             var minimumDate = DateTime.UtcNow.AddHours(-120);
-            var candleDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.UtcNow.Day, DateTime.Now.Hour, 0, 0, 0);
+            var candleDate = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day, DateTime.UtcNow.Hour, 0, 0, 0);
             var candles = await _api.GetTickerHistory(tradeMarket, minimumDate, Core.Models.Period.Hour);
 
             // We eliminate all candles that aren't needed and the last one (if it's the current running candle).

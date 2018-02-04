@@ -64,11 +64,11 @@ namespace Mynt.Core
 
         // These are the markets we don't want to trade on
         public static readonly List<string> MarketBlackList = new List<string>() {
-           // "XVG"
+           "XVG"
         };
         // These are the markets we want to trade on regardless of volume
         public static readonly List<string> AlwaysTradeList = new List<string>() {
-           "VEN", "OMG", "NEO", "XRP", "LSK", "ETH", "LTC", "ARK
+           "VEN", "OMG", "NEO", "XRP", "LSK", "ETH", "LTC", "ARK"
         };
     }
 }
