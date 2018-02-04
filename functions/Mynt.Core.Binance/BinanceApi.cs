@@ -32,7 +32,7 @@ namespace Mynt.Core.Binance
             if (_isDryRunning)
             {
                 var emptyResult = await _client.PlaceTestOrderAsync(market, OrderSide.Buy, OrderType.Limit, (decimal)quantity, null, (decimal)rate, TimeInForce.GoodTillCancel);
-                return $"DRY_RUN_BUY_{DateTime.UtcNow.Ticks}";
+                return $"{DateTime.UtcNow.Year}{DateTime.UtcNow.Month}{DateTime.UtcNow.Day}{DateTime.UtcNow.Hour}{DateTime.UtcNow.Minute}{DateTime.UtcNow.Second}{DateTime.UtcNow.Millisecond}";
             }
 
             var result = await _client.PlaceOrderAsync(market, OrderSide.Buy, OrderType.Limit, (decimal)quantity, null, (decimal)rate, TimeInForce.GoodTillCancel);
@@ -47,7 +47,7 @@ namespace Mynt.Core.Binance
             if (_isDryRunning)
             {
                 var emptyResult = await _client.PlaceTestOrderAsync(market, OrderSide.Buy, OrderType.StopLossLimit, (decimal)quantity, null, (decimal)rate, TimeInForce.GoodTillCancel, (decimal)limit);
-                return $"DRY_RUN_BUY_{DateTime.UtcNow.Ticks}";
+                return $"{DateTime.UtcNow.Year}{DateTime.UtcNow.Month}{DateTime.UtcNow.Day}{DateTime.UtcNow.Hour}{DateTime.UtcNow.Minute}{DateTime.UtcNow.Second}{DateTime.UtcNow.Millisecond}";
             }
 
             var result = await _client.PlaceOrderAsync(market, OrderSide.Buy, OrderType.StopLossLimit, (decimal)quantity, null, (decimal)rate, TimeInForce.GoodTillCancel, (decimal)limit);
@@ -62,7 +62,7 @@ namespace Mynt.Core.Binance
             if (_isDryRunning)
             {
                 var emptyResult = await _client.PlaceTestOrderAsync(market, OrderSide.Sell, OrderType.Limit, (decimal)quantity, null, (decimal)rate, TimeInForce.GoodTillCancel);
-                return $"DRY_RUN_SELL_{DateTime.UtcNow.Ticks}";
+                return $"{DateTime.UtcNow.Year}{DateTime.UtcNow.Month}{DateTime.UtcNow.Day}{DateTime.UtcNow.Hour}{DateTime.UtcNow.Minute}{DateTime.UtcNow.Second}{DateTime.UtcNow.Millisecond}";
             }
 
             var result = await _client.PlaceOrderAsync(market, OrderSide.Sell, OrderType.Limit, (decimal)quantity, null, (decimal)rate, TimeInForce.GoodTillCancel);
@@ -77,7 +77,7 @@ namespace Mynt.Core.Binance
             if (_isDryRunning)
             {
                 var emptyResult = await _client.PlaceTestOrderAsync(market, OrderSide.Sell, OrderType.StopLossLimit, (decimal)quantity, null, (decimal)rate, TimeInForce.GoodTillCancel, (decimal)limit);
-                return $"DRY_RUN_SELL_{DateTime.UtcNow.Ticks}";
+                return $"{DateTime.UtcNow.Year}{DateTime.UtcNow.Month}{DateTime.UtcNow.Day}{DateTime.UtcNow.Hour}{DateTime.UtcNow.Minute}{DateTime.UtcNow.Second}{DateTime.UtcNow.Millisecond}";
             }
 
             var result = await _client.PlaceOrderAsync(market, OrderSide.Sell, OrderType.StopLossLimit, (decimal)quantity, null, (decimal)rate, TimeInForce.GoodTillCancel, (decimal)limit);

@@ -160,7 +160,7 @@ namespace Mynt.Core.TradeManagers
                 var exchangeOrder = await _api.GetOrder(trade.BuyOrderId, trade.Market);
 
                 // if this order is filled, we can update our database.
-                if (exchangeOrder.Status == OrderStatus.Filled)
+                if (exchangeOrder?.Status == OrderStatus.Filled)
                 {
                     trade.OpenOrderId = null;
                     trade.StakeAmount = exchangeOrder.OriginalQuantity * exchangeOrder.Price;
@@ -331,8 +331,8 @@ namespace Mynt.Core.TradeManagers
         /// <returns></returns>
         private async Task CheckForSellConditions(List<Trade> activeTrades)
         {
-            // There are trades that have an open order ID set & no sell order id set
-            // that means its a buy trade that is waiting to get bought. See if we can update that first.
+            // There are trades that have no open order ID set & are still open.
+            // that means its a trade that is waiting to get sold. See if we can update that first.
             var orderBatch = new TableBatchOperation();
             
             foreach (var trade in activeTrades.Where(x => x.OpenOrderId == null && x.IsOpen))
@@ -418,7 +418,7 @@ namespace Mynt.Core.TradeManagers
                 var exchangeOrder = await _api.GetOrder(order.SellOrderId, order.Market);
 
                 // if this order is filled, we can update our database.
-                if (exchangeOrder.Status == OrderStatus.Filled)
+                if (exchangeOrder?.Status == OrderStatus.Filled)
                 {
                     order.OpenOrderId = null;
                     order.IsOpen = false;
