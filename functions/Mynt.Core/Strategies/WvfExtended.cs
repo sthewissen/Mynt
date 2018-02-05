@@ -8,11 +8,13 @@ using Mynt.Core.Models;
 
 namespace Mynt.Core.Strategies
 {
-    public class WvfExtended : ITradingStrategy
+    public class WvfExtended : BaseStrategy
     {
-        public string Name => "Williams Vix Fix (Extended)";
-        
-        public List<ITradeAdvice> Prepare(List<Candle> candles)
+        public override string Name => "Williams Vix Fix (Extended)";
+        public override int MinimumAmountOfCandles => 40;
+        public override Period IdealPeriod => Period.Hour;
+
+        public override List<ITradeAdvice> Prepare(List<Candle> candles)
         {
             var result = new List<ITradeAdvice>();
 
@@ -115,7 +117,7 @@ namespace Mynt.Core.Strategies
             return result;
         }
 
-        public ITradeAdvice Forecast(List<Candle> candles)
+        public override ITradeAdvice Forecast(List<Candle> candles)
         {
             return Prepare(candles).LastOrDefault();
         }

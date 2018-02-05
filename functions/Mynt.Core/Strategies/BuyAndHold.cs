@@ -6,11 +6,13 @@ using Mynt.Core.Models;
 
 namespace Mynt.Core.Strategies
 {
-    public class BuyAndHold : ITradingStrategy
+    public class BuyAndHold : BaseStrategy
     {
-        public string Name => "Buy & Hold";
+        public override string Name => "Buy & Hold";
+        public override int MinimumAmountOfCandles => 20;
+        public override Period IdealPeriod => Period.Hour;
 
-        public List<ITradeAdvice> Prepare(List<Candle> candles)
+        public override List<ITradeAdvice> Prepare(List<Candle> candles)
         {
             var result = new List<ITradeAdvice> {new SimpleTradeAdvice(TradeAdvice.Buy)};
             var holdAdvices = new int[candles.Count - 1];
@@ -20,7 +22,7 @@ namespace Mynt.Core.Strategies
             return result;
         }
 
-        public ITradeAdvice Forecast(List<Candle> candles)
+        public override ITradeAdvice Forecast(List<Candle> candles)
         {
             return Prepare(candles).LastOrDefault();
         }

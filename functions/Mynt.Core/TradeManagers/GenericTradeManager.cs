@@ -300,7 +300,7 @@ namespace Mynt.Core.TradeManagers
         /// <returns></returns>
         private async Task<ITradeAdvice> GetAdvice(string tradeMarket)
         {
-            var minimumDate = DateTime.UtcNow.AddHours(-120);
+            var minimumDate = _strategy.GetMinimumDateTime();
             var candleDate = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day, DateTime.UtcNow.Hour, 0, 0, 0);
             var candles = await _api.GetTickerHistory(tradeMarket, minimumDate, Period.Hour);
 
@@ -311,7 +311,7 @@ namespace Mynt.Core.TradeManagers
             var signalDate = candles[candles.Count - 1].Timestamp;
 
             // This is an outdated candle...
-            if (signalDate < DateTime.UtcNow.AddMinutes(-120))
+            if (signalDate < _strategy.GetSignalDate())
                 return null;
 
             // This calculates an advice for the next timestamp.

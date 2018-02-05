@@ -7,11 +7,13 @@ using Mynt.Core.Models;
 
 namespace Mynt.Core.Strategies
 {
-    public class BigThree : ITradingStrategy
+    public class BigThree : BaseStrategy
     {
-        public string Name => "Big Three";
-        
-        public List<ITradeAdvice> Prepare(List<Candle> candles)
+        public override string Name => "Big Three";
+        public override int MinimumAmountOfCandles => 100;
+        public override Period IdealPeriod => Period.Hour;
+
+        public override List<ITradeAdvice> Prepare(List<Candle> candles)
         {
             var result = new List<ITradeAdvice>();
             
@@ -57,7 +59,7 @@ namespace Mynt.Core.Strategies
             return result;
         }
 
-        public ITradeAdvice Forecast(List<Candle> candles)
+        public override ITradeAdvice Forecast(List<Candle> candles)
         {
             return Prepare(candles).LastOrDefault();
         }

@@ -7,11 +7,13 @@ using Mynt.Core.Models;
 
 namespace Mynt.Core.Strategies
 {
-    public class TheScalper : ITradingStrategy
+    public class TheScalper : BaseStrategy
     {
-        public string Name => "The Scalper";
+        public override string Name => "The Scalper";
+        public override int MinimumAmountOfCandles => 210;
+        public override Period IdealPeriod => Period.Hour;
 
-        public List<ITradeAdvice> Prepare(List<Candle> candles)
+        public override List<ITradeAdvice> Prepare(List<Candle> candles)
         {
             var result = new List<ITradeAdvice>();
 
@@ -28,8 +30,8 @@ namespace Mynt.Core.Strategies
                     if (sma200[i] < closes[i] && // Candles above the SMA
                         stoch.K[i - 1] <= stoch.D[i - 1] && // K below 20, oversold
                         stoch.K[i] > stoch.D[i] &&
-                        stoch.D[i-1] < 20 &&
-                        stoch.K[i-1] < 20 // && // K below 20, oversold
+                        stoch.D[i - 1] < 20 &&
+                        stoch.K[i - 1] < 20 // && // K below 20, oversold
                         )
                         result.Add(new SimpleTradeAdvice(TradeAdvice.Buy));
                     else
@@ -39,7 +41,8 @@ namespace Mynt.Core.Strategies
 
             return result;
         }
-        public ITradeAdvice Forecast(List<Candle> candles)
+
+        public override ITradeAdvice Forecast(List<Candle> candles)
         {
             return Prepare(candles).LastOrDefault();
         }

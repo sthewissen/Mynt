@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using Mynt.Core.Enums;
 using Mynt.Core.Models;
 
 namespace Mynt.Core.Interfaces
@@ -6,6 +8,13 @@ namespace Mynt.Core.Interfaces
     public interface ITradingStrategy
     {
         string Name { get;  }
+
+        int MinimumAmountOfCandles { get; }
+
+        Period IdealPeriod { get; }
+
+        DateTime GetMinimumDateTime();
+        DateTime GetSignalDate();
 
         /// <summary>
         /// Gets a list of trade advices, one for each of the candles provided as input.
