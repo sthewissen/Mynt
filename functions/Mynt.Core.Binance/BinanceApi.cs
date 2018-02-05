@@ -216,6 +216,9 @@ namespace Mynt.Core.Binance
 
         public async Task CancelOrder(string orderId, string market)
         {
+            // Don't allow cancellation if in dry run mode.
+            if (_isDryRunning) return;
+
             long longId;
 
             if (!long.TryParse(orderId, out longId))
