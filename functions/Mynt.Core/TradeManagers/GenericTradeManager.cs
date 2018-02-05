@@ -307,6 +307,10 @@ namespace Mynt.Core.TradeManagers
             // We eliminate all candles that aren't needed and the last one (if it's the current running candle).
             candles = candles.Where(x => x.Timestamp > minimumDate && x.Timestamp < candleDate).ToList();
 
+            // Not enough candles to perform what we need to do.
+            if(candles.Count < _strategy.MinimumAmountOfCandles)
+                return new SimpleTradeAdvice(TradeAdvice.Hold);
+
             // Get the date for the last candle we have left.
             var signalDate = candles[candles.Count - 1].Timestamp;
 
