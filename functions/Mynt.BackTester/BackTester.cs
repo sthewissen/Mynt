@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Mynt.BackTester.Traits;
 using Mynt.Core.Api;
 using Mynt.Core.Enums;
 using Mynt.Core.Interfaces;
@@ -42,16 +41,6 @@ namespace Mynt.BackTester
             // has been reached we adjust our stop loss to become that percentage. 
             // That way we theoretically lock in some profits and continue to ride an uptrend
             0.01, 0.02, 0.03, 0.05, 0.08, 0.13, 0.21
-        };
-
-        private readonly List<ITrait> traits = new List<ITrait>()
-        {
-            new Traits.Cci(),
-            new Traits.Cmo(),
-            new Traits.EmaCross(),
-            new Traits.Mfi(),
-            new Traits.Rsi(),
-            new Traits.SmaCross()
         };
 
         private readonly List<ITradingStrategy> strategies;
@@ -318,143 +307,6 @@ namespace Mynt.BackTester
             PrintResults(stratResults);
         }
 
-        private void BackTestTraits()
-        {
-
-            Console.WriteLine();
-            Console.WriteLine(
-                $"\t=============== BACKTESTING REPORT ===============");
-            Console.WriteLine();
-
-            var stratResults = new List<StrategyResult>();
-            var stratName = String.Empty;
-            
-            for (int x = 0; x < (1 << 8); x++)
-            {
-                var useCci = (x & (1 << 0)) != 0;
-                var useCmo = (x & (1 << 1)) != 0;
-                var useEmaCross = (x & (1 << 2)) != 0;
-                var useMfi = (x & (1 << 3)) != 0;
-                var useRsi = (x & (1 << 4)) != 0;
-                var useSmaCross = (x & (1 << 5)) != 0;
-                var useAdx = (x & (1 << 6)) != 0;
-                var useAo = (x & (1 << 7)) != 0;
-
-                stratName = string.Empty;
-                stratName += useCci ? "|CCI" : "";
-                stratName += useMfi ? "|MFI" : "";
-                stratName += useCmo ? "|CMO" : "";
-                stratName += useRsi ? "|RSI" : "";
-                stratName += useSmaCross ? "|SMA+" : "";
-                stratName += useEmaCross ? "|EMA+" : "";
-                stratName += useAdx ? "|ADX" : "";
-                stratName += useAo ? "|AO" : "";
-                stratName = stratName.Trim('|');
-
-                try
-                {
-                    var results = new List<BackTestResult>();
-
-                    foreach (var pair in coinsToBuy)
-                    {
-                        var dataString = File.ReadAllText($"Data/{pair}.json");
-
-                        // This creates a list of buy signals.
-                        var candles = JsonConvert.DeserializeObject<List<Core.Models.Candle>>(dataString);
-
-                        var cci = new Traits.Cci().Create(candles);
-                        var mfi = new Traits.Mfi().Create(candles);
-                        var cmo = new Traits.Cmo().Create(candles);
-                        var rsi = new Traits.Rsi().Create(candles);
-                        var emacross = new Traits.EmaCross().Create(candles);
-                        var smacross = new Traits.SmaCross().Create(candles);
-                        var adx = new Traits.Adx().Create(candles);
-                        var ao = new Traits.Ao().Create(candles);
-
-                        for (int i = 0; i < candles.Count; i++)
-                        {
-                            if (((useCci && cci[i] == 1) || !useCci) &&
-                                    ((useMfi && mfi[i] == 1) || !useMfi) &&
-                                    ((useCmo && cmo[i] == 1) || !useCmo) &&
-                                    ((useRsi && rsi[i] == 1) || !useRsi) &&
-                                    ((useEmaCross && emacross[i] == 1) || !useEmaCross) &&
-                                    ((useSmaCross && smacross[i] == 1) || !useSmaCross) &&
-                                    ((useAdx && adx[i] == 1) || !useAdx) &&
-                                    ((useAo && ao[i] == 1) || !useAo))
-                            {
-                                // This is a buy signal
-                                var trade = new Trade()
-                                {
-                                    OpenRate = candles[i].Close,
-                                    OpenDate = candles[i].Timestamp,
-                                    Quantity = 1
-                                };
-
-                                // Calculate win/lose forwards from buy point
-                                for (int j = i; j < candles.Count; j++)
-                                {
-                                    if (((useCci && cci[i] == -1) || !useCci) &&
-                                    ((useMfi && mfi[i] == -1) || !useMfi) &&
-                                    ((useCmo && cmo[i] == -1) || !useCmo) &&
-                                    ((useRsi && rsi[i] == -1) || !useRsi) &&
-                                    ((useEmaCross && emacross[i] == -1) || !useEmaCross) &&
-                                    ((useSmaCross && smacross[i] == -1) || !useSmaCross) &&
-                                    ((useAdx && adx[i] == -1) || !useAdx) &&
-                                    ((useAo && ao[i] == -1) || !useAo) || ShouldSell(trade, candles[j].Close, candles[j].Timestamp) != SellType.None)
-                                    {
-                                        var currentProfit = 0.995 * ((candles[j].Close - trade.OpenRate) / trade.OpenRate);
-                                        results.Add(new BackTestResult
-                                        {
-                                            Currency = pair,
-                                            Profit = currentProfit,
-                                            Duration = j - i
-                                        });
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    
-                    Console.WriteLine($"\t{stratName} FINISHED");
-
-                    if (results.Count == 0)
-                    {
-                        stratResults.Add(new StrategyResult()
-                        {
-                            Name = $"{stratName}",
-                            TotalTrades = 0,
-                            ProfitTrades = 0,
-                            NonProfitTrades = 0,
-                            AvgProfit = 0,
-                            TotalProfit = 0,
-                            AvgTime = 0,
-                        });
-                    }
-                    else
-                    {
-                        stratResults.Add(new StrategyResult()
-                        {
-                            Name = $"{stratName}",
-                            TotalTrades = results.Count,
-                            ProfitTrades = results.Count(y => y.Profit > 0),
-                            NonProfitTrades = results.Count(y => y.Profit <= 0),
-                            AvgProfit = results.Select(y => y.Profit).Average() * 100,
-                            TotalProfit = results.Select(y => y.Profit).Sum(),
-                            AvgTime = results.Select(y => y.Duration).Average() * 5,
-                        });
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"\t  {stratName}: " + "DNF");
-                }
-            }
-
-
-            PrintResults(stratResults);
-        }
-
         private List<BackTestResult> RunBackTest(ITradingStrategy strategy)
         {
             var results = new List<BackTestResult>();
@@ -622,18 +474,14 @@ namespace Mynt.BackTester
                         BackTestEntryExit();
                         continue;
                     case "5":
-                        Console.WriteLine("\tBacktesting all traits. Starting...");
-                        BackTestTraits();
-                        continue;
-                    case "6":
                         Console.WriteLine("\tRefreshing case. Starting...");
                         RefreshCandleData().Wait();
                         continue;
-                    case "7":
+                    case "6":
                         Console.WriteLine("\tCopy example data. Starting...");
                         CopyExampleCandleData();
                         continue;
-                    case "8":
+                    case "7":
                     default:
                         Environment.Exit(1);
                         break;

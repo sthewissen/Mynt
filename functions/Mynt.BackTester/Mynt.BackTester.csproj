@@ -238,15 +238,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StrategyResult.cs" />
     <Compile Include="TableParser.cs" />
-    <Compile Include="Traits\Ao.cs" />
-    <Compile Include="Traits\EmaCross.cs" />
-    <Compile Include="Traits\Adx.cs" />
-    <Compile Include="Traits\SmaCross.cs" />
-    <Compile Include="Traits\Cmo.cs" />
-    <Compile Include="Traits\Mfi.cs" />
-    <Compile Include="Traits\ITrait.cs" />
-    <Compile Include="Traits\Cci.cs" />
-    <Compile Include="Traits\Rsi.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
