@@ -10,7 +10,7 @@ namespace Mynt.Core.Strategies
     public class TheScalper : BaseStrategy
     {
         public override string Name => "The Scalper";
-        public override int MinimumAmountOfCandles => 210;
+        public override int MinimumAmountOfCandles => 200;
         public override Period IdealPeriod => Period.Hour;
 
         public override List<ITradeAdvice> Prepare(List<Candle> candles)

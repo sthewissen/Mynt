@@ -301,17 +301,17 @@ namespace Mynt.Core.TradeManagers
         private async Task<ITradeAdvice> GetAdvice(string tradeMarket)
         {
             var minimumDate = _strategy.GetMinimumDateTime();
-            var candleDate = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day, DateTime.UtcNow.Hour, 0, 0, 0);
+            var candleDate = _strategy.GetCurrentCandleDateTime();
             var candles = await _api.GetTickerHistory(tradeMarket, minimumDate, Period.Hour);
 
-            // We eliminate all candles that aren't needed and the last one (if it's the current running candle).
-            candles = candles.Where(x => x.Timestamp > minimumDate && x.Timestamp < candleDate).ToList();
+            // We eliminate all candles that aren't needed for the dataset incl. the last one (if it's the current running candle).
+            candles = candles.Where(x => x.Timestamp >= minimumDate && x.Timestamp < candleDate).ToList();
 
             // Not enough candles to perform what we need to do.
             if(candles.Count < _strategy.MinimumAmountOfCandles)
                 return new SimpleTradeAdvice(TradeAdvice.Hold);
 
-            // Get the date for the last candle we have left.
+            // Get the date for the last candle.
             var signalDate = candles[candles.Count - 1].Timestamp;
 
             // This is an outdated candle...

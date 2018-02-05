@@ -12,26 +12,35 @@ namespace Mynt.Core.Strategies
         public abstract int MinimumAmountOfCandles { get; }
         public abstract Period IdealPeriod { get; }
 
+        public DateTime GetCurrentCandleDateTime()
+        {
+            var minutes = IdealPeriod == Period.Minute || IdealPeriod == Period.FiveMinutes || IdealPeriod == Period.QuarterOfAnHour || IdealPeriod == Period.HalfAnHour ? DateTime.UtcNow.Minute : 0;
+            return new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day, DateTime.UtcNow.Hour, minutes, 0, 0);
+        }
+
         public DateTime GetSignalDate()
         {
+            var minutes = IdealPeriod == Period.Minute || IdealPeriod == Period.FiveMinutes || IdealPeriod == Period.QuarterOfAnHour || IdealPeriod == Period.HalfAnHour ? DateTime.UtcNow.Minute : 0;
+            var current = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day, DateTime.UtcNow.Hour, minutes, 0, 0);
+
             switch (IdealPeriod)
             {
                 case Period.Minute:
-                    return DateTime.UtcNow.AddMinutes(-2);
+                    return current.AddMinutes(-2);
                 case Period.FiveMinutes:
-                    return DateTime.UtcNow.AddMinutes(-10);
+                    return current.AddMinutes(-10);
                 case Period.QuarterOfAnHour:
-                    return DateTime.UtcNow.AddMinutes(-30);
+                    return current.AddMinutes(-30);
                 case Period.HalfAnHour:
-                    return DateTime.UtcNow.AddHours(-1);
+                    return current.AddHours(-1);
                 case Period.Hour:
-                    return DateTime.UtcNow.AddHours(-2);
+                    return current.AddHours(-2);
                 case Period.Day:
-                    return DateTime.UtcNow.AddDays(-2);
+                    return current.AddDays(-2);
                 case Period.TwoHours:
-                    return DateTime.UtcNow.AddHours(-4);
+                    return current.AddHours(-4);
                 case Period.FourHours:
-                    return DateTime.UtcNow.AddHours(-8);
+                    return current.AddHours(-8);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(IdealPeriod));
             }
@@ -39,24 +48,27 @@ namespace Mynt.Core.Strategies
 
         public DateTime GetMinimumDateTime()
         {
+            var minutes = IdealPeriod == Period.Minute || IdealPeriod == Period.FiveMinutes || IdealPeriod == Period.QuarterOfAnHour || IdealPeriod == Period.HalfAnHour ? DateTime.UtcNow.Minute : 0;
+            var current = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day, DateTime.UtcNow.Hour, minutes, 0, 0);
+
             switch (IdealPeriod)
             {
                 case Period.Minute:
-                    return DateTime.UtcNow.AddMinutes(-MinimumAmountOfCandles);
+                    return current.AddMinutes(-MinimumAmountOfCandles);
                 case Period.FiveMinutes:
-                    return DateTime.UtcNow.AddMinutes(-(5 * MinimumAmountOfCandles));
+                    return current.AddMinutes(-(5 * MinimumAmountOfCandles));
                 case Period.QuarterOfAnHour:
-                    return DateTime.UtcNow.AddMinutes(-(15 * MinimumAmountOfCandles));
+                    return current.AddMinutes(-(15 * MinimumAmountOfCandles));
                 case Period.HalfAnHour:
-                    return DateTime.UtcNow.AddMinutes(-(30 * MinimumAmountOfCandles));
+                    return current.AddMinutes(-(30 * MinimumAmountOfCandles));
                 case Period.Hour:
-                    return DateTime.UtcNow.AddHours(-MinimumAmountOfCandles);
+                    return current.AddHours(-MinimumAmountOfCandles);
                 case Period.Day:
-                    return DateTime.UtcNow.AddDays(-MinimumAmountOfCandles);
+                    return current.AddDays(-MinimumAmountOfCandles);
                 case Period.TwoHours:
-                    return DateTime.UtcNow.AddHours(-(2 * MinimumAmountOfCandles));
+                    return current.AddHours(-(2 * MinimumAmountOfCandles));
                 case Period.FourHours:
-                    return DateTime.UtcNow.AddHours(-(4 * MinimumAmountOfCandles));
+                    return current.AddHours(-(4 * MinimumAmountOfCandles));
                 default:
                     throw new ArgumentOutOfRangeException(nameof(IdealPeriod));
             }
