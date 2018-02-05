@@ -114,7 +114,7 @@ namespace Mynt.Core
                 var creditPosition = new CreditPosition(symbol, 0.0005, btcCredit); // TODO: Make fee configurable.
 
                 creditPositions.Add(creditPosition);
-                log.Info($"Create credit position for {entry.Item1} (balance {balance.Balance * ticker.Last} BTC). BTC credit: {btcCredit}");
+                log.Info($"Create credit position for {entry.Item1.BaseCurrency}/{entry.Item1.QuoteCurrency} (balance {balance.Balance * ticker.Last} BTC). BTC credit: {btcCredit}");
             }
 
             return creditPositions;
