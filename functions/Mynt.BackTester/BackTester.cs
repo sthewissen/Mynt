@@ -17,8 +17,6 @@ namespace Mynt.BackTester
     {
         #region trading variables
 
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
         private IDataStorage dataStorage;
 
         private IExchangeApi exchangeApi;
