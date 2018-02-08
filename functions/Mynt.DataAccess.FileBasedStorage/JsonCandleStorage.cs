@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 
 namespace Mynt.DataAccess.FileBasedStorage
 {
-    public class JsonCandleProvider : ICandleProvider
+    public class JsonCandleProvider : ICandleStorage
     {
         private string folder;
 

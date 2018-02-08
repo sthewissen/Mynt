@@ -3,7 +3,7 @@ using Mynt.Core.Models;
 
 namespace Mynt.DataAccess.Interfaces
 {
-    public interface ICandleProvider
+    public interface ICandleStorage
     {
         List<Candle> GetCandles(string symbol);
     }

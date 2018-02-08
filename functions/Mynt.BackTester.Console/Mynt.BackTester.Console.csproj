@@ -66,6 +66,14 @@
       <Project>{e1879751-5218-46f9-9d5a-d52079fe58bd}</Project>
       <Name>Mynt.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Mynt.DataAccess.FileBasedStorage\Mynt.DataAccess.FileBasedStorage.csproj">
+      <Project>{9B066863-B898-4D73-9BFE-433C1F3C5694}</Project>
+      <Name>Mynt.DataAccess.FileBasedStorage</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Mynt.DataAccess.Interfaces\Mynt.DataAccess.Interfaces.csproj">
+      <Project>{09BEC4BC-6233-4072-ABB9-7633AC83437A}</Project>
+      <Name>Mynt.DataAccess.Interfaces</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

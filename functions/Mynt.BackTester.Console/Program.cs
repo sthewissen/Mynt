@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Mynt.Core.Bittrex;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Strategies;
+using Mynt.DataAccess.FileBasedStorage;
 
 namespace Mynt.BackTester.Console
 {
@@ -12,7 +13,7 @@ namespace Mynt.BackTester.Console
         {
             string coinsToBuyCsv = System.Configuration.ConfigurationManager.AppSettings["CoinsToBuy"];
 
-            var backTester = new BackTester(GetTradingStrategies(), new BittrexApi(true), coinsToBuyCsv);
+            var backTester = new BackTester(GetTradingStrategies(), new BittrexApi(true), new CsvDataStorage("DataStorage"), coinsToBuyCsv);
             try
             {
                 backTester.WriteIntro();

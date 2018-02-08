@@ -13,9 +13,9 @@ namespace Mynt.Services
     {
         private IExchangeApi api;
 
-        private ICandleProvider candleProvider;
+        private ICandleStorage candleProvider;
 
-        public SymbolInformationService(IExchangeApi api, ICandleProvider candleProvider)
+        public SymbolInformationService(IExchangeApi api, ICandleStorage candleProvider)
         {
             this.api = api;
             this.candleProvider = candleProvider;
@@ -26,7 +26,7 @@ namespace Mynt.Services
             return symbols.Select(_ => CreateHistoricalAdvicesModel(_, strategy, candleProvider));
         }
 
-        private static HistoricalAdvicesModel CreateHistoricalAdvicesModel(string symbol, ITradingStrategy strategy, ICandleProvider candleProvider)
+        private static HistoricalAdvicesModel CreateHistoricalAdvicesModel(string symbol, ITradingStrategy strategy, ICandleStorage candleProvider)
         {
             var candles = candleProvider.GetCandles(symbol);
             var advices = strategy.Prepare(candles);

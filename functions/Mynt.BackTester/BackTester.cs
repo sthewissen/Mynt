@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using Mynt.Core.Api;
 using Mynt.Core.Enums;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
 using Mynt.DataAccess.FileBasedStorage;
+using Mynt.DataAccess.Interfaces;
 using Newtonsoft.Json;
 
 namespace Mynt.BackTester
@@ -14,6 +16,10 @@ namespace Mynt.BackTester
     public class BackTester
     {
         #region trading variables
+
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
+        private IDataStorage dataStorage;
 
         private IExchangeApi exchangeApi;
 
@@ -33,7 +39,7 @@ namespace Mynt.BackTester
         // These are the coins we're interested in. 
         // This is what we have some backtest data for. 
         // You can always add more backtest data by saving data from the Bittrex API.
-        private readonly List<string> coinsToBuy;
+        private readonly IEnumerable<string> coinsToBuy;
 
         private readonly List<double> stopLossAnchors = new List<double>()
         {
@@ -48,16 +54,23 @@ namespace Mynt.BackTester
 
         #region constructors
 
-        public BackTester(List<ITradingStrategy> strategies, IExchangeApi exchangeApi, string coinsToBuyCsv)
+        public BackTester(List<ITradingStrategy> strategies, IExchangeApi exchangeApi, IDataStorage dataStorage, string coinsToBuyCsv) :
+            this(strategies, exchangeApi, dataStorage, coinsToBuyCsv.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList())
+        {
+
+        }
+
+        public BackTester(List<ITradingStrategy> strategies, IExchangeApi exchangeApi, IDataStorage dataStorage, IEnumerable<string> coinsToBuy)
         {
             // Create Data Folder
             if (!Directory.Exists(GetDataDirectory()))
                 Directory.CreateDirectory(GetDataDirectory());
 
-            coinsToBuy = coinsToBuyCsv.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList();            
+            this.coinsToBuy = coinsToBuy;
 
             this.strategies = strategies;
             this.exchangeApi = exchangeApi;
+            this.dataStorage = dataStorage;
         }
 
         #endregion
@@ -77,11 +90,13 @@ namespace Mynt.BackTester
             {
                 Console.Write($"\t{pair.ToUpper()}:".PadRight(15, ' '));
                 PrintResults(results.Where(x => x.Currency == pair).ToList());
+                dataStorage.Save<BackTestResult>($"{strategy.Name}-{pair}", results.Where(x => x.Currency == pair));
             }
 
             Console.WriteLine();
             Console.Write("\tTOTAL:".PadRight(15, ' '));
             PrintResults(results);
+            dataStorage.Save<BackTestResult>($"{strategy.Name}-Total", results);
             WriteSeparator();
         }
 
@@ -99,6 +114,7 @@ namespace Mynt.BackTester
                     List<BackTestResult> results = RunBackTest(strategy);
                     Console.Write($"\t{strategy.Name}:".PadRight(35, ' '));
                     PrintResults(results);
+                    dataStorage.Save<BackTestResult>($"{strategy.Name}-summary", results);
                 }
                 catch (Exception ex)
                 {
@@ -108,7 +124,7 @@ namespace Mynt.BackTester
 
             WriteSeparator();
         }
-        
+
         private void BackTestCombinations()
         {
 
@@ -133,7 +149,7 @@ namespace Mynt.BackTester
 
                             // This creates a list of buy signals.
                             var candles = JsonConvert.DeserializeObject<List<Core.Models.Candle>>(dataString);
-                            var trend1 = strategy1.Prepare(candles);                            
+                            var trend1 = strategy1.Prepare(candles);
                             var trend2 = strategy2.Prepare(candles);
 
                             for (int i = 0; i < trend1.Count; i++)
@@ -319,6 +335,7 @@ namespace Mynt.BackTester
                 // This creates a list of buy signals.
                 var candles = candleProvider.GetCandles(pair);
                 var trend = strategy.Prepare(candles);
+                dataStorage.Save<ITradeAdvice>($"{strategy.Name}-{pair}", trend);
 
                 for (int i = 0; i < trend.Count; i++)
                 {
@@ -339,7 +356,7 @@ namespace Mynt.BackTester
                             {
                                 // Bittrex charges 0.25% transaction fee
                                 // Binance charges 0.1% transaction fee, 0.05% if paid in BNB
-                                var currentProfit = (candles[i].Close - trade.OpenRate) / trade.OpenRate - 0.002;
+                                var currentProfit = (candles[i].Close - trade.OpenRate) / trade.OpenRate - 0.001;
                                 results.Add(new BackTestResult { Currency = pair, Profit = currentProfit, Duration = i - buyStep });
                                 break;
                             }
@@ -405,20 +422,20 @@ namespace Mynt.BackTester
                 var cumulativeProfits = results.GroupBy(_ => _.Currency).
                     Select(_ => (_.Select(x => (1 + x.Profit)).Aggregate((a, x) => a * x) - 1) * 100);
                 var cumulativeProfit = cumulativeProfits.Average();
-                WriteColoredLine(
-                    $"{(Convert.ToDouble(results.Count(x => x.Profit > 0)) / Convert.ToDouble(results.Count) * 100.0):0.00}%  |  " +
+                var resultString = $"{(Convert.ToDouble(results.Count(x => x.Profit > 0)) / Convert.ToDouble(results.Count) * 100.0):0.00}%  |  " +
                     $"Made {results.Count} buys ({results.Count(x => x.Profit > 0)}/{results.Count(x => x.Profit < 0)}). " +
                     $"Average profit {(results.Select(x => x.Profit).Average() * 100):0.00}%. " +
                     $"Total profit was {(results.Select(x => x.Profit).Sum()):0.000}. " +
                     $"Profit when reinvesting was {cumulativeProfit:0.00}%. " +
-                    $"Average duration {(results.Select(x => x.Duration).Average() * 5):0.0} mins.", color);
+                    $"Average duration {(results.Select(x => x.Duration).Average() * 5):0.0} mins.";
+                WriteColoredLine(resultString, color);
             }
             else
             {
                 WriteColoredLine($"Made {results.Count} buys. ", ConsoleColor.Yellow);
             }
         }
-        
+
         #endregion
 
         #region console bootstrapping
@@ -602,9 +619,9 @@ namespace Mynt.BackTester
 
         public async System.Threading.Tasks.Task RefreshCandleData()
         {
-            DateTime startDate = DateTime.Now.AddDays(-30);
+            DateTime startDate = DateTime.Now.AddMinutes(-5 * 6000);
             var period = Period.FiveMinutes;
-            
+
             List<string> writtenFiles = new List<string>();
 
             foreach (var coinToBuy in coinsToBuy)
