@@ -541,10 +541,9 @@ namespace Mynt.BackTester
             Console.WriteLine("\t2. Run all strategies");
             Console.WriteLine("\t3. Combine 2 strategies");
             Console.WriteLine("\t4. Combine entry/exit strategies");
-            Console.WriteLine("\t5. Combine traits");
-            Console.WriteLine("\t6. Refresh candle data");
-            Console.WriteLine("\t7. Copy example candle data");
-            Console.WriteLine("\t8. Close the tool");
+            Console.WriteLine("\t5. Refresh candle data");
+            Console.WriteLine("\t6. Copy example candle data");
+            Console.WriteLine("\t7. Close the tool");
             Console.WriteLine();
 
             if (cacheAge == TimeSpan.MinValue)
