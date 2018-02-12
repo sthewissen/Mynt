@@ -29,6 +29,7 @@ This bot was first mentioned in [one of my blogposts].
 
 ### Additional tools used
 
+- Binance API wrapper - https://github.com/JKorf/Binance.Net
 - Bittrex API wrapper - https://github.com/Coinio/Bittrex.Api.Client
 - TA-Lib wrapper - https://www.nuget.org/packages/TA-Lib/
 
