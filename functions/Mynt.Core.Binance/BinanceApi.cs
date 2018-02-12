@@ -63,6 +63,21 @@ namespace Mynt.Core.Binance
             return result.Data.OrderId.ToString();
         }
 
+        public async Task<string> BuyWithTakeProfit(string market, double quantity, double rate, double limit)
+        {
+            if (_isDryRunning)
+            {
+                var emptyResult = await _client.PlaceTestOrderAsync(market, OrderSide.Buy, OrderType.TakeProfitLimit, (decimal)quantity, null, (decimal)rate, TimeInForce.GoodTillCancel, (decimal)limit);
+                return $"{DateTime.UtcNow.Year}{DateTime.UtcNow.Month}{DateTime.UtcNow.Day}{DateTime.UtcNow.Hour}{DateTime.UtcNow.Minute}{DateTime.UtcNow.Second}{DateTime.UtcNow.Millisecond}";
+            }
+
+            var result = await _client.PlaceOrderAsync(market, OrderSide.Buy, OrderType.TakeProfitLimit, (decimal)quantity, null, (decimal)rate, TimeInForce.GoodTillCancel, (decimal)limit);
+
+            if (!result.Success) throw new Exception(result.Error.Message);
+
+            return result.Data.OrderId.ToString();
+        }
+
         public async Task<string> Sell(string market, double quantity, double rate)
         {
             if (_isDryRunning)
@@ -87,6 +102,21 @@ namespace Mynt.Core.Binance
             }
 
             var result = await _client.PlaceOrderAsync(market, OrderSide.Sell, OrderType.StopLossLimit, (decimal)quantity, null, (decimal)rate, TimeInForce.GoodTillCancel, (decimal)limit);
+
+            if (!result.Success) throw new Exception(result.Error.Message);
+
+            return result.Data.OrderId.ToString();
+        }
+
+        public async Task<string> SellWithTakeProfit(string market, double quantity, double rate, double limit)
+        {
+            if (_isDryRunning)
+            {
+                var emptyResult = await _client.PlaceTestOrderAsync(market, OrderSide.Sell, OrderType.TakeProfitLimit, (decimal)quantity, null, (decimal)rate, TimeInForce.GoodTillCancel, (decimal)limit);
+                return $"{DateTime.UtcNow.Year}{DateTime.UtcNow.Month}{DateTime.UtcNow.Day}{DateTime.UtcNow.Hour}{DateTime.UtcNow.Minute}{DateTime.UtcNow.Second}{DateTime.UtcNow.Millisecond}";
+            }
+
+            var result = await _client.PlaceOrderAsync(market, OrderSide.Sell, OrderType.TakeProfitLimit, (decimal)quantity, null, (decimal)rate, TimeInForce.GoodTillCancel, (decimal)limit);
 
             if (!result.Success) throw new Exception(result.Error.Message);
 
