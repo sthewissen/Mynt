@@ -27,7 +27,7 @@ namespace Mynt.Core.Binance
             _client = new BinanceClient(Settings.BinanceApiKey, Settings.BinanceApiSecret)
             {
                 TradeRulesBehaviour = TradeRulesBehaviour.AutoComply,
-                AutoTimestamp = false
+                AutoTimestamp = true
             };
 
             this._isDryRunning = isDryRunning;
