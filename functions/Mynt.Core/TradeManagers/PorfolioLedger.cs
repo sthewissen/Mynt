@@ -14,6 +14,8 @@ namespace Mynt.Core
     {
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
+        private static readonly double exchangeFee = AppSettings.Get<double>("ExchangeFee");
+
         private readonly IExchangeApi api;
 
         private IEnumerable<CreditPosition> creditPositions;
@@ -59,7 +61,7 @@ namespace Mynt.Core
                 if (order == null)
                 {
                     openOrders.Remove(item);
-                    log.Info($"Removed order with order ID {item.Item1} (market {item.Item2}) because cannot be found");
+                    log.Info($"Removed order with order ID {item.Item1} (market {item.Item2}) because the order cannot be found");
                     break;
                 }
 
@@ -69,15 +71,11 @@ namespace Mynt.Core
                     case OrderStatus.Expired:
                     case OrderStatus.PendingCancel:
                     case OrderStatus.Rejected:
-                        // Just remove the order.
-                        openOrders.Remove(item);
-                        log.Info($"Removed order with order ID {item.Item1} (market {item.Item2}) because its status is {order.Status}");
-                        break;
                     case OrderStatus.Filled:
                         // Update the credit position and remove the order.
                         UpdateCreditPosition(order);
                         openOrders.Remove(item);
-                        log.Info($"Removed order with order ID {item.Item1} (market {item.Item2}) because because its status is {order.Status}");
+                        log.Info($"Removed order with order ID {item.Item1} (market {item.Item2}) because its status is {order.Status}");
                         break;
                     default:
                         // Do nothing.
@@ -111,10 +109,10 @@ namespace Mynt.Core
                 var ticker = await api.GetTicker(symbol);
                 var balance = await api.GetBalance(entry.Item1.BaseCurrency);
                 var btcCredit = entry.Item2 - balance.Balance * ticker.Last;
-                var creditPosition = new CreditPosition(symbol, 0.0005, btcCredit); // TODO: Make fee configurable.
+                var creditPosition = new CreditPosition(symbol, exchangeFee, btcCredit);
 
                 creditPositions.Add(creditPosition);
-                log.Info($"Create credit position for {entry.Item1.BaseCurrency}/{entry.Item1.QuoteCurrency} (balance {balance.Balance * ticker.Last} BTC). BTC credit: {btcCredit}");
+                log.Info($"Create credit position for {entry.Item1.BaseCurrency}/{entry.Item1.QuoteCurrency} (balance {balance.Balance * ticker.Last:#0.##########} BTC). BTC credit: {btcCredit:#0.##########}");
             }
 
             return creditPositions;
