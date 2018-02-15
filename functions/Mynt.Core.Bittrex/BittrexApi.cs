@@ -28,11 +28,11 @@ namespace Mynt.Core.Bittrex
 
             foreach (var market in Constants.MarketBlackList)
             {
-                if (!markets.Select(x=>x.MarketName).Contains(market))
+                if (!markets.Select(x => x.MarketName).Contains(market))
                     throw new Exception($"Pair {market} is not available at Bittrex");
             }
         }
-        
+
         public async Task<string> Buy(string market, double quantity, double rate)
         {
             if (_dryRun) return "DRY_RUN_BUY";
@@ -73,7 +73,7 @@ namespace Mynt.Core.Bittrex
 
             var result = await _api.GetBalance(currency);
 
-            if(!result.Success)
+            if (!result.Success)
                 throw new Exception($"Bittrex API failure {result.Message}");
 
             return new Core.Models.AccountBalance(result.Result.Currency, result.Result.Available, result.Result.Pending);
@@ -127,7 +127,7 @@ namespace Mynt.Core.Bittrex
                 OrderId = result.Result.OrderUuid.ToString(),
                 OriginalQuantity = result.Result.Quantity,
                 Price = result.Result.Price,
-                Status = (OrderStatus) (-1), // Not supported yet.
+                Status = (OrderStatus)(-1), // Not supported yet.
                 Side = result.Result.OrderType.ToOrderSide(),
                 StopPrice = result.Result.Limit,
                 Symbol = result.Result.Exchange,
@@ -181,10 +181,10 @@ namespace Mynt.Core.Bittrex
                 Last = result.Result.Last
             };
         }
-        
+
         public async Task<HistoricAccountOrder> GetOrder(string orderId)
         {
-            if(_dryRun) return new HistoricAccountOrder();
+            if (_dryRun) return new HistoricAccountOrder();
 
             var result = await _api.GetOrder(new Guid(orderId));
 
@@ -202,6 +202,11 @@ namespace Mynt.Core.Bittrex
                 throw new Exception($"Bittrex API failure {result.Message}");
 
             return result.Result.ToGenericCandles();
-        }        
+        }
+
+        public Task<OrderBook> GetOrderBook(string market)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

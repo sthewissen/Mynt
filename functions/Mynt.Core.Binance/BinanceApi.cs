@@ -141,7 +141,7 @@ namespace Mynt.Core.Binance
 
             var result = new List<MarketSummary>();
 
-            foreach(var _ in symbols.Data)
+            foreach (var _ in symbols.Data)
             {
                 var info = await GetSymbolInfo(_.Symbol);
                 result.Add(new MarketSummary()
@@ -171,9 +171,9 @@ namespace Mynt.Core.Binance
             {
                 throw new ArgumentException("'orderId' should be of type long but cannot be parsed");
             }
-            
+
             var result = await _client.GetAllOrdersAsync(market, longId);
-            
+
             if (!result.Success) throw new Exception(result.Error.Message);
 
             if (result.Data.Any())
@@ -228,7 +228,7 @@ namespace Mynt.Core.Binance
         public async Task<List<OpenOrder>> GetOpenOrders(string market)
         {
             var result = await _client.GetOpenOrdersAsync(market);
-            
+
             if (!result.Success) throw new Exception(result.Error.Message);
 
             return result.Data.Select(_ =>
@@ -274,6 +274,19 @@ namespace Mynt.Core.Binance
             return _exchangeInfo.Symbols.FirstOrDefault(x => x.SymbolName == symbol);
         }
 
+
+        public async Task<OrderBook> GetOrderBook(string symbol)
+        {
+            var result = await _client.GetOrderBookAsync(symbol);
+            if (!result.Success) throw new Exception(result.Error.Message);
+
+            return new OrderBook
+            {
+                Asks = result.Data.Asks.Select(_ => new OrderBookEntry { Price = _.Price, Quantity = _.Quantity }).ToList(),
+                Bids = result.Data.Bids.Select(_ => new OrderBookEntry { Price = _.Price, Quantity = _.Quantity }).ToList(),
+            };
+        }
+
         public async Task<Ticker> GetTicker(string market)
         {
             var result = await _client.Get24HPriceAsync(market);
@@ -298,7 +311,7 @@ namespace Mynt.Core.Binance
             while (start < endTime)
             {
                 var candlesticksToAdd = await _client.GetKlinesAsync(market, period.ToBinanceEquivalent(), start, endTime);
-                
+
                 if (!candlesticksToAdd.Success) throw new Exception(candlesticksToAdd.Error.Message);
 
                 candles.AddRange(candlesticksToAdd.Data);
