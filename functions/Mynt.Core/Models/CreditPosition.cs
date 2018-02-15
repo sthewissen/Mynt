@@ -1,6 +1,5 @@
-﻿using System;
+﻿using log4net;
 using System.Reflection;
-using log4net;
 
 namespace Mynt.Core.Models
 {
@@ -12,13 +11,16 @@ namespace Mynt.Core.Models
 
         private readonly double fee;
 
+        private double balance;
+
         private double btcCredit;
 
-        public CreditPosition(string symbol, double fee, double btcCredit)
+        public CreditPosition(string symbol, double fee, double balance, double btcCredit)
         {
             this.symbol = symbol;
-            this.fee =fee;
-            this.btcCredit= btcCredit;
+            this.fee = fee;
+            this.balance = balance;
+            this.btcCredit = btcCredit;
         }
 
         public string Symbol => symbol;
@@ -28,15 +30,19 @@ namespace Mynt.Core.Models
         public void RegisterBuy(double quantity, double rate)
         {
             // Decreased the credit
-            btcCredit -= quantity * rate * (1 + fee);
-            log.Info($"Registered a buy for {symbol}. Substracted {quantity * rate * (1 + fee)} from the credit. New BTC credit: {btcCredit}");
+            var buyValue = quantity * rate ;
+            balance += buyValue;
+            btcCredit -= buyValue * (1 + fee);
+            log.Info($"Registered a buy for {symbol}. Subtracted {quantity * rate * (1 + fee):#0.##########} from the credit. New position = {balance:#0.##########}, BTC credit = {btcCredit:#0.##########}");
         }
 
         public void RegisterSell(double quantity, double rate)
         {
             // Increased the credit
-            btcCredit += quantity * rate * (1 - fee);
-            log.Info($"Registered a sell for {symbol}. Added {quantity * rate * (1 - fee)} to the credit. New BTC credit: {btcCredit}");
+            var sellValue = quantity * rate;
+            balance -= sellValue;
+            btcCredit += sellValue * (1 - fee);
+            log.Info($"Registered a sell for {symbol}. Added {quantity * rate * (1 - fee):#0.##########} to the credit. New position = {balance:#0.##########}, BTC credit = {btcCredit:#0.##########}");
 
         }
     }

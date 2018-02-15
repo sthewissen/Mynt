@@ -163,7 +163,7 @@ namespace Mynt.Core.Binance
 
         public async Task<Order> GetOrder(string orderId, string market)
         {
-            if (_isDryRunning) return new Order { OrderId = orderId, Symbol = market };
+            if (_isDryRunning) return new Order { OrderId = orderId, Symbol = market, Status = Enums.OrderStatus.Canceled };
 
             int longId;
 

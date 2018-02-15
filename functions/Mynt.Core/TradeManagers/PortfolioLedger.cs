@@ -10,7 +10,7 @@ using Mynt.Core.Models;
 
 namespace Mynt.Core
 {
-    public class PorfolioLedger
+    public class PortfolioLedger
     {
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -22,12 +22,12 @@ namespace Mynt.Core
 
         private IList<(string, string)> openOrders = new List<(string, string)>();
 
-        public PorfolioLedger(IExchangeApi api, IEnumerable<CurrencyPair> pairs, double initialBudget) :
+        public PortfolioLedger(IExchangeApi api, IEnumerable<CurrencyPair> pairs, double initialBudget) :
             this(api, pairs.Select(_ => (_, initialBudget)))
         {
         }
 
-        public PorfolioLedger(IExchangeApi api, IEnumerable<(CurrencyPair, double)> entries)
+        public PortfolioLedger(IExchangeApi api, IEnumerable<(CurrencyPair, double)> entries)
         {
             this.api = api;
             var task = CreateCreditPositions(api, entries);
@@ -51,8 +51,10 @@ namespace Mynt.Core
             log.Info($"Added order with order ID {orderId} (market {market})");
         }
 
-        public async void Update()
+        public async Task Update()
         {
+            log.Info("Updating the portfolio ledger");
+
             for (int index = openOrders.Count - 1; index >= 0; index--)
             {
                 var item = openOrders[index];
@@ -82,6 +84,8 @@ namespace Mynt.Core
                         break;
                 }
             }
+
+            log.Info("Updating the portfolio ledger is done");
         }
 
         private void UpdateCreditPosition(Order order)
@@ -109,7 +113,7 @@ namespace Mynt.Core
                 var ticker = await api.GetTicker(symbol);
                 var balance = await api.GetBalance(entry.Item1.BaseCurrency);
                 var btcCredit = entry.Item2 - balance.Balance * ticker.Last;
-                var creditPosition = new CreditPosition(symbol, exchangeFee, btcCredit);
+                var creditPosition = new CreditPosition(symbol, exchangeFee, balance.Balance * ticker.Last, btcCredit);
 
                 creditPositions.Add(creditPosition);
                 log.Info($"Create credit position for {entry.Item1.BaseCurrency}/{entry.Item1.QuoteCurrency} (balance {balance.Balance * ticker.Last:#0.##########} BTC). BTC credit: {btcCredit:#0.##########}");
