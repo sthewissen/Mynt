@@ -297,7 +297,7 @@
     <Compile Include="Interfaces\ITradeManager.cs" />
     <Compile Include="Strategies\WvfExtended.cs" />
     <Compile Include="TradeManagers\GenericTradeManager.cs" />
-    <Compile Include="TradeManagers\PorfolioLedger.cs" />
+    <Compile Include="TradeManagers\PortfolioLedger.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
