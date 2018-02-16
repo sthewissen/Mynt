@@ -85,6 +85,14 @@ namespace Mynt.Core
                 }
             }
 
+            // Logging the current status
+            foreach (var position in creditPositions)
+            {
+                var ticker = await api.GetTicker(position.Symbol);
+                var investmentValue = position.OwnedQuantity * ticker.Last;
+                log.Info($"{position.Symbol}: Investment value + credit left = {investmentValue:#0.##########} + {position.BtcCredit:#0.##########} = {investmentValue + position.BtcCredit:#0.##########} BTC");
+            }
+
             log.Info("Updating the portfolio ledger is done");
         }
 
@@ -113,7 +121,7 @@ namespace Mynt.Core
                 var ticker = await api.GetTicker(symbol);
                 var balance = await api.GetBalance(entry.Item1.BaseCurrency);
                 var btcCredit = entry.Item2 - balance.Balance * ticker.Last;
-                var creditPosition = new CreditPosition(symbol, exchangeFee, balance.Balance, ticker.Last, btcCredit);
+                var creditPosition = new CreditPosition(symbol, exchangeFee, balance.Balance, btcCredit);
 
                 creditPositions.Add(creditPosition);
                 log.Info($"Create credit position for {entry.Item1.BaseCurrency}/{entry.Item1.QuoteCurrency} (balance {balance.Balance * ticker.Last:#0.##########} BTC). BTC credit: {btcCredit:#0.##########}");
