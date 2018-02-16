@@ -113,7 +113,7 @@ namespace Mynt.Core
                 var ticker = await api.GetTicker(symbol);
                 var balance = await api.GetBalance(entry.Item1.BaseCurrency);
                 var btcCredit = entry.Item2 - balance.Balance * ticker.Last;
-                var creditPosition = new CreditPosition(symbol, exchangeFee, balance.Balance * ticker.Last, btcCredit);
+                var creditPosition = new CreditPosition(symbol, exchangeFee, balance.Balance, ticker.Last, btcCredit);
 
                 creditPositions.Add(creditPosition);
                 log.Info($"Create credit position for {entry.Item1.BaseCurrency}/{entry.Item1.QuoteCurrency} (balance {balance.Balance * ticker.Last:#0.##########} BTC). BTC credit: {btcCredit:#0.##########}");

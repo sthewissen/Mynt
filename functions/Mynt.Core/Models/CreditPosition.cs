@@ -1,4 +1,5 @@
 ﻿using log4net;
+using System;
 using System.Reflection;
 
 namespace Mynt.Core.Models
@@ -11,15 +12,18 @@ namespace Mynt.Core.Models
 
         private readonly double fee;
 
-        private double balance;
+        private double ownedQuantity;
+
+        private double lastKnownPricePerPiece;
 
         private double btcCredit;
 
-        public CreditPosition(string symbol, double fee, double balance, double btcCredit)
+        public CreditPosition(string symbol, double fee, double ownedQuantity, double lastKnownPricePerPiece, double btcCredit)
         {
             this.symbol = symbol;
             this.fee = fee;
-            this.balance = balance;
+            this.ownedQuantity = ownedQuantity;
+            this.lastKnownPricePerPiece = lastKnownPricePerPiece;
             this.btcCredit = btcCredit;
         }
 
@@ -29,21 +33,26 @@ namespace Mynt.Core.Models
 
         public void RegisterBuy(double quantity, double rate)
         {
-            // Decreased the credit
-            var buyValue = quantity * rate ;
-            balance += buyValue;
-            btcCredit -= buyValue * (1 + fee);
-            log.Info($"Registered a buy for {symbol}. Subtracted {quantity * rate * (1 + fee):#0.##########} from the credit. New position = {balance:#0.##########}, BTC credit = {btcCredit:#0.##########}");
+            // Increase invested amount, decrease free amount.
+            ownedQuantity += quantity;
+            lastKnownPricePerPiece = rate;
+            btcCredit -= quantity * rate * (1 + fee);
+
+            var investmentValue = ownedQuantity * lastKnownPricePerPiece;
+            log.Info($"Registered a buy for {symbol}. Subtracted {quantity * rate * (1 + fee):#0.##########} from the credit");
+            log.Info($"{symbol}: Investment value + credit left = {investmentValue:#0.##########} + {btcCredit:#0.##########} = {investmentValue + btcCredit:#0.##########} BTC");
         }
 
         public void RegisterSell(double quantity, double rate)
         {
-            // Increased the credit
-            var sellValue = quantity * rate;
-            balance -= sellValue;
-            btcCredit += sellValue * (1 - fee);
-            log.Info($"Registered a sell for {symbol}. Added {quantity * rate * (1 - fee):#0.##########} to the credit. New position = {balance:#0.##########}, BTC credit = {btcCredit:#0.##########}");
+            // Decrease invested amount, increase free amount.
+            ownedQuantity -= quantity;
+            lastKnownPricePerPiece = rate;
+            btcCredit += quantity * rate * (1 - fee);
 
+            var investmentValue = ownedQuantity * lastKnownPricePerPiece;
+            log.Info($"Registered a sell for {symbol}. Added {quantity * rate * (1 - fee):#0.##########} to the credit");
+            log.Info($"{symbol}: Investment value + credit left = {investmentValue:#0.##########} + {btcCredit:#0.##########} = {investmentValue + btcCredit:#0.##########} BTC");
         }
     }
 }
