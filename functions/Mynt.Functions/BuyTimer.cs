@@ -12,21 +12,23 @@ namespace Mynt.Functions
     {
         // This function runs every hour at 1 minute and 10 seconds past the hour (e.g. 14:01:10, 15:01:10).
         [FunctionName("BuyTimer")]
-        public static async Task Run([TimerTrigger("10 1 * * * *")]TimerInfo myTimer, TraceWriter log)
+        public static async Task Run([TimerTrigger("10 3 * * * *")]TimerInfo myTimer, TraceWriter log)
         {
             try
             {
                 log.Info("Starting processing...");
 
-                // Call the Bittrex Trade manager with the strategy of our choosing.
+                // Call the trade manager with the strategy of our choosing.
                 var manager = new GenericTradeManager(
                     new BinanceApi(), 
-                    new TheScalper(), 
+                    new BollingerAwe(), 
                     null, (a) => log.Info(a)
                 );
 
                 // Call the process method to start processing the current situation.
                 await manager.CheckForBuySignals();
+
+                log.Info("Done...");
             }
             catch (Exception ex)
             {

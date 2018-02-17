@@ -288,6 +288,7 @@
     <Compile Include="Settings.cs" />
     <Compile Include="Strategies\BaseStrategy.cs" />
     <Compile Include="Strategies\BigThree.cs" />
+    <Compile Include="Strategies\BollingerAwe.cs" />
     <Compile Include="Strategies\BuyAndHold.cs" />
     <Compile Include="Interfaces\ITradingStrategy.cs" />
     <Compile Include="Strategies\SmaCrossover.cs" />

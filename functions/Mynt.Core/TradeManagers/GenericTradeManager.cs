@@ -78,7 +78,8 @@ namespace Mynt.Core.TradeManagers
                         {
                             // Send a notification that we found something suitable
                             _log($"New trade signal {order.Market}...");
-                            await SendNotification($"Buying {order.Market} at {order.OpenRate:0.0000000 BTC} ({order.Quantity:0.0000} units)");
+                            await SendNotification(
+                                $"Buying {order.Market} at {order.OpenRate:0.0000000 BTC} ({order.Quantity:0.0000} units)");
 
                             // Update the trader to busy
                             freeTraders[i].LastUpdated = DateTime.UtcNow;
@@ -89,6 +90,10 @@ namespace Mynt.Core.TradeManagers
                             orderBatch.Add(TableOperation.Insert(order));
                         }
                     }
+                }
+                else
+                {
+                    _log("No trade opportunities found...");
                 }
 
                 if (traderBatch.Count > 0) await _traderTable.ExecuteBatchAsync(traderBatch);
@@ -167,6 +172,18 @@ namespace Mynt.Core.TradeManagers
                     trade.Quantity = exchangeOrder.OriginalQuantity;
                     trade.OpenRate = exchangeOrder.Price;
                     trade.OpenDate = exchangeOrder.Time;
+
+                    // If this is enabled we place a sell order as soon as our buy order got filled.
+                    if (Constants.ImmediatelyPlaceSellOrder)
+                    {
+                        var sellPrice = Math.Round(trade.OpenRate * (1 + Constants.ImmediatelyPlaceSellOrderAtProfit),8);
+                        var orderId = await _api.Sell(trade.Market, trade.Quantity,sellPrice);
+
+                        trade.CloseRate = sellPrice;
+                        trade.OpenOrderId = orderId;
+                        trade.SellOrderId = orderId;
+                        trade.SellType = SellType.Immediate;
+                    }
 
                     orderBatch.Add(TableOperation.Replace(trade));
                 }
@@ -338,26 +355,33 @@ namespace Mynt.Core.TradeManagers
             // There are trades that have no open order ID set & are still open.
             // that means its a trade that is waiting to get sold. See if we can update that first.
             var orderBatch = new TableBatchOperation();
-            
-            foreach (var trade in activeTrades.Where(x => x.OpenOrderId == null && x.IsOpen))
-            {
-                // These are trades that are not being bought or sold at the moment so these need to be checked for sell conditions.
-                var ticker = await _api.GetTicker(trade.Market);
-                var sellType = ShouldSell(trade, ticker.Bid, DateTime.UtcNow);
 
-                if (sellType != SellType.None)
+            // An open order currently not selling or being an immediate sell are checked for SL  etc.
+                foreach (var trade in activeTrades.Where(x => (x.OpenOrderId == null || x.SellType == SellType.Immediate) && x.IsOpen))
                 {
-                    var orderId = await _api.Sell(trade.Market, trade.Quantity, ticker.Bid);
+                    // These are trades that are not being bought or sold at the moment so these need to be checked for sell conditions.
+                    var ticker = await _api.GetTicker(trade.Market);
+                    var sellType = ShouldSell(trade, ticker.Bid, DateTime.UtcNow);
 
-                    trade.CloseRate = ticker.Bid;
-                    trade.OpenOrderId = orderId;
-                    trade.SellOrderId = orderId;
-                    trade.SellType = sellType;
+                    if (sellType != SellType.None)
+                    {
+                        if (trade.SellType == SellType.Immediate)
+                        {
+                            // Immediates need to be cancelled first.
+                           await _api.CancelOrder(trade.SellOrderId, trade.Market);
+                        }
 
-                    orderBatch.Add(TableOperation.Replace(trade));
+                        var orderId = await _api.Sell(trade.Market, trade.Quantity, ticker.Bid);
+
+                        trade.CloseRate = ticker.Bid;
+                        trade.OpenOrderId = orderId;
+                        trade.SellOrderId = orderId;
+                        trade.SellType = sellType;
+
+                        orderBatch.Add(TableOperation.Replace(trade));
+                    }
                 }
-            }
-            
+
             if (orderBatch.Count > 0) await _orderTable.ExecuteBatchAsync(orderBatch);
         }
 
@@ -380,16 +404,6 @@ namespace Mynt.Core.TradeManagers
                 _log($"Stop loss hit: {Constants.StopLossPercentage}");
                 return SellType.StopLoss;
             }
-
-            //if (currentProfit < trade.StopLossAnchor)
-            //    return SellType.StopLossAnchor;
-
-            //// Set a stop loss anchor to minimize losses.
-            //foreach (var item in Constants.StopLossAnchors)
-            //{
-            //    if (currentProfit > item)
-            //        trade.StopLossAnchor = item - 0.01;
-            //}
 
             // Check if time matches and current rate is above threshold
             foreach (var item in Constants.ReturnOnInvestment)
@@ -427,6 +441,7 @@ namespace Mynt.Core.TradeManagers
                     order.OpenOrderId = null;
                     order.IsOpen = false;
                     order.CloseDate = exchangeOrder.Time;
+                    order.CloseRate = exchangeOrder.Price;
 
                     order.CloseProfit = (exchangeOrder.Price * exchangeOrder.OriginalQuantity) - order.StakeAmount;
                     order.CloseProfitPercentage = ((exchangeOrder.Price * exchangeOrder.OriginalQuantity) - order.StakeAmount) / order.StakeAmount * 100;

@@ -11,7 +11,7 @@ namespace Mynt.Functions
     public static class SellTimer
     {
         [FunctionName("SellTimer")]
-        public static async Task Run([TimerTrigger("0 */5 * * * *")]TimerInfo myTimer, TraceWriter log)
+        public static async Task Run([TimerTrigger("0 * * * * *")]TimerInfo myTimer, TraceWriter log)
         {
             try
             {
@@ -26,6 +26,8 @@ namespace Mynt.Functions
 
                 // Call the process method to start processing the current situation.
                 await manager.CheckForSellSignals();
+
+                log.Info("Done...");
             }
             catch (Exception ex)
             {

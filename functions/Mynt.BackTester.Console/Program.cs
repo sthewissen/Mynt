@@ -30,17 +30,17 @@ namespace Mynt.BackTester.Console
 
         private static List<ITradingStrategy> GetTradingStrategies()
         {
- return new List<ITradingStrategy>()
-        {
-            // The strategies we want to backtest.
-            new BigThree(),
-            new BuyAndHold(),
-            new SmaCrossover(),
-            new TheScalper(),
-            new Wvf(),
-            new WvfExtended()
-        };
-
+            return new List<ITradingStrategy>()
+            {
+                // The strategies we want to backtest.
+                new BigThree(),
+                new BollingerAwe(),
+                new BuyAndHold(),
+                new SmaCrossover(),
+                new TheScalper(),
+                new Wvf(),
+                new WvfExtended()
+            };
         }
     }
 }

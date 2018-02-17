@@ -22,16 +22,16 @@ namespace Mynt.BackTester
         private IExchangeApi exchangeApi;
 
         // As soon as our profit dips below this percentage we sell.
-        private const double stopLossPercentage = -0.05;
+        private const double stopLossPercentage = -0.1;
 
         private readonly List<(int Duration, double Profit)> returnOnInvestment = new List<ValueTuple<int, double>>()
         {
             // These values determine how much time we want to way for profits.
-            new ValueTuple<int, double>(5, 0.03), // If the profit percentage is above 3% after 5 minutes, we sell
-            new ValueTuple<int, double>(10, 0.02), // If the profit percentage is above 2% after 10 minutes, we sell
-            new ValueTuple<int, double>(30, 0.015),  // If the profit percentage is above 1,5% after 30 minutes, we sell
-            new ValueTuple<int, double>(45, 0.005),  // If the profit percentage is above 0,5% after 45 minutes, we sell
-            new ValueTuple<int, double>(0, 0.05)  // If the profit percentage is above 5% we always sell
+            //new ValueTuple<int, double>(5, 0.03), // If the profit percentage is above 3% after 5 minutes, we sell
+            //new ValueTuple<int, double>(10, 0.02), // If the profit percentage is above 2% after 10 minutes, we sell
+            //new ValueTuple<int, double>(30, 0.015),  // If the profit percentage is above 1,5% after 30 minutes, we sell
+            //new ValueTuple<int, double>(45, 0.005),  // If the profit percentage is above 0,5% after 45 minutes, we sell
+            new ValueTuple<int, double>(0, 0.02)  // If the profit percentage is above 5% we always sell
         };
 
         // These are the coins we're interested in. 
@@ -44,7 +44,7 @@ namespace Mynt.BackTester
             // Use these to anchor in your profits. As soon as one of these profit percentages
             // has been reached we adjust our stop loss to become that percentage. 
             // That way we theoretically lock in some profits and continue to ride an uptrend
-            0.01, 0.02, 0.03, 0.05, 0.08, 0.13, 0.21
+            // 0.01, 0.02, 0.03, 0.05, 0.08, 0.13, 0.21
         };
 
         private readonly List<ITradingStrategy> strategies;

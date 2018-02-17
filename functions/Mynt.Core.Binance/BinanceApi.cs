@@ -21,7 +21,7 @@ namespace Mynt.Core.Binance
         private readonly bool _isDryRunning;
         private BinanceExchangeInfo _exchangeInfo;
 
-        public BinanceApi(bool isDryRunning = true)
+        public BinanceApi()
         {
             // Initialise the general client with config
             _client = new BinanceClient(Settings.BinanceApiKey, Settings.BinanceApiSecret)
@@ -30,7 +30,7 @@ namespace Mynt.Core.Binance
                 AutoTimestamp = true
             };
 
-            this._isDryRunning = isDryRunning;
+            this._isDryRunning = Constants.IsDryRunning;
         }
 
         public async Task<string> Buy(string market, double quantity, double rate)
@@ -277,7 +277,7 @@ namespace Mynt.Core.Binance
 
         public async Task<OrderBook> GetOrderBook(string symbol)
         {
-            var result = await _client.GetOrderBookAsync(symbol);
+            var result = await _client.GetOrderBookAsync(symbol, 1000);
             if (!result.Success) throw new Exception(result.Error.Message);
 
             return new OrderBook
