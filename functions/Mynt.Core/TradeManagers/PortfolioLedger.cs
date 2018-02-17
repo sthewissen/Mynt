@@ -86,13 +86,17 @@ namespace Mynt.Core
             }
 
             // Logging the current status
+            double totalInvestmentValue = 0.0;
+            double totalCreditValue = creditPositions.Sum(_ => _.BtcCredit);
             foreach (var position in creditPositions)
             {
                 var ticker = await api.GetTicker(position.Symbol);
                 var investmentValue = position.OwnedQuantity * ticker.Last;
+                totalInvestmentValue += investmentValue;
                 log.Info($"{position.Symbol}: Investment value + credit left = {investmentValue:#0.##########} + {position.BtcCredit:#0.##########} = {investmentValue + position.BtcCredit:#0.##########} BTC");
             }
 
+            log.Info($"Total: Investment value + credit left = {totalInvestmentValue:#0.##########} + {totalCreditValue:#0.##########} = {totalInvestmentValue + totalCreditValue:#0.##########} BTC");
             log.Info("Updating the portfolio ledger is done");
         }
 
