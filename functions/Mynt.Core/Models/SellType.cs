@@ -12,6 +12,8 @@ namespace Mynt.Core.Models
         StopLoss,
         StopLossAnchor,
         Timed,
-        Immediate
+        Immediate,
+        Strategy,
+        Cancelled
     }
 }

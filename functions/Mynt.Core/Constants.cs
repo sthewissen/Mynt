@@ -5,7 +5,7 @@ namespace Mynt.Core
 {
     public class Constants
     {
-        public const bool IsDryRunning = true;
+        public const bool IsDryRunning = false;
 
         public const string BlockChainApiRoot = "https://blockchain.info";
 
@@ -31,6 +31,14 @@ namespace Mynt.Core
         // If we go below this profit percentage, we sell immediately.
         public const double StopLossPercentage = -0.1;
 
+        // Use this to create a sell order as soon as the buy order is hit.
+        public const bool ImmediatelyPlaceSellOrder = true;
+        public const double ImmediatelyPlaceSellOrderAtProfit = 0.02;
+
+        // If set to true, orders that have not been bought for an entire cycle of the BuyTimer
+        // are cancelled. This frees up a trader to look for other opportunities.
+        public const bool CancelUnboughtOrdersEachCycle = true;
+
         // Setting this to 0 means we will not look at volume and only look at our AlwaysTradeList. 
         // Setting this to any value higher than 0 means we will get a list of markets currently
         // trading a volume above this value and analyze those for buy signals.
@@ -53,18 +61,9 @@ namespace Mynt.Core
             new ValueTuple<int, double>(0, 0.02)
         };
 
-        // These are anchors for which we lock in profits to close a trade.
-        // They are used by combining the stop loss percentage with these percentages.
-        // E.g. if you put a percentage of 0.05 as a stop loss anchor a stop loss order will be placed
-        // at 0.05 - StopLossPercentage when price passes 5% profit.
-        // public static readonly List<double> StopLossAnchors = new List<double>()
-        // {
-        //     0.01, 0.02, 0.03, 0.05, 0.08, 0.13, 0.21
-        // };
-
         // These are the markets we don't want to trade on
         public static readonly List<string> MarketBlackList = new List<string>() {
-           "XVG"
+           "XVG", "TRX"
         };
         // These are the markets we want to trade on regardless of volume
         public static readonly List<string> AlwaysTradeList = new List<string>() {

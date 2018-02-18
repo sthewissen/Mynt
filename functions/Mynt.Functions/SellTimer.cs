@@ -25,7 +25,7 @@ namespace Mynt.Functions
                 );
 
                 // Call the process method to start processing the current situation.
-                await manager.CheckForSellSignals();
+                await manager.UpdateRunningTrades();
 
                 log.Info("Done...");
             }

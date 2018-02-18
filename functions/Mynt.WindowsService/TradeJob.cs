@@ -31,7 +31,7 @@ namespace Mynt.WindowsService
             var manager = new GenericTradeManager(new BittrexApi(), new BigThree(), null, (a) => log.Info(a));
 
             // Call the process method to start processing the current situation.
-            manager.CheckForBuySignals().GetAwaiter().GetResult();
+            manager.CheckStrategySignals().GetAwaiter().GetResult();
 
             return Task.FromResult(true);
         }

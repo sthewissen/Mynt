@@ -19,6 +19,10 @@ namespace Mynt.Core.TradeManagers
         private readonly Action<string> _log;
         private CloudTable _orderTable;
         private CloudTable _traderTable;
+        private List<Trade> _activeTrades;
+        private List<Trader> _currentTraders;
+        private TableBatchOperation _orderBatch;
+        private TableBatchOperation _traderBatch;
 
         public GenericTradeManager(IExchangeApi api, ITradingStrategy strat, INotificationManager notificationManager, Action<string> log)
         {
@@ -28,33 +32,50 @@ namespace Mynt.Core.TradeManagers
             _notification = notificationManager;
         }
 
+        public async Task Initialize()
+        {
+            // First initialize a few things
+            _orderTable = await ConnectionManager.GetTableConnection(Constants.OrderTableName, Constants.IsDryRunning);
+            _traderTable = await ConnectionManager.GetTableConnection(Constants.TraderTableName, Constants.IsDryRunning);
+
+            _activeTrades = _orderTable.CreateQuery<Trade>().Where(x => x.IsOpen).ToList();
+            _currentTraders = _traderTable.CreateQuery<Trader>().ToList();
+
+            // Create our trader records if they don't exist yet.
+            if (_currentTraders.Count == 0) await CreateTradersIfNoneExist();
+
+            _currentTraders = _traderTable.CreateQuery<Trader>().ToList();
+
+            // Create a batch that we can use to update our table.
+            _orderBatch = new TableBatchOperation();
+            _traderBatch = new TableBatchOperation();
+        }
+
         /// <summary>
         /// Checks if new trades can be started.
         /// </summary>
         /// <returns></returns>
-        public async Task CheckForBuySignals()
+        public async Task CheckStrategySignals()
         {
-            // Get our current trades.
-            _orderTable = await ConnectionManager.GetTableConnection(Constants.OrderTableName, Constants.IsDryRunning);
-            _traderTable = await ConnectionManager.GetTableConnection(Constants.TraderTableName, Constants.IsDryRunning);
+            // Initialize the things we'll be using throughout the process.
+            await Initialize();
 
-            var activeTrades = _orderTable.CreateQuery<Trade>().Where(x => x.IsOpen).ToList();
-            var currentTraders = _traderTable.CreateQuery<Trader>().ToList();
+            // This means an order to buy has been open for an entire buy cycle.
+            if (Constants.CancelUnboughtOrdersEachCycle)
+                await CancelUnboughtOrders();
 
-            // Create our trader records if they don't exist yet.
-            if (currentTraders.Count == 0) await CreateTradersIfNoneExist();
+            // Check active trades against our strategy.
+            // If the strategy tells you to sell, we create a sell.
+            await CheckActiveTradesAgainstStrategy();
 
-            // Create a batch that we can use to update our table.
-            var orderBatch = new TableBatchOperation();
-            var traderBatch = new TableBatchOperation();
-
-            // Get a list of traders that are currently standing there doing nothing...
+            // Check if there is room for more trades
             var freeTraders = _traderTable.CreateQuery<Trader>().Where(x => !x.IsBusy).ToList();
 
+            // We have available traders to work for us!
             if (freeTraders.Count > 0)
             {
-                // We have slots open!
-                var trades = await FindTrades(activeTrades);
+                // There's room for more.
+                var trades = await FindBuyOpportunities();
 
                 if (trades.Count > 0)
                 {
@@ -64,61 +85,21 @@ namespace Mynt.Core.TradeManagers
                     // Only create trades for our free traders
                     for (int i = 0; i < loopCount; i++)
                     {
-                        // Get our Bitcoin balance from the exchange
-                        var currentBtcBalance = await _api.GetBalance("BTC");
-
-                        // Do we even have enough funds to invest?
-                        if (currentBtcBalance.Available < freeTraders[i].CurrentBalance)
-                            throw new Exception("Insufficient BTC funds to perform a trade.");
-
-                        var order = await CreateBuyOrder(freeTraders[i], trades[i]);
-
-                        // We found a trade and have set it all up!
-                        if (order != null)
-                        {
-                            // Send a notification that we found something suitable
-                            _log($"New trade signal {order.Market}...");
-                            await SendNotification(
-                                $"Buying {order.Market} at {order.OpenRate:0.0000000 BTC} ({order.Quantity:0.0000} units)");
-
-                            // Update the trader to busy
-                            freeTraders[i].LastUpdated = DateTime.UtcNow;
-                            freeTraders[i].IsBusy = true;
-                            traderBatch.Add(TableOperation.Replace(freeTraders[i]));
-
-                            // Create the trade record as well
-                            orderBatch.Add(TableOperation.Insert(order));
-                        }
+                        await CreateNewTrade(freeTraders[i], trades[i]);
                     }
                 }
                 else
                 {
                     _log("No trade opportunities found...");
                 }
-
-                if (traderBatch.Count > 0) await _traderTable.ExecuteBatchAsync(traderBatch);
-                if (orderBatch.Count > 0) await _orderTable.ExecuteBatchAsync(orderBatch);
             }
+
+            // Save any changes we may have made.
+            if (_traderBatch.Count > 0) await _traderTable.ExecuteBatchAsync(_traderBatch);
+            if (_orderBatch.Count > 0) await _orderTable.ExecuteBatchAsync(_orderBatch);
         }
 
-        public async Task CheckForSellSignals()
-        {
-            // Get our current trades.
-            _orderTable = await ConnectionManager.GetTableConnection(Constants.OrderTableName, Constants.IsDryRunning);
-            _traderTable = await ConnectionManager.GetTableConnection(Constants.TraderTableName, Constants.IsDryRunning);
-
-            var activeTrades = _orderTable.CreateQuery<Trade>().Where(x => x.IsOpen).ToList();
-            var busyTraders = _traderTable.CreateQuery<Trader>().Where(x => x.IsBusy).ToList();
-
-            // First we update our open buy orders by checking if they're filled.
-            activeTrades = await UpdateOpenBuyOrders(activeTrades);
-
-            // Secondly we check if currently selling trades can be marked as sold if they're filled.
-            activeTrades = await UpdateOpenSellOrders(busyTraders, activeTrades);
-
-            // Third, our current trades need to be checked if one of these has hit its sell targets...
-            await CheckForSellConditions(activeTrades);
-        }
+        #region SETUP
 
         /// <summary>
         /// Creates trader objects that run in their own little bubble.
@@ -147,51 +128,118 @@ namespace Mynt.Core.TradeManagers
             if (tableBatch.Count > 0) await _traderTable.ExecuteBatchAsync(tableBatch);
         }
 
-        #region BUY side
+        #endregion
+
+        #region STRATEGY RELATED
 
         /// <summary>
-        /// Updates the buy orders by checking with the exchange what status they are currently.
+        /// Cancels any orders that have been buying for an entire cycle.
         /// </summary>
-        /// <param name="activeTrades"></param>
         /// <returns></returns>
-        private async Task<List<Trade>> UpdateOpenBuyOrders(List<Trade> activeTrades)
+        private async Task CancelUnboughtOrders()
         {
-            // There are trades that have an open order ID set & no sell order id set
-            // that means its a buy trade that is waiting to get bought. See if we can update that first.
-            var orderBatch = new TableBatchOperation();
-
-            foreach (var trade in activeTrades.Where(x => x.OpenOrderId != null && x.SellOrderId == null))
+            // Only trigger if there are orders still buying.
+            if (_activeTrades.Any(x => x.IsBuying))
             {
-                var exchangeOrder = await _api.GetOrder(trade.BuyOrderId, trade.Market);
-
-                // if this order is filled, we can update our database.
-                if (exchangeOrder?.Status == OrderStatus.Filled)
+                // Loop our current buying trades if there are any.
+                foreach (var trade in _activeTrades.Where(x => x.IsBuying))
                 {
+                    // Cancel our open buy order.
+                    await _api.CancelOrder(trade.BuyOrderId, trade.Market);
+
+                    // Update the buy order.
+                    trade.IsBuying = false;
                     trade.OpenOrderId = null;
-                    trade.StakeAmount = exchangeOrder.OriginalQuantity * exchangeOrder.Price;
-                    trade.Quantity = exchangeOrder.OriginalQuantity;
-                    trade.OpenRate = exchangeOrder.Price;
-                    trade.OpenDate = exchangeOrder.Time;
+                    trade.IsOpen = false;
+                    trade.SellType = SellType.Cancelled;
+                    trade.CloseDate = DateTime.UtcNow;
 
-                    // If this is enabled we place a sell order as soon as our buy order got filled.
-                    if (Constants.ImmediatelyPlaceSellOrder)
+                    // Update the order in our batch.
+                    _orderBatch.Add(TableOperation.Replace(trade));
+
+                    // Handle the trader that was dedicated to this order.
+                    var currentTrader = _currentTraders.FirstOrDefault(x => x.RowKey == trade.TraderId);
+
+                    if (currentTrader != null)
                     {
-                        var sellPrice = Math.Round(trade.OpenRate * (1 + Constants.ImmediatelyPlaceSellOrderAtProfit),8);
-                        var orderId = await _api.Sell(trade.Market, trade.Quantity,sellPrice);
+                        currentTrader.IsBusy = false;
+                        currentTrader.LastUpdated = DateTime.UtcNow;
 
-                        trade.CloseRate = sellPrice;
-                        trade.OpenOrderId = orderId;
-                        trade.SellOrderId = orderId;
-                        trade.SellType = SellType.Immediate;
+                        // Update the trader to indicate that we're not busy anymore.
+                        await _traderTable.ExecuteAsync(TableOperation.Replace(currentTrader));
                     }
-
-                    orderBatch.Add(TableOperation.Replace(trade));
                 }
             }
+        }
 
-            if (orderBatch.Count > 0) await _orderTable.ExecuteBatchAsync(orderBatch);
+        /// <summary>
+        /// Creates a new trade in our system and opens a buy order.
+        /// </summary>
+        /// <param name="freeTrader"></param>
+        /// <param name="trade"></param>
+        /// <returns></returns>
+        private async Task CreateNewTrade(Trader freeTrader, string trade)
+        {
+            // Get our Bitcoin balance from the exchange
+            var currentBtcBalance = await _api.GetBalance("BTC");
 
-            return activeTrades;
+            // Do we even have enough funds to invest?
+            if (currentBtcBalance.Available < freeTrader.CurrentBalance)
+                throw new Exception("Insufficient BTC funds to perform a trade.");
+
+            var order = await CreateBuyOrder(freeTrader, trade);
+
+            // We found a trade and have set it all up!
+            if (order != null)
+            {
+                // Send a notification that we found something suitable
+                _log($"New trade signal {order.Market}...");
+                await SendNotification($"Buying {order.Market} at {order.OpenRate:0.0000000 BTC} ({order.Quantity:0.0000} units)");
+
+                // Update the trader to busy
+                freeTrader.LastUpdated = DateTime.UtcNow;
+                freeTrader.IsBusy = true;
+                _traderBatch.Add(TableOperation.Replace(freeTrader));
+
+                // Create the trade record as well
+                _orderBatch.Add(TableOperation.Insert(order));
+            }
+        }
+
+        /// <summary>
+        /// Checks our current running trades against the strategy.
+        /// If the strategy tells us to sell we need to do so.
+        /// </summary>
+        /// <returns></returns>
+        private async Task CheckActiveTradesAgainstStrategy()
+        {
+            // Check our active trades for a sell signal from the strategy
+            foreach (var trade in _activeTrades.Where(x => (x.OpenOrderId == null || x.SellType == SellType.Immediate) && x.IsOpen))
+            {
+                var signal = await GetStrategySignal(trade.Market);
+
+                // If the strategy is telling us to sell we need to do so.
+                if (signal != null && signal.TradeAdvice == TradeAdvice.Sell)
+                {
+                    if ((trade.IsSelling && trade.SellType == SellType.Immediate))
+                    {
+                        // If an immediate order is placed it needs to be cancelled first.
+                        await _api.CancelOrder(trade.OpenOrderId, trade.Market);
+                    }
+
+                    // Create a sell order for our strategy.
+                    var ticker = await _api.GetTicker(trade.Market);
+                    var orderId = await _api.Sell(trade.Market, trade.Quantity, ticker.Bid);
+
+                    trade.CloseRate = ticker.Bid;
+                    trade.OpenOrderId = orderId;
+                    trade.SellOrderId = orderId;
+                    trade.SellType = SellType.Strategy;
+                    trade.IsSelling = true;
+
+                    _orderBatch.Add(TableOperation.Replace(trade));
+                }
+            }
         }
 
         /// <summary>
@@ -200,20 +248,20 @@ namespace Mynt.Core.TradeManagers
         /// </summary>
         /// <param name="trades"></param>
         /// <returns></returns>
-        private async Task<List<string>> FindTrades(List<Trade> trades)
+        private async Task<List<string>> FindBuyOpportunities()
         {
             // Retrieve our current markets
             var markets = await _api.GetMarketSummaries();
             var pairs = new List<string>();
 
             // Check if there are markets matching our volume.
-            markets = markets.Where(x => 
-                (x.BaseVolume > Constants.MinimumAmountOfVolume || 
+            markets = markets.Where(x =>
+                (x.BaseVolume > Constants.MinimumAmountOfVolume ||
                 Constants.AlwaysTradeList.Contains(x.CurrencyPair.BaseCurrency)) &&
                 x.CurrencyPair.QuoteCurrency.ToUpper() == "BTC").ToList();
 
             // Remove existing trades from the list to check.
-            foreach (var trade in trades)
+            foreach (var trade in _activeTrades)
                 markets.RemoveAll(x => x.MarketName == trade.Market);
 
             // Remove items that are on our blacklist.
@@ -223,9 +271,11 @@ namespace Mynt.Core.TradeManagers
             // Prioritize markets with high volume.
             foreach (var market in markets.Distinct().OrderByDescending(x => x.BaseVolume).ToList())
             {
-                if (await GetBuySignal(market.MarketName))
+                var signal = await GetStrategySignal(market.MarketName);
+
+                // A match was made, buy that please!
+                if (signal != null && signal.TradeAdvice == TradeAdvice.Buy)
                 {
-                    // A match was made, buy that please!
                     pairs.Add(market.MarketName);
                 }
             }
@@ -266,6 +316,7 @@ namespace Mynt.Core.TradeManagers
                 OpenOrderId = orderId,
                 BuyOrderId = orderId,
                 IsOpen = true,
+                IsBuying = true,
                 StrategyUsed = _strategy.Name,
                 PartitionKey = "TRADE",
                 SellType = SellType.None,
@@ -278,22 +329,40 @@ namespace Mynt.Core.TradeManagers
         /// </summary>
         /// <param name="market">The market we're going to check against.</param>
         /// <returns></returns>
-        private async Task<bool> GetBuySignal(string market)
+        private async Task<ITradeAdvice> GetStrategySignal(string market)
         {
             try
             {
                 _log($"Checking market {market}...");
 
-                var advice = await GetAdvice(market);
+                var minimumDate = _strategy.GetMinimumDateTime();
+                var candleDate = _strategy.GetCurrentCandleDateTime();
+                var candles = await _api.GetTickerHistory(market, minimumDate, _strategy.IdealPeriod);
 
-                // If the last signal was a 1, we buy!
-                return advice != null && advice.TradeAdvice == TradeAdvice.Buy;
+                // We eliminate all candles that aren't needed for the dataset incl. the last one (if it's the current running candle).
+                candles = candles.Where(x => x.Timestamp >= minimumDate && x.Timestamp < candleDate).ToList();
+
+                // Not enough candles to perform what we need to do.
+                if (candles.Count < _strategy.MinimumAmountOfCandles)
+                    return new SimpleTradeAdvice(TradeAdvice.Hold);
+
+                // Get the date for the last candle.
+                var signalDate = candles[candles.Count - 1].Timestamp;
+
+                // This is an outdated candle...
+                if (signalDate < _strategy.GetSignalDate())
+                    return null;
+
+                // This calculates an advice for the next timestamp.
+                var advice = _strategy.Forecast(candles);
+
+                return advice;
             }
             catch (Exception)
             {
                 // Couldn't get a buy signal for this market, no problem. Let's skip it.
                 _log($"Couldn't get buy signal for {market}...");
-                return false;
+                return null;
             }
         }
 
@@ -310,79 +379,109 @@ namespace Mynt.Core.TradeManagers
             return tick.Ask + Constants.AskLastBalance * (tick.Last - tick.Ask);
         }
 
-        /// <summary>
-        /// Retrieves an advice (e.g. buy, sell, hold) for the given market.
-        /// </summary>
-        /// <param name="tradeMarket"></param>
-        /// <returns></returns>
-        private async Task<ITradeAdvice> GetAdvice(string tradeMarket)
-        {
-            var minimumDate = _strategy.GetMinimumDateTime();
-            var candleDate = _strategy.GetCurrentCandleDateTime();
-            var candles = await _api.GetTickerHistory(tradeMarket, minimumDate, _strategy.IdealPeriod);
-
-            // We eliminate all candles that aren't needed for the dataset incl. the last one (if it's the current running candle).
-            candles = candles.Where(x => x.Timestamp >= minimumDate && x.Timestamp < candleDate).ToList();
-
-            // Not enough candles to perform what we need to do.
-            if(candles.Count < _strategy.MinimumAmountOfCandles)
-                return new SimpleTradeAdvice(TradeAdvice.Hold);
-
-            // Get the date for the last candle.
-            var signalDate = candles[candles.Count - 1].Timestamp;
-
-            // This is an outdated candle...
-            if (signalDate < _strategy.GetSignalDate())
-                return null;
-
-            // This calculates an advice for the next timestamp.
-            var advice = _strategy.Forecast(candles);
-
-            return advice;
-        }
-
         #endregion
 
-        #region SELL side
+        #region UPDATE TRADES
+
+        public async Task UpdateRunningTrades()
+        {
+            // Get our current trades.
+            await Initialize();
+
+            // First we update our open buy orders by checking if they're filled.
+            await UpdateOpenBuyOrders();
+
+            // Secondly we check if currently selling trades can be marked as sold if they're filled.
+            await UpdateOpenSellOrders();
+
+            // Third, our current trades need to be checked if one of these has hit its sell targets...
+            await CheckForSellConditions();
+        }
+
+        /// <summary>
+        /// Updates the buy orders by checking with the exchange what status they are currently.
+        /// </summary>
+        /// <param name="activeTrades"></param>
+        /// <returns></returns>
+        private async Task UpdateOpenBuyOrders()
+        {
+            // There are trades that have an open order ID set & no sell order id set
+            // that means its a buy trade that is waiting to get bought. See if we can update that first.
+            _orderBatch = new TableBatchOperation();
+
+            foreach (var trade in _activeTrades.Where(x => x.OpenOrderId != null && x.SellOrderId == null))
+            {
+                var exchangeOrder = await _api.GetOrder(trade.BuyOrderId, trade.Market);
+
+                // if this order is filled, we can update our database.
+                if (exchangeOrder?.Status == OrderStatus.Filled)
+                {
+                    trade.OpenOrderId = null;
+                    trade.StakeAmount = exchangeOrder.OriginalQuantity * exchangeOrder.Price;
+                    trade.Quantity = exchangeOrder.OriginalQuantity;
+                    trade.OpenRate = exchangeOrder.Price;
+                    trade.OpenDate = exchangeOrder.Time;
+                    trade.IsBuying = false;
+
+                    // If this is enabled we place a sell order as soon as our buy order got filled.
+                    if (Constants.ImmediatelyPlaceSellOrder)
+                    {
+                        var sellPrice = Math.Round(trade.OpenRate * (1 + Constants.ImmediatelyPlaceSellOrderAtProfit), 8);
+                        var orderId = await _api.Sell(trade.Market, trade.Quantity, sellPrice);
+
+                        trade.CloseRate = sellPrice;
+                        trade.OpenOrderId = orderId;
+                        trade.SellOrderId = orderId;
+                        trade.IsSelling = true;
+                        trade.SellType = SellType.Immediate;
+                    }
+
+                    _orderBatch.Add(TableOperation.Replace(trade));
+                }
+            }
+
+            if (_orderBatch.Count > 0) await _orderTable.ExecuteBatchAsync(_orderBatch);
+        }
 
         /// <summary>
         /// Checks the current active trades if they need to be sold.
         /// </summary>
         /// <param name="activeTrades"></param>
         /// <returns></returns>
-        private async Task CheckForSellConditions(List<Trade> activeTrades)
+        private async Task CheckForSellConditions()
         {
             // There are trades that have no open order ID set & are still open.
             // that means its a trade that is waiting to get sold. See if we can update that first.
-            var orderBatch = new TableBatchOperation();
+            _orderBatch = new TableBatchOperation();
 
             // An open order currently not selling or being an immediate sell are checked for SL  etc.
-                foreach (var trade in activeTrades.Where(x => (x.OpenOrderId == null || x.SellType == SellType.Immediate) && x.IsOpen))
+            foreach (var trade in _activeTrades.Where(x => (x.OpenOrderId == null || x.SellType == SellType.Immediate) && x.IsOpen))
+            {
+                // These are trades that are not being bought or sold at the moment so these need to be checked for sell conditions.
+                var ticker = await _api.GetTicker(trade.Market);
+                var sellType = ShouldSell(trade, ticker.Bid, DateTime.UtcNow);
+
+                if (sellType != SellType.None)
                 {
-                    // These are trades that are not being bought or sold at the moment so these need to be checked for sell conditions.
-                    var ticker = await _api.GetTicker(trade.Market);
-                    var sellType = ShouldSell(trade, ticker.Bid, DateTime.UtcNow);
-
-                    if (sellType != SellType.None)
+                    if (trade.SellType == SellType.Immediate)
                     {
-                        if (trade.SellType == SellType.Immediate)
-                        {
-                            // Immediates need to be cancelled first.
-                           await _api.CancelOrder(trade.SellOrderId, trade.Market);
-                        }
-
-                        var orderId = await _api.Sell(trade.Market, trade.Quantity, ticker.Bid);
-
-                        trade.CloseRate = ticker.Bid;
-                        trade.OpenOrderId = orderId;
-                        trade.SellOrderId = orderId;
-                        trade.SellType = sellType;
-
-                        orderBatch.Add(TableOperation.Replace(trade));
+                        // Immediates need to be cancelled first.
+                        await _api.CancelOrder(trade.SellOrderId, trade.Market);
                     }
-                }
 
-            if (orderBatch.Count > 0) await _orderTable.ExecuteBatchAsync(orderBatch);
+                    var orderId = await _api.Sell(trade.Market, trade.Quantity, ticker.Bid);
+
+                    trade.CloseRate = ticker.Bid;
+                    trade.OpenOrderId = orderId;
+                    trade.SellOrderId = orderId;
+                    trade.SellType = sellType;
+                    trade.IsSelling = true;
+
+                    _orderBatch.Add(TableOperation.Replace(trade));
+                }
+            }
+
+            if (_orderBatch.Count > 0) await _orderTable.ExecuteBatchAsync(_orderBatch);
         }
 
         /// <summary>
@@ -424,14 +523,15 @@ namespace Mynt.Core.TradeManagers
         /// Updates the sell orders by checking with the exchange what status they are currently.
         /// </summary>
         /// <returns></returns>
-        private async Task<List<Trade>> UpdateOpenSellOrders(List<Trader> busyTraders, List<Trade> activeTrades)
+        private async Task UpdateOpenSellOrders()
         {
             // There are trades that have an open order ID set & sell order id set
             // that means its a sell trade that is waiting to get sold. See if we can update that first.
-            var orderBatch = new TableBatchOperation();
-            var traderBatch = new TableBatchOperation();
+            _orderBatch = new TableBatchOperation();
+            _traderBatch = new TableBatchOperation();
 
-            foreach (var order in activeTrades.Where(x => x.OpenOrderId != null && x.SellOrderId != null))
+
+            foreach (var order in _activeTrades.Where(x => x.OpenOrderId != null && x.SellOrderId != null))
             {
                 var exchangeOrder = await _api.GetOrder(order.SellOrderId, order.Market);
 
@@ -440,14 +540,15 @@ namespace Mynt.Core.TradeManagers
                 {
                     order.OpenOrderId = null;
                     order.IsOpen = false;
+                    order.IsSelling = false;
                     order.CloseDate = exchangeOrder.Time;
                     order.CloseRate = exchangeOrder.Price;
 
                     order.CloseProfit = (exchangeOrder.Price * exchangeOrder.OriginalQuantity) - order.StakeAmount;
                     order.CloseProfitPercentage = ((exchangeOrder.Price * exchangeOrder.OriginalQuantity) - order.StakeAmount) / order.StakeAmount * 100;
 
-                    // Retrieve the trader respsonsible for this trade
-                    var trader = busyTraders.FirstOrDefault(x => x.RowKey == order.TraderId);
+                    // Retrieve the trader responsible for this trade
+                    var trader = _currentTraders.FirstOrDefault(x => x.RowKey == order.TraderId);
 
                     if (trader != null)
                     {
@@ -456,15 +557,13 @@ namespace Mynt.Core.TradeManagers
                         trader.LastUpdated = DateTime.UtcNow;
                     }
 
-                    traderBatch.Add(TableOperation.Replace(trader));
-                    orderBatch.Add(TableOperation.Replace(order));
+                    _traderBatch.Add(TableOperation.Replace(trader));
+                    _orderBatch.Add(TableOperation.Replace(order));
                 }
             }
 
-            if (traderBatch.Count > 0) await _traderTable.ExecuteBatchAsync(traderBatch);
-            if (orderBatch.Count > 0) await _orderTable.ExecuteBatchAsync(orderBatch);
-
-            return activeTrades;
+            if (_traderBatch.Count > 0) await _traderTable.ExecuteBatchAsync(_traderBatch);
+            if (_orderBatch.Count > 0) await _orderTable.ExecuteBatchAsync(_orderBatch);
         }
 
         #endregion
@@ -478,3 +577,4 @@ namespace Mynt.Core.TradeManagers
         }
     }
 }
+
