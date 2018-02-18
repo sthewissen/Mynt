@@ -54,10 +54,6 @@ namespace Mynt.Core
         // "Sell when 5 minutes have passed and profit is at 3%".
         public static readonly List<(int Duration, double Profit)> ReturnOnInvestment = new List<ValueTuple<int, double>>()
         {
-            // new ValueTuple<int, double>(5, 0.03),
-            // new ValueTuple<int, double>(10, 0.02),
-            // new ValueTuple<int, double>(30, 0.015),
-            // new ValueTuple<int, double>(45, 0.005),
             new ValueTuple<int, double>(0, 0.1)
         };
 

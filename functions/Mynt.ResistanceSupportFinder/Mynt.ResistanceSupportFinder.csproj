@@ -79,6 +79,7 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SupportResistanceLevel.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mynt.Core.Binance\Mynt.Core.Binance.csproj">
