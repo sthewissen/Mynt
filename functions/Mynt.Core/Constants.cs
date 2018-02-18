@@ -29,10 +29,10 @@ namespace Mynt.Core
         public const double TransactionFeePercentage = 0.0025;
 
         // If we go below this profit percentage, we sell immediately.
-        public const double StopLossPercentage = -0.1;
+        public const double StopLossPercentage = -0.06;
 
         // Use this to create a sell order as soon as the buy order is hit.
-        public const bool ImmediatelyPlaceSellOrder = true;
+        public const bool ImmediatelyPlaceSellOrder = false;
         public const double ImmediatelyPlaceSellOrderAtProfit = 0.02;
 
         // If set to true, orders that have not been bought for an entire cycle of the BuyTimer
@@ -58,7 +58,7 @@ namespace Mynt.Core
             // new ValueTuple<int, double>(10, 0.02),
             // new ValueTuple<int, double>(30, 0.015),
             // new ValueTuple<int, double>(45, 0.005),
-            new ValueTuple<int, double>(0, 0.02)
+            new ValueTuple<int, double>(0, 0.1)
         };
 
         // These are the markets we don't want to trade on

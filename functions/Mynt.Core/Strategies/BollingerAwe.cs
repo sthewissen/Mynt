@@ -56,7 +56,6 @@ namespace Mynt.Core.Strategies
                         result.Add(new SimpleTradeAdvice(TradeAdvice.Buy));
                     else if (closes[i] < bb.MiddleBand[i] && // Closed above the bollinger band
                         Math.Abs(ao[i]) == 2 &&
-                        macd.Macd[i] < macd.Signal[i] &&
                         fastMa[i] < bb.MiddleBand[i] &&
                         fastMa[i - 1] > bb.MiddleBand[i])
                         result.Add(new SimpleTradeAdvice(TradeAdvice.Sell));

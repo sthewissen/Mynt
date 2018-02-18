@@ -168,6 +168,8 @@ namespace Mynt.Core.TradeManagers
                         // Update the trader to indicate that we're not busy anymore.
                         await _traderTable.ExecuteAsync(TableOperation.Replace(currentTrader));
                     }
+
+                    await SendNotification($"Cancelled {trade.Market} buy order.");
                 }
             }
         }
@@ -238,6 +240,8 @@ namespace Mynt.Core.TradeManagers
                     trade.IsSelling = true;
 
                     _orderBatch.Add(TableOperation.Replace(trade));
+
+                    await SendNotification($"Sell order placed for {trade.Market} at {trade.CloseRate:0.00000000} (Strategy sell).");
                 }
             }
         }
@@ -437,6 +441,8 @@ namespace Mynt.Core.TradeManagers
                     }
 
                     _orderBatch.Add(TableOperation.Replace(trade));
+
+                    await SendNotification($"Buy order hit for {trade.Market} at {trade.OpenRate:0.00000000}.");
                 }
             }
 
@@ -446,7 +452,6 @@ namespace Mynt.Core.TradeManagers
         /// <summary>
         /// Checks the current active trades if they need to be sold.
         /// </summary>
-        /// <param name="activeTrades"></param>
         /// <returns></returns>
         private async Task CheckForSellConditions()
         {
@@ -478,6 +483,8 @@ namespace Mynt.Core.TradeManagers
                     trade.IsSelling = true;
 
                     _orderBatch.Add(TableOperation.Replace(trade));
+
+                    await SendNotification($"Going to sell {trade.Market} at {trade.CloseRate:0.00000000}.");
                 }
             }
 
@@ -530,7 +537,6 @@ namespace Mynt.Core.TradeManagers
             _orderBatch = new TableBatchOperation();
             _traderBatch = new TableBatchOperation();
 
-
             foreach (var order in _activeTrades.Where(x => x.OpenOrderId != null && x.SellOrderId != null))
             {
                 var exchangeOrder = await _api.GetOrder(order.SellOrderId, order.Market);
@@ -559,6 +565,8 @@ namespace Mynt.Core.TradeManagers
 
                     _traderBatch.Add(TableOperation.Replace(trader));
                     _orderBatch.Add(TableOperation.Replace(order));
+
+                    await SendNotification($"Sold {order.Market} at {order.CloseRate:0.00000000} for {order.CloseProfit:0.00000000} profit ({order.CloseProfitPercentage:0.00}%).");
                 }
             }
 
