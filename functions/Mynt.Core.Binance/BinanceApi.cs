@@ -33,6 +33,8 @@ namespace Mynt.Core.Binance
             this._isDryRunning = Constants.IsDryRunning;
         }
 
+        #region IExchangeApi Implementations
+
         public async Task<string> Buy(string market, double quantity, double rate)
         {
             if (_isDryRunning)
@@ -48,36 +50,6 @@ namespace Mynt.Core.Binance
             return result.Data.OrderId.ToString();
         }
 
-        public async Task<string> BuyWithStopLimit(string market, double quantity, double rate, double limit)
-        {
-            if (_isDryRunning)
-            {
-                var emptyResult = await _client.PlaceTestOrderAsync(market, OrderSide.Buy, OrderType.StopLossLimit, (decimal)quantity, null, (decimal)rate, TimeInForce.GoodTillCancel, (decimal)limit);
-                return $"{DateTime.UtcNow.Year}{DateTime.UtcNow.Month}{DateTime.UtcNow.Day}{DateTime.UtcNow.Hour}{DateTime.UtcNow.Minute}{DateTime.UtcNow.Second}";
-            }
-
-            var result = await _client.PlaceOrderAsync(market, OrderSide.Buy, OrderType.StopLossLimit, (decimal)quantity, null, (decimal)rate, TimeInForce.GoodTillCancel, (decimal)limit);
-
-            if (!result.Success) throw new Exception(result.Error.Message);
-
-            return result.Data.OrderId.ToString();
-        }
-
-        public async Task<string> BuyWithTakeProfit(string market, double quantity, double rate, double limit)
-        {
-            if (_isDryRunning)
-            {
-                var emptyResult = await _client.PlaceTestOrderAsync(market, OrderSide.Buy, OrderType.TakeProfitLimit, (decimal)quantity, null, (decimal)rate, TimeInForce.GoodTillCancel, (decimal)limit);
-                return $"{DateTime.UtcNow.Year}{DateTime.UtcNow.Month}{DateTime.UtcNow.Day}{DateTime.UtcNow.Hour}{DateTime.UtcNow.Minute}{DateTime.UtcNow.Second}";
-            }
-
-            var result = await _client.PlaceOrderAsync(market, OrderSide.Buy, OrderType.TakeProfitLimit, (decimal)quantity, null, (decimal)rate, TimeInForce.GoodTillCancel, (decimal)limit);
-
-            if (!result.Success) throw new Exception(result.Error.Message);
-
-            return result.Data.OrderId.ToString();
-        }
-
         public async Task<string> Sell(string market, double quantity, double rate)
         {
             if (_isDryRunning)
@@ -87,36 +59,6 @@ namespace Mynt.Core.Binance
             }
 
             var result = await _client.PlaceOrderAsync(market, OrderSide.Sell, OrderType.Limit, (decimal)quantity, null, (decimal)rate, TimeInForce.GoodTillCancel);
-
-            if (!result.Success) throw new Exception(result.Error.Message);
-
-            return result.Data.OrderId.ToString();
-        }
-
-        public async Task<string> SellWithStopLimit(string market, double quantity, double rate, double limit)
-        {
-            if (_isDryRunning)
-            {
-                var emptyResult = await _client.PlaceTestOrderAsync(market, OrderSide.Sell, OrderType.StopLossLimit, (decimal)quantity, null, (decimal)rate, TimeInForce.GoodTillCancel, (decimal)limit);
-                return $"{DateTime.UtcNow.Year}{DateTime.UtcNow.Month}{DateTime.UtcNow.Day}{DateTime.UtcNow.Hour}{DateTime.UtcNow.Minute}{DateTime.UtcNow.Second}";
-            }
-
-            var result = await _client.PlaceOrderAsync(market, OrderSide.Sell, OrderType.StopLossLimit, (decimal)quantity, null, (decimal)rate, TimeInForce.GoodTillCancel, (decimal)limit);
-
-            if (!result.Success) throw new Exception(result.Error.Message);
-
-            return result.Data.OrderId.ToString();
-        }
-
-        public async Task<string> SellWithTakeProfit(string market, double quantity, double rate, double limit)
-        {
-            if (_isDryRunning)
-            {
-                var emptyResult = await _client.PlaceTestOrderAsync(market, OrderSide.Sell, OrderType.TakeProfitLimit, (decimal)quantity, null, (decimal)rate, TimeInForce.GoodTillCancel, (decimal)limit);
-                return $"{DateTime.UtcNow.Year}{DateTime.UtcNow.Month}{DateTime.UtcNow.Day}{DateTime.UtcNow.Hour}{DateTime.UtcNow.Minute}{DateTime.UtcNow.Second}";
-            }
-
-            var result = await _client.PlaceOrderAsync(market, OrderSide.Sell, OrderType.TakeProfitLimit, (decimal)quantity, null, (decimal)rate, TimeInForce.GoodTillCancel, (decimal)limit);
 
             if (!result.Success) throw new Exception(result.Error.Message);
 
@@ -163,7 +105,7 @@ namespace Mynt.Core.Binance
 
         public async Task<Order> GetOrder(string orderId, string market)
         {
-            if (_isDryRunning) return new Order { OrderId = orderId, Symbol = market };
+            if (_isDryRunning) return new Order { OrderId = orderId, Symbol = market, Status = Enums.OrderStatus.Canceled };
 
             int longId;
 
@@ -301,6 +243,29 @@ namespace Mynt.Core.Binance
                 Volume = (double)result.Data.Volume
             };
         }
+        
+        #endregion
+
+        public async Task<DateTime> GetServerTime()
+        {
+            var result = await _client.GetServerTimeAsync();
+
+            if (!result.Success) throw new Exception(result.Error.Message);
+
+            return result.Data;
+        }
+
+        public async Task<BinanceSymbol> GetSymbolInfo(string symbol)
+        {
+            if (_exchangeInfo == null)
+            {
+                var result = await _client.GetExchangeInfoAsync();
+                if (!result.Success) throw new Exception(result.Error.Message);
+                _exchangeInfo = result.Data;
+            }
+
+            return _exchangeInfo.Symbols.FirstOrDefault(x => x.SymbolName == symbol);
+        }
 
         public async Task<List<Candle>> GetTickerHistory(string market, DateTime startDate, Period period)
         {
@@ -328,6 +293,66 @@ namespace Mynt.Core.Binance
                     Timestamp = _.OpenTime
                 }
             ).ToList();
+        }
+
+        public async Task<string> BuyWithStopLimit(string market, double quantity, double rate, double limit)
+        {
+            if (_isDryRunning)
+            {
+                var emptyResult = await _client.PlaceTestOrderAsync(market, OrderSide.Buy, OrderType.StopLossLimit, (decimal)quantity, null, (decimal)rate, TimeInForce.GoodTillCancel, (decimal)limit);
+                return $"{DateTime.UtcNow.Year}{DateTime.UtcNow.Month}{DateTime.UtcNow.Day}{DateTime.UtcNow.Hour}{DateTime.UtcNow.Minute}{DateTime.UtcNow.Second}";
+            }
+
+            var result = await _client.PlaceOrderAsync(market, OrderSide.Buy, OrderType.StopLossLimit, (decimal)quantity, null, (decimal)rate, TimeInForce.GoodTillCancel, (decimal)limit);
+
+            if (!result.Success) throw new Exception(result.Error.Message);
+
+            return result.Data.OrderId.ToString();
+        }
+
+        public async Task<string> BuyWithTakeProfit(string market, double quantity, double rate, double limit)
+        {
+            if (_isDryRunning)
+            {
+                var emptyResult = await _client.PlaceTestOrderAsync(market, OrderSide.Buy, OrderType.TakeProfitLimit, (decimal)quantity, null, (decimal)rate, TimeInForce.GoodTillCancel, (decimal)limit);
+                return $"{DateTime.UtcNow.Year}{DateTime.UtcNow.Month}{DateTime.UtcNow.Day}{DateTime.UtcNow.Hour}{DateTime.UtcNow.Minute}{DateTime.UtcNow.Second}";
+            }
+
+            var result = await _client.PlaceOrderAsync(market, OrderSide.Buy, OrderType.TakeProfitLimit, (decimal)quantity, null, (decimal)rate, TimeInForce.GoodTillCancel, (decimal)limit);
+
+            if (!result.Success) throw new Exception(result.Error.Message);
+
+            return result.Data.OrderId.ToString();
+        }
+
+        public async Task<string> SellWithStopLimit(string market, double quantity, double rate, double limit)
+        {
+            if (_isDryRunning)
+            {
+                var emptyResult = await _client.PlaceTestOrderAsync(market, OrderSide.Sell, OrderType.StopLossLimit, (decimal)quantity, null, (decimal)rate, TimeInForce.GoodTillCancel, (decimal)limit);
+                return $"{DateTime.UtcNow.Year}{DateTime.UtcNow.Month}{DateTime.UtcNow.Day}{DateTime.UtcNow.Hour}{DateTime.UtcNow.Minute}{DateTime.UtcNow.Second}";
+            }
+
+            var result = await _client.PlaceOrderAsync(market, OrderSide.Sell, OrderType.StopLossLimit, (decimal)quantity, null, (decimal)rate, TimeInForce.GoodTillCancel, (decimal)limit);
+
+            if (!result.Success) throw new Exception(result.Error.Message);
+
+            return result.Data.OrderId.ToString();
+        }
+
+        public async Task<string> SellWithTakeProfit(string market, double quantity, double rate, double limit)
+        {
+            if (_isDryRunning)
+            {
+                var emptyResult = await _client.PlaceTestOrderAsync(market, OrderSide.Sell, OrderType.TakeProfitLimit, (decimal)quantity, null, (decimal)rate, TimeInForce.GoodTillCancel, (decimal)limit);
+                return $"{DateTime.UtcNow.Year}{DateTime.UtcNow.Month}{DateTime.UtcNow.Day}{DateTime.UtcNow.Hour}{DateTime.UtcNow.Minute}{DateTime.UtcNow.Second}";
+            }
+
+            var result = await _client.PlaceOrderAsync(market, OrderSide.Sell, OrderType.TakeProfitLimit, (decimal)quantity, null, (decimal)rate, TimeInForce.GoodTillCancel, (decimal)limit);
+
+            if (!result.Success) throw new Exception(result.Error.Message);
+
+            return result.Data.OrderId.ToString();
         }
 
         private async Task<BinanceKline> GetLastDaysCandle(string symbol)

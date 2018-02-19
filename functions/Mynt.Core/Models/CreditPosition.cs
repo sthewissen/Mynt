@@ -1,6 +1,6 @@
-﻿using System;
+﻿using log4net;
+using System;
 using System.Reflection;
-using log4net;
 
 namespace Mynt.Core.Models
 {
@@ -12,32 +12,38 @@ namespace Mynt.Core.Models
 
         private readonly double fee;
 
+        private double ownedQuantity;
+
         private double btcCredit;
 
-        public CreditPosition(string symbol, double fee, double btcCredit)
+        public CreditPosition(string symbol, double fee, double ownedQuantity, double btcCredit)
         {
             this.symbol = symbol;
-            this.fee =fee;
-            this.btcCredit= btcCredit;
+            this.fee = fee;
+            this.ownedQuantity = ownedQuantity;
+            this.btcCredit = btcCredit;
         }
 
         public string Symbol => symbol;
 
         public double BtcCredit => btcCredit;
 
+        public double OwnedQuantity => ownedQuantity;
+
         public void RegisterBuy(double quantity, double rate)
         {
-            // Decreased the credit
+            // Increase invested amount, decrease free amount.
+            ownedQuantity += quantity;
             btcCredit -= quantity * rate * (1 + fee);
-            log.Info($"Registered a buy for {symbol}. Substracted {quantity * rate * (1 + fee)} from the credit. New BTC credit: {btcCredit}");
+            log.Info($"Registered a buy for {symbol}. Subtracted {quantity * rate * (1 + fee):#0.##########} from the credit");
         }
 
         public void RegisterSell(double quantity, double rate)
         {
-            // Increased the credit
+            // Decrease invested amount, increase free amount.
+            ownedQuantity -= quantity;
             btcCredit += quantity * rate * (1 - fee);
-            log.Info($"Registered a sell for {symbol}. Added {quantity * rate * (1 - fee)} to the credit. New BTC credit: {btcCredit}");
-
+            log.Info($"Registered a sell for {symbol}. Added {quantity * rate * (1 - fee):#0.##########} to the credit");
         }
     }
 }
