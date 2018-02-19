@@ -288,6 +288,7 @@
     <Compile Include="Settings.cs" />
     <Compile Include="Strategies\BaseStrategy.cs" />
     <Compile Include="Strategies\BigThree.cs" />
+    <Compile Include="Strategies\BollingerAwe.cs" />
     <Compile Include="Strategies\BuyAndHold.cs" />
     <Compile Include="Interfaces\ITradingStrategy.cs" />
     <Compile Include="Strategies\SmaCrossover.cs" />
@@ -297,6 +298,8 @@
     <Compile Include="Interfaces\ITradeManager.cs" />
     <Compile Include="Strategies\WvfExtended.cs" />
     <Compile Include="TradeManagers\GenericTradeManager.cs" />
+    <Compile Include="Models\OrderBook.cs" />
+    <Compile Include="Models\OrderBookEntry.cs" />
     <Compile Include="TradeManagers\PortfolioLedger.cs" />
   </ItemGroup>
   <ItemGroup>

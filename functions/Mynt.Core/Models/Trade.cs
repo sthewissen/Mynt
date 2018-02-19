@@ -18,6 +18,8 @@ namespace Mynt.Core.Models
         public double Quantity { get; set; }
 
         public bool IsOpen { get; set; }
+        public bool IsBuying { get; set; }
+        public bool IsSelling { get; set; }
 
         public string OpenOrderId { get; set; }
         public string BuyOrderId { get; set; }

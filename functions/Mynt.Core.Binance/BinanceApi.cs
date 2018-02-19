@@ -21,7 +21,7 @@ namespace Mynt.Core.Binance
         private readonly bool _isDryRunning;
         private BinanceExchangeInfo _exchangeInfo;
 
-        public BinanceApi(bool isDryRunning = true)
+        public BinanceApi()
         {
             // Initialise the general client with config
             _client = new BinanceClient(Settings.BinanceApiKey, Settings.BinanceApiSecret)
@@ -30,7 +30,7 @@ namespace Mynt.Core.Binance
                 AutoTimestamp = true
             };
 
-            this._isDryRunning = isDryRunning;
+            this._isDryRunning = Constants.IsDryRunning;
         }
 
         #region IExchangeApi Implementations
@@ -83,7 +83,7 @@ namespace Mynt.Core.Binance
 
             var result = new List<MarketSummary>();
 
-            foreach(var _ in symbols.Data)
+            foreach (var _ in symbols.Data)
             {
                 var info = await GetSymbolInfo(_.Symbol);
                 result.Add(new MarketSummary()
@@ -113,9 +113,9 @@ namespace Mynt.Core.Binance
             {
                 throw new ArgumentException("'orderId' should be of type long but cannot be parsed");
             }
-            
+
             var result = await _client.GetAllOrdersAsync(market, longId);
-            
+
             if (!result.Success) throw new Exception(result.Error.Message);
 
             if (result.Data.Any())
@@ -170,7 +170,7 @@ namespace Mynt.Core.Binance
         public async Task<List<OpenOrder>> GetOpenOrders(string market)
         {
             var result = await _client.GetOpenOrdersAsync(market);
-            
+
             if (!result.Success) throw new Exception(result.Error.Message);
 
             return result.Data.Select(_ =>
@@ -202,6 +202,18 @@ namespace Mynt.Core.Binance
             }
 
             await _client.CancelOrderAsync(market, longId);
+        }
+
+        public async Task<OrderBook> GetOrderBook(string symbol)
+        {
+            var result = await _client.GetOrderBookAsync(symbol, 1000);
+            if (!result.Success) throw new Exception(result.Error.Message);
+
+            return new OrderBook
+            {
+                Asks = result.Data.Asks.Select(_ => new OrderBookEntry { Price = _.Price, Quantity = _.Quantity }).ToList(),
+                Bids = result.Data.Bids.Select(_ => new OrderBookEntry { Price = _.Price, Quantity = _.Quantity }).ToList(),
+            };
         }
 
         public async Task<Ticker> GetTicker(string market)
@@ -251,7 +263,7 @@ namespace Mynt.Core.Binance
             while (start < endTime)
             {
                 var candlesticksToAdd = await _client.GetKlinesAsync(market, period.ToBinanceEquivalent(), start, endTime);
-                
+
                 if (!candlesticksToAdd.Success) throw new Exception(candlesticksToAdd.Error.Message);
 
                 candles.AddRange(candlesticksToAdd.Data);
