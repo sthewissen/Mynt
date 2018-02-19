@@ -23,6 +23,8 @@ This bot was first mentioned in [one of my blogposts].
 
 ### Documentation
 
+* [Installation (Azure)](https://github.com/sthewissen/Mynt/wiki/Installation-(Azure))
+* [Installation (Local)](https://github.com/sthewissen/Mynt/wiki/Installation-(Local))
 * [Configuration](https://github.com/sthewissen/Mynt/wiki/Configuration)
 * [Indicators](https://github.com/sthewissen/Mynt/wiki/Indicators)
 * [Strategies](https://github.com/sthewissen/Mynt/wiki/Strategies)
