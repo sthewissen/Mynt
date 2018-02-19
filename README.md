@@ -1,3 +1,5 @@
+![Mynt](https://raw.githubusercontent.com/sthewissen/Mynt/master/myntlogo.png)
+
 Finding this useful? Consider a donation!
 
 | Coin | Address |
