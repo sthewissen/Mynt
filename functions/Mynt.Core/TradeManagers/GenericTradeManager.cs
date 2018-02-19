@@ -250,7 +250,6 @@ namespace Mynt.Core.TradeManagers
         /// Checks the implemented trading indicator(s),
         /// if one pair triggers the buy signal a new trade record gets created.
         /// </summary>
-        /// <param name="trades"></param>
         /// <returns></returns>
         private async Task<List<string>> FindBuyOpportunities()
         {

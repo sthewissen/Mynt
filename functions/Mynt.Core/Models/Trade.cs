@@ -29,7 +29,7 @@ namespace Mynt.Core.Models
         public DateTime? CloseDate { get; set; }
 
         public string StrategyUsed { get; set; }
-        public double? StopLossAnchor { get; set; }
+        public double? StopLossRate { get; set; }
         public SellType SellType { get; set; }
 
         public Trade()
