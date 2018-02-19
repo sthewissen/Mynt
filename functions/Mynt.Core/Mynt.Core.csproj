@@ -227,6 +227,7 @@
     <Compile Include="Api\IExchangeApi.cs" />
     <Compile Include="Configuration.cs" />
     <Compile Include="Constants.cs" />
+    <Compile Include="Enums\BuyInPriceStrategy.cs" />
     <Compile Include="Enums\OrderSide.cs" />
     <Compile Include="Enums\EnumExtensions.cs" />
     <Compile Include="Enums\OrderStatus.cs" />
@@ -273,7 +274,6 @@
     <Compile Include="Models\TimestampedTradeAdvice.cs" />
     <Compile Include="Models\Trader.cs" />
     <Compile Include="NotificationManagers\DiscordNotificationManager.cs" />
-    <Compile Include="NotificationManagers\NotificationManager.cs" />
     <Compile Include="NotificationManagers\SlackNotificationManager.cs" />
     <Compile Include="Models\Candle.cs" />
     <Compile Include="Models\CandleVariable.cs" />

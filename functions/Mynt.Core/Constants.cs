@@ -51,7 +51,9 @@ namespace Mynt.Core
         // Sets the bidding price. A value of 0.0 will use the ask price, 1.0 will use the last price and values between 
         // those interpolate between ask and last price. Using the ask price will guarantee quick success in bid, but
         // the bot will also end up paying more then would probably have been necessary.
+        public const BuyInPriceStrategy BuyInPriceStrategy = Enums.BuyInPriceStrategy.PercentageBelowBid;
         public const double AskLastBalance = 0.4;
+        public const double BuyInPricePercentage = 0.02;
 
         // A list of duration and profit pairs. The duration is a value in minutes and the profit is a 
         // double containing a percentage. This list is used to define constraints such as
@@ -63,6 +65,7 @@ namespace Mynt.Core
             //new ValueTuple<int, double>(180, 0.04),
             //new ValueTuple<int, double>(240, 0.03),
             //new ValueTuple<int, double>(300, 0.02),
+            new ValueTuple<int, double>(1440, 0.02),
         };
 
         // These are the markets we don't want to trade on

@@ -196,7 +196,6 @@ namespace Mynt.Core.TradeManagers
             {
                 // Send a notification that we found something suitable
                 _log($"New trade signal {order.Market}...");
-                await SendNotification($"Buying {order.Market} at {order.OpenRate:0.0000000 BTC} ({order.Quantity:0.0000} units)");
 
                 // Update the trader to busy
                 freeTrader.LastUpdated = DateTime.UtcNow;
@@ -300,13 +299,19 @@ namespace Mynt.Core.TradeManagers
                 : freeTrader.CurrentBalance;
 
             // The amount here is an indication and will probably not be precisely what you get.
-            var openRate = GetTargetBid(await _api.GetTicker(pair));
+            var ticker = await _api.GetTicker(pair);
+            var openRate = GetTargetBid(ticker);
             var amount = btcToSpend / openRate;
             var amountYouGet = (btcToSpend * (1 - Constants.TransactionFeePercentage)) / openRate;
 
             // Get the order ID, this is the most important because we need this to check
             // up on our trade. We update the data below later when the final data is present.
             var orderId = await _api.Buy(pair, amount, openRate);
+
+            await SendNotification($"Buying {pair} at {openRate:0.0000000 BTC} which was spotted at bid: {ticker.Bid:0.00000000}, " +
+                                   $"ask: {ticker.Ask:0.00000000}, " +
+                                   $"ask: {ticker.Last:0.00000000}, " +
+                                   $"({amountYouGet:0.0000} units).");
 
             return new Trade()
             {
@@ -376,10 +381,17 @@ namespace Mynt.Core.TradeManagers
         /// <returns></returns>
         private double GetTargetBid(Ticker tick)
         {
-            // If the ask is below the last, we can get it on the cheap.
-            if (tick.Ask < tick.Last) return tick.Ask;
+            if (Constants.BuyInPriceStrategy == BuyInPriceStrategy.AskLastBalance)
+            {
+                // If the ask is below the last, we can get it on the cheap.
+                if (tick.Ask < tick.Last) return tick.Ask;
 
-            return tick.Ask + Constants.AskLastBalance * (tick.Last - tick.Ask);
+                return tick.Ask + Constants.AskLastBalance * (tick.Last - tick.Ask);
+            }
+            else
+            {
+                return Math.Round(tick.Bid * (1 - Constants.BuyInPricePercentage), 8);
+            }
         }
 
         #endregion
@@ -440,7 +452,7 @@ namespace Mynt.Core.TradeManagers
 
                     _orderBatch.Add(TableOperation.Replace(trade));
 
-                    await SendNotification($"Buy order hit for {trade.Market} at {trade.OpenRate:0.00000000}.");
+                    await SendNotification($"Buy order filled for {trade.Market} at {trade.OpenRate:0.00000000}.");
                 }
             }
 
@@ -515,6 +527,18 @@ namespace Mynt.Core.TradeManagers
                 return SellType.StopLoss;
             }
 
+            // Check if time matches and current rate is above threshold
+            foreach (var item in Constants.ReturnOnInvestment)
+            {
+                var timeDiff = (utcNow - trade.OpenDate).TotalSeconds / 60;
+
+                if (timeDiff > item.Duration && currentProfit > item.Profit)
+                {
+                    _log($"Timer hit: {timeDiff} mins, profit {item.Profit:0.00}%");
+                    return SellType.Timed;
+                }
+            }
+
             // Only run this when we're past our starting percentage for trailing stop.
             if (Constants.EnableTrailingStop)
             {
@@ -535,18 +559,6 @@ namespace Mynt.Core.TradeManagers
                 }
 
                 return SellType.None;
-            }
-
-            // Check if time matches and current rate is above threshold
-            foreach (var item in Constants.ReturnOnInvestment)
-            {
-                var timeDiff = (utcNow - trade.OpenDate).TotalSeconds / 60;
-
-                if (timeDiff > item.Duration && currentProfit > item.Profit)
-                {
-                    _log($"Timer hit: {timeDiff} mins, profit {item.Profit:0.00}%");
-                    return SellType.Timed;
-                }
             }
 
             return SellType.None;
