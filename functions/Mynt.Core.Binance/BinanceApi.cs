@@ -204,19 +204,6 @@ namespace Mynt.Core.Binance
             await _client.CancelOrderAsync(market, longId);
         }
 
-        public async Task<BinanceSymbol> GetSymbolInfo(string symbol)
-        {
-            if (_exchangeInfo == null)
-            {
-                var result = await _client.GetExchangeInfoAsync();
-                if (!result.Success) throw new Exception(result.Error.Message);
-                _exchangeInfo = result.Data;
-            }
-
-            return _exchangeInfo.Symbols.FirstOrDefault(x => x.SymbolName == symbol);
-        }
-
-
         public async Task<OrderBook> GetOrderBook(string symbol)
         {
             var result = await _client.GetOrderBookAsync(symbol, 1000);
