@@ -484,6 +484,12 @@ namespace Mynt.Core.TradeManagers
 
                     await SendNotification($"Going to sell {trade.Market} at {trade.CloseRate:0.00000000}.");
                 }
+                else if (sellType == SellType.TrailingStopLossUpdated)
+                {
+                    // Update the stop loss for this trade, which was set in ShouldSell.
+                    _log($"Updated the trailing stop loss for {trade.Market} to {trade.StopLossRate.Value:0.00000000}");
+                    _orderBatch.Add(TableOperation.Replace(trade));
+                }
             }
 
             if (_orderBatch.Count > 0) await _orderTable.ExecuteBatchAsync(_orderBatch);
@@ -505,8 +511,30 @@ namespace Mynt.Core.TradeManagers
             // Let's not do a stoploss for now...
             if (currentProfit < Constants.StopLossPercentage)
             {
-                _log($"Stop loss hit: {Constants.StopLossPercentage}");
+                _log($"Stop loss hit: {Constants.StopLossPercentage}%");
                 return SellType.StopLoss;
+            }
+
+            // Only run this when we're past our starting percentage for trailing stop.
+            if (Constants.EnableTrailingStop)
+            {
+                // If the current rate is below our current stoploss percentage, close the trade.
+                if (trade.StopLossRate.HasValue && currentRateBid < trade.StopLossRate.Value)
+                    return SellType.TrailingStopLoss;
+
+                // The new stop would be at a specific percentage above our starting point.
+                var newStopRate = trade.OpenRate * (1 + (currentProfit - Constants.TrailingStopPercentage));
+
+                // Only update the trailing stop when its above our starting percentage and higher than the previous one.
+                if (currentProfit > Constants.TrailingStopStartingPercentage && (trade.StopLossRate < newStopRate || !trade.StopLossRate.HasValue))
+                {
+                    // The current profit percentage is high enough to create the trailing stop value.
+                    trade.StopLossRate = newStopRate;
+
+                    return SellType.TrailingStopLossUpdated;
+                }
+
+                return SellType.None;
             }
 
             // Check if time matches and current rate is above threshold

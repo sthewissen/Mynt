@@ -35,9 +35,9 @@ namespace Mynt.Core
         public const double ImmediatelyPlaceSellOrderAtProfit = 0.02;
 
         // Use a trailing stop to lock in your profits.
-        public const bool EnableTrailingStop = false;
+        public const bool EnableTrailingStop = true;
         public const double TrailingStopStartingPercentage = 0.05;
-        public const double TrailingStopPercentage = 0.05;
+        public const double TrailingStopPercentage = 0.02;
 
         // If set to true, orders that have not been bought for an entire cycle of the BuyTimer
         // are cancelled. This frees up a trader to look for other opportunities.

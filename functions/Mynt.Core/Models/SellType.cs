@@ -10,7 +10,8 @@ namespace Mynt.Core.Models
     {
         None,
         StopLoss,
-        StopLossAnchor,
+        TrailingStopLoss,
+        TrailingStopLossUpdated,
         Timed,
         Immediate,
         Strategy,
