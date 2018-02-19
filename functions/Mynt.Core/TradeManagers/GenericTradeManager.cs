@@ -405,7 +405,6 @@ namespace Mynt.Core.TradeManagers
         /// <summary>
         /// Updates the buy orders by checking with the exchange what status they are currently.
         /// </summary>
-        /// <param name="activeTrades"></param>
         /// <returns></returns>
         private async Task UpdateOpenBuyOrders()
         {
