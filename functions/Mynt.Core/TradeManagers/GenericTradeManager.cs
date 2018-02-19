@@ -310,7 +310,7 @@ namespace Mynt.Core.TradeManagers
 
             await SendNotification($"Buying {pair} at {openRate:0.0000000 BTC} which was spotted at bid: {ticker.Bid:0.00000000}, " +
                                    $"ask: {ticker.Ask:0.00000000}, " +
-                                   $"ask: {ticker.Last:0.00000000}, " +
+                                   $"last: {ticker.Last:0.00000000}, " +
                                    $"({amountYouGet:0.0000} units).");
 
             return new Trade()
