@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Mynt.Core.Enums;
 
 namespace Mynt.Core
 {
