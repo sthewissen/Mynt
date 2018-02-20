@@ -373,16 +373,6 @@ namespace Mynt.BackTester
             if (currentProfit < stopLossPercentage)
                 return SellType.StopLoss;
 
-            if (currentProfit < trade.StopLossAnchor)
-                return SellType.StopLossAnchor;
-
-            // Set a stop loss anchor to minimize losses.
-            foreach (var item in stopLossAnchors)
-            {
-                if (currentProfit > item)
-                    trade.StopLossAnchor = item - 0.01;
-            }
-
             // Check if time matches and current rate is above threshold
             foreach (var item in returnOnInvestment)
             {
