@@ -1,44 +1,47 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Mynt.Core.Enums;
 using Mynt.Core.Indicators;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
 
 namespace Mynt.Core.Strategies
 {
-    public class SmaCrossover : ITradingStrategy
+    public class SmaCrossover : BaseStrategy
     {
-        public string Name => "SMA Crossover";
-        public List<Candle> Candles { get; set; }
+        public override string Name => "SMA Crossover";
+        public override int MinimumAmountOfCandles => 26;
+        public override Period IdealPeriod => Period.Hour;
 
-        public SmaCrossover()
+        public override List<ITradeAdvice> Prepare(List<Candle> candles)
         {
-            this.Candles = new List<Candle>();
-        }
-
-        public List<int> Prepare()
-        {
-            var result = new List<int>();
-
-            var sma12 = Candles.Sma(12);
-            var sma26 = Candles.Sma(26);
-
-            for (int i = 0; i < Candles.Count; i++)
             {
-                // Since we look back 1 candle, the first candle can never be a signal.
-                if (i == 0)
-                    result.Add(0);
-                // When the fast SMA moves above the slow SMA, we have a positive cross-over
-                else if (sma12[i] < sma26[i] && sma12[i - 1] > sma26[i])
-                    result.Add(1);
-                // When the slow SMA moves above the fast SMA, we have a negative cross-over
-                else if (sma12[i] > sma26[i] && sma12[i - 1] < sma26[i])
-                    result.Add(-1);
-                else
-                    result.Add(0);
-            }
+                var result = new List<ITradeAdvice>();
 
-            return result;
+                var sma12 = candles.Sma(12);
+                var sma26 = candles.Sma(26);
+
+                for (int i = 0; i < candles.Count; i++)
+                {
+                    // Since we look back 1 candle, the first candle can never be a signal.
+                    if (i == 0)
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
+                    // When the fast SMA moves above the slow SMA, we have a positive cross-over
+                    else if (sma12[i] < sma26[i] && sma12[i - 1] > sma26[i])
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Buy));
+                    // When the slow SMA moves above the fast SMA, we have a negative cross-over
+                    else if (sma12[i] > sma26[i] && sma12[i - 1] < sma26[i])
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Sell));
+                    else
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
+                }
+
+                return result;
+            }
+        }
+        public override ITradeAdvice Forecast(List<Candle> candles)
+        {
+            return Prepare(candles).LastOrDefault();
         }
     }
 }

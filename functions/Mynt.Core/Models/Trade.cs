@@ -5,6 +5,8 @@ namespace Mynt.Core.Models
 {
     public class Trade : TableEntity
     {
+        public string TraderId { get; set; }
+
         public string Market { get; set; }
 
         public double OpenRate { get; set; }
@@ -16,6 +18,8 @@ namespace Mynt.Core.Models
         public double Quantity { get; set; }
 
         public bool IsOpen { get; set; }
+        public bool IsBuying { get; set; }
+        public bool IsSelling { get; set; }
 
         public string OpenOrderId { get; set; }
         public string BuyOrderId { get; set; }
@@ -25,7 +29,7 @@ namespace Mynt.Core.Models
         public DateTime? CloseDate { get; set; }
 
         public string StrategyUsed { get; set; }
-        public double? StopLossAnchor { get; set; }
+        public double? StopLossRate { get; set; }
         public SellType SellType { get; set; }
 
         public Trade()

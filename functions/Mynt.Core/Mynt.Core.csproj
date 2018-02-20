@@ -32,6 +32,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.AspNetCore.WebUtilities, Version=1.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNetCore.WebUtilities.1.0.0\lib\net451\Microsoft.AspNetCore.WebUtilities.dll</HintPath>
     </Reference>
@@ -59,8 +62,8 @@
     <Reference Include="Microsoft.WindowsAzure.Storage, Version=8.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\WindowsAzure.Storage.8.5.0\lib\net45\Microsoft.WindowsAzure.Storage.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Refit, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\refit.3.0.1\lib\net46\Refit.dll</HintPath>
@@ -121,8 +124,9 @@
       <HintPath>..\packages\System.IO.FileSystem.Primitives.4.3.0\lib\net46\System.IO.FileSystem.Primitives.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="System.Net.Http, Version=4.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Net.Http.4.1.0\lib\net46\System.Net.Http.dll</HintPath>
+    <Reference Include="System.Net.Http, Version=4.1.1.2, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Net.Http.4.3.3\lib\net46\System.Net.Http.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System.Net.Sockets, Version=4.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Net.Sockets.4.1.0\lib\net46\System.Net.Sockets.dll</HintPath>
@@ -217,27 +221,19 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Api\Bittrex\BittrexApi.cs" />
-    <Compile Include="Api\Bittrex\BittrexClient.cs" />
-    <Compile Include="Api\Bittrex\Extensions.cs" />
-    <Compile Include="Api\Bittrex\Models\AccountBalance.cs" />
-    <Compile Include="Api\Bittrex\Models\ApiResult.cs" />
-    <Compile Include="Api\Bittrex\Models\BookOrder.cs" />
-    <Compile Include="Api\Bittrex\Models\Candle.cs" />
-    <Compile Include="Api\Bittrex\Models\Period.cs" />
-    <Compile Include="Api\Bittrex\Models\CryptoCurrency.cs" />
-    <Compile Include="Api\Bittrex\Models\DepositAddress.cs" />
-    <Compile Include="Api\Bittrex\Models\HistoricAccountOrder.cs" />
-    <Compile Include="Api\Bittrex\Models\HistoricTrade.cs" />
-    <Compile Include="Api\Bittrex\Models\Market.cs" />
-    <Compile Include="Api\Bittrex\Models\MarketSummary.cs" />
-    <Compile Include="Api\Bittrex\Models\OpenOrder.cs" />
-    <Compile Include="Api\Bittrex\Models\OrderResult.cs" />
-    <Compile Include="Api\Bittrex\Models\Ticker.cs" />
     <Compile Include="Api\BlockChain\BlockChainApi.cs" />
     <Compile Include="Api\BlockChain\IBlockChainApi.cs" />
     <Compile Include="Api\BlockChain\Models\Prices.cs" />
+    <Compile Include="Api\IExchangeApi.cs" />
+    <Compile Include="Configuration.cs" />
     <Compile Include="Constants.cs" />
+    <Compile Include="Enums\BuyInPriceStrategy.cs" />
+    <Compile Include="Enums\OrderSide.cs" />
+    <Compile Include="Enums\EnumExtensions.cs" />
+    <Compile Include="Enums\OrderStatus.cs" />
+    <Compile Include="Enums\OrderType.cs" />
+    <Compile Include="Enums\TimeInForce.cs" />
+    <Compile Include="Enums\TradeAdvice.cs" />
     <Compile Include="Extensions\DateTimeExtensions.cs" />
     <Compile Include="Indicators\DerivativeOscillator.cs" />
     <Compile Include="Indicators\Cmo.cs" />
@@ -264,71 +260,53 @@
     <Compile Include="Indicators\StochRsi.cs" />
     <Compile Include="Indicators\Tema.cs" />
     <Compile Include="Interfaces\INotificationManager.cs" />
+    <Compile Include="Interfaces\ITradingStrategyProvider.cs" />
     <Compile Include="Managers\ConnectionManager.cs" />
-    <Compile Include="NotificationManagers\NotificationManager.cs" />
-    <Compile Include="NotificationManagers\PushNotificationManager.cs" />
+    <Compile Include="Models\AccountBalance.cs" />
+    <Compile Include="Models\CreditPosition.cs" />
+    <Compile Include="Models\CurrencyPair.cs" />
+    <Compile Include="Models\ITradeAdvice.cs" />
+    <Compile Include="Models\MarketSummary.cs" />
+    <Compile Include="Models\OpenOrder.cs" />
+    <Compile Include="Models\Order.cs" />
+    <Compile Include="Models\SimpleTradeAdvice.cs" />
+    <Compile Include="Models\Ticker.cs" />
+    <Compile Include="Models\TimestampedTradeAdvice.cs" />
+    <Compile Include="Models\Trader.cs" />
+    <Compile Include="NotificationManagers\DiscordNotificationManager.cs" />
     <Compile Include="NotificationManagers\SlackNotificationManager.cs" />
-    <Compile Include="Models\Balance.cs" />
     <Compile Include="Models\Candle.cs" />
     <Compile Include="Models\CandleVariable.cs" />
     <Compile Include="Models\MarketData.cs" />
-    <Compile Include="Models\Period.cs" />
+    <Compile Include="Enums\Period.cs" />
     <Compile Include="Models\ProfitType.cs" />
     <Compile Include="Models\SellType.cs" />
     <Compile Include="Models\Trade.cs" />
     <Compile Include="Models\Opportunity.cs" />
+    <Compile Include="NotificationManagers\TelegramNotificationManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Strategies\AdxMomentum.cs" />
-    <Compile Include="Strategies\AdxSmas.cs" />
-    <Compile Include="Strategies\AwesomeMacd.cs" />
-    <Compile Include="Strategies\AwesomeSma.cs" />
-    <Compile Include="Strategies\Base150.cs" />
-    <Compile Include="Strategies\BbandRsi.cs" />
+    <Compile Include="Settings.cs" />
+    <Compile Include="Strategies\BaseStrategy.cs" />
     <Compile Include="Strategies\BigThree.cs" />
-    <Compile Include="Strategies\BreakoutMa.cs" />
-    <Compile Include="Strategies\CciEma.cs" />
-    <Compile Include="Strategies\CciRsi.cs" />
-    <Compile Include="Strategies\CciScalper.cs" />
-    <Compile Include="Strategies\DerivativeOscillator.cs" />
-    <Compile Include="Strategies\DoubleVolatility.cs" />
-    <Compile Include="Strategies\EmaAdx.cs" />
-    <Compile Include="Strategies\EmaAdxF.cs" />
-    <Compile Include="Strategies\EmaAdxMacd.cs" />
-    <Compile Include="Strategies\EmaAdxSmall.cs" />
-    <Compile Include="Strategies\EmaCross.cs" />
-    <Compile Include="Strategies\EmaStochRsi.cs" />
-    <Compile Include="Strategies\FaMaMaMa.cs" />
-    <Compile Include="Strategies\FifthElement.cs" />
-    <Compile Include="Strategies\FisherTransform.cs" />
-    <Compile Include="Strategies\FreqTrade.cs" />
+    <Compile Include="Strategies\BollingerAwe.cs" />
+    <Compile Include="Strategies\BuyAndHold.cs" />
     <Compile Include="Interfaces\ITradingStrategy.cs" />
-    <Compile Include="Strategies\Fractals.cs" />
-    <Compile Include="Strategies\MacdSma.cs" />
-    <Compile Include="Strategies\MacdTema.cs" />
-    <Compile Include="Strategies\Momentum.cs" />
-    <Compile Include="Strategies\PowerRanger.cs" />
-    <Compile Include="Strategies\RsiMacd.cs" />
-    <Compile Include="Strategies\RsiMacdAwesome.cs" />
-    <Compile Include="Strategies\RsiMacdMfi.cs" />
-    <Compile Include="Strategies\RsiSarAwesome.cs" />
-    <Compile Include="Strategies\SarAwesome.cs" />
-    <Compile Include="Strategies\SarRsi.cs" />
-    <Compile Include="Strategies\SarStoch.cs" />
-    <Compile Include="Strategies\SimpleBearBull.cs" />
-    <Compile Include="Strategies\SmaSar.cs" />
-    <Compile Include="Strategies\SmaStochRsi.cs" />
-    <Compile Include="Strategies\StochAdx.cs" />
-    <Compile Include="Strategies\ThreeMAgos.cs" />
-    <Compile Include="Strategies\RsiBbands.cs" />
-    <Compile Include="Strategies\TripleMa.cs" />
-    <Compile Include="Strategies\Wvf.cs" />
-    <Compile Include="TradeManagers\BittrexTradeManager.cs" />
-    <Compile Include="Interfaces\ITradeManager.cs" />
     <Compile Include="Strategies\SmaCrossover.cs" />
+    <Compile Include="Strategies\TheScalper.cs" />
+    <Compile Include="Providers\CoreTradingStrategyProvider.cs" />
+    <Compile Include="Strategies\Wvf.cs" />
+    <Compile Include="Interfaces\ITradeManager.cs" />
     <Compile Include="Strategies\WvfExtended.cs" />
+    <Compile Include="TradeManagers\GenericTradeManager.cs" />
+    <Compile Include="Models\OrderBook.cs" />
+    <Compile Include="Models\OrderBookEntry.cs" />
+    <Compile Include="TradeManagers\PortfolioLedger.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="log4net.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

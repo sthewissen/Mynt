@@ -1,69 +1,67 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Mynt.Core.Enums;
 using Mynt.Core.Indicators;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
 
 namespace Mynt.Core.Strategies
 {
-    public class BigThree : ITradingStrategy
+    public class BigThree : BaseStrategy
     {
-        public string Name => "Big Three";
+        public override string Name => "Big Three";
+        public override int MinimumAmountOfCandles => 100;
+        public override Period IdealPeriod => Period.Hour;
 
-        public List<Candle> Candles { get; set; }
-
-        public BigThree()
+        public override List<ITradeAdvice> Prepare(List<Candle> candles)
         {
-            this.Candles = new List<Candle>();
-        }
-
-        public List<int> Prepare()
-        {
-            var result = new List<int>();
+            var result = new List<ITradeAdvice>();
             
-            var sma20 = Candles.Sma(20);
-            var sma40 = Candles.Sma(40);
-            var sma80 = Candles.Sma(80);
+            var sma20 = candles.Sma(20);
+            var sma40 = candles.Sma(40);
+            var sma80 = candles.Sma(80);
             
-            for (int i = 0; i < Candles.Count; i++)
+            for (int i = 0; i < candles.Count; i++)
             {
                 if (i < 2)
                 {
-                    result.Add(0);
+                    result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
                 }
                 else
                 {
-                    var lastIsGreen = Candles[i].Close > Candles[i].Open;
-                    var previousIsRed = Candles[i - 1].Close < Candles[i - 1].Open;
-                    var beforeIsGreen = Candles[i - 2].Close > Candles[i - 2].Open;
+                    var lastIsGreen = candles[i].Close > candles[i].Open;
+                    var previousIsRed = candles[i - 1].Close < candles[i - 1].Open;
+                    var beforeIsGreen = candles[i - 2].Close > candles[i - 2].Open;
 
                     var highestSma = new List<double?> { sma20[i], sma40[i], sma80[i] }.Max();
 
-                    var lastAboveSma = Candles[i].Close > highestSma && Candles[i].High > highestSma &&
-                                       Candles[i].Low > highestSma && Candles[i].Open > highestSma;
+                    var lastAboveSma = candles[i].Close > highestSma && candles[i].High > highestSma &&
+                                       candles[i].Low > highestSma && candles[i].Open > highestSma;
 
-                    var previousAboveSma = Candles[i - 1].Close > highestSma && Candles[i - 1].High > highestSma &&
-                                       Candles[i - 1].Low > highestSma && Candles[i - 1].Open > highestSma;
+                    var previousAboveSma = candles[i - 1].Close > highestSma && candles[i - 1].High > highestSma &&
+                                       candles[i - 1].Low > highestSma && candles[i - 1].Open > highestSma;
 
-                    var beforeAboveSma = Candles[i - 2].Close > highestSma && Candles[i - 2].High > highestSma &&
-                                       Candles[i - 2].Low > highestSma && Candles[i - 2].Open > highestSma;
+                    var beforeAboveSma = candles[i - 2].Close > highestSma && candles[i - 2].High > highestSma &&
+                                       candles[i - 2].Low > highestSma && candles[i - 2].Open > highestSma;
 
                     var allAboveSma = lastAboveSma && previousAboveSma && beforeAboveSma;
-                    var hitsAnSma = (sma80[i] < Candles[i].High && sma80[i] > Candles[i].Low);
+                    var hitsAnSma = (sma80[i] < candles[i].High && sma80[i] > candles[i].Low);
 
                     if (lastIsGreen && previousIsRed && beforeIsGreen && allAboveSma && sma20[i] > sma40[i] && sma20[i] > sma80[i])
-                        result.Add(1);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Buy));
                     else if (hitsAnSma)
-                        result.Add(-1);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Sell));
                     else
-                        result.Add(0);
+                        result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
                 }
             }
 
             return result;
+        }
+
+        public override ITradeAdvice Forecast(List<Candle> candles)
+        {
+            return Prepare(candles).LastOrDefault();
         }
     }
 }
