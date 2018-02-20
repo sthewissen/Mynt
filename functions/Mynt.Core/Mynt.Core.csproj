@@ -273,6 +273,7 @@
     <Compile Include="Models\Ticker.cs" />
     <Compile Include="Models\TimestampedTradeAdvice.cs" />
     <Compile Include="Models\Trader.cs" />
+    <Compile Include="Models\TradeSignal.cs" />
     <Compile Include="NotificationManagers\DiscordNotificationManager.cs" />
     <Compile Include="NotificationManagers\SlackNotificationManager.cs" />
     <Compile Include="Models\Candle.cs" />
@@ -288,6 +289,7 @@
     <Compile Include="Settings.cs" />
     <Compile Include="Strategies\BaseStrategy.cs" />
     <Compile Include="Strategies\BigThree.cs" />
+    <Compile Include="Strategies\Engulfing.cs" />
     <Compile Include="Strategies\BollingerAwe.cs" />
     <Compile Include="Strategies\BuyAndHold.cs" />
     <Compile Include="Interfaces\ITradingStrategy.cs" />

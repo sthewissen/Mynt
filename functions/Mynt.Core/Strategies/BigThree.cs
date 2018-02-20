@@ -59,6 +59,11 @@ namespace Mynt.Core.Strategies
             return result;
         }
 
+        public override Candle GetSignalCandle(List<Candle> candles)
+        {
+            return candles.Last();
+        }
+
         public override ITradeAdvice Forecast(List<Candle> candles)
         {
             return Prepare(candles).LastOrDefault();

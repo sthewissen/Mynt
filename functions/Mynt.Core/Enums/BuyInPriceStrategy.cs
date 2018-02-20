@@ -9,6 +9,7 @@ namespace Mynt.Core.Enums
     public enum BuyInPriceStrategy
     {
         AskLastBalance,
-        PercentageBelowBid
+        PercentageBelowBid,
+        MatchCurrentBid
     }
 }
