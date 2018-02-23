@@ -311,7 +311,7 @@ namespace Mynt.Core.TradeManagers
             // up on our trade. We update the data below later when the final data is present.
             var orderId = await _api.Buy(pair, amount, openRate);
 
-            await SendNotification($"Buying {pair} at {openRate:0.0000000 BTC} which was spotted at bid: {ticker.Bid:0.00000000}, " +
+            await SendNotification($"Buying {pair} at ±{openRate:0.0000000 BTC} which was spotted at bid: {ticker.Bid:0.00000000}, " +
                                    $"ask: {ticker.Ask:0.00000000}, " +
                                    $"last: {ticker.Last:0.00000000}, " +
                                    $"({amountYouGet:0.0000} units).");
@@ -337,6 +337,7 @@ namespace Mynt.Core.TradeManagers
             if (Constants.PlaceFirstStopAtSignalCandleLow)
             {
                 trade.StopLossRate = signalCandle.Low;
+                _log($"Automatic stop set at signal candle low {signalCandle.Low:0.00000000}");
             }
 
             return trade;
@@ -362,18 +363,24 @@ namespace Mynt.Core.TradeManagers
 
                 // Not enough candles to perform what we need to do.
                 if (candles.Count < _strategy.MinimumAmountOfCandles)
+                {
+                    _log($"Not enough candle data for {market}...");
                     return new TradeSignal
                     {
                         TradeAdvice = new SimpleTradeAdvice(TradeAdvice.Hold),
                         Pair = market
                     };
+                }
 
                 // Get the date for the last candle.
                 var signalDate = candles[candles.Count - 1].Timestamp;
 
                 // This is an outdated candle...
                 if (signalDate < _strategy.GetSignalDate())
+                {
+                    _log($"Outdated candle for {market}...");
                     return null;
+                }
 
                 // This calculates an advice for the next timestamp.
                 var advice = _strategy.Forecast(candles);
