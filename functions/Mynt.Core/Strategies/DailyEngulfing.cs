@@ -9,11 +9,11 @@ using Mynt.Core.Models;
 
 namespace Mynt.Core.Strategies
 {
-    public class Engulfing : BaseStrategy
+    public class DailyEngulfing : BaseStrategy
     {
-        public override string Name => "Engulfing";
+        public override string Name => "DailyEngulfing";
         public override int MinimumAmountOfCandles => 50;
-        public override Period IdealPeriod => Period.Hour;
+        public override Period IdealPeriod => Period.Day;
 
         public override List<ITradeAdvice> Prepare(List<Candle> candles)
         {
