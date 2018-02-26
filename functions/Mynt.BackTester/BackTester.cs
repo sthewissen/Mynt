@@ -606,7 +606,6 @@ namespace Mynt.BackTester
 
         public async System.Threading.Tasks.Task RefreshCandleData()
         {
-            DateTime startDate = DateTime.Now.AddMinutes(-5 * 6000);
             var period = Period.FiveMinutes;
 
             List<string> writtenFiles = new List<string>();
@@ -615,7 +614,7 @@ namespace Mynt.BackTester
             {
                 WriteColoredLine($"\tRefreshing {coinToBuy}", ConsoleColor.DarkGreen);
 
-                var candles = await exchangeApi.GetTickerHistory(coinToBuy, startDate, period);
+                var candles = await exchangeApi.GetTickerHistory(coinToBuy, period, 6000);
                 var jsonPath = GetJsonFilePath(coinToBuy);
 
                 if (File.Exists(jsonPath))

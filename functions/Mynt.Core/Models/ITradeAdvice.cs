@@ -10,5 +10,7 @@ namespace Mynt.Core.Models
     public interface ITradeAdvice
     {
         TradeAdvice TradeAdvice { get; }
+
+        double Price { get; }
     }
 }

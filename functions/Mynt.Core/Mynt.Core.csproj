@@ -235,6 +235,7 @@
     <Compile Include="Enums\TimeInForce.cs" />
     <Compile Include="Enums\TradeAdvice.cs" />
     <Compile Include="Extensions\DateTimeExtensions.cs" />
+    <Compile Include="Extensions\EnumExtensions.cs" />
     <Compile Include="Indicators\DerivativeOscillator.cs" />
     <Compile Include="Indicators\Cmo.cs" />
     <Compile Include="Indicators\Fisher.cs" />

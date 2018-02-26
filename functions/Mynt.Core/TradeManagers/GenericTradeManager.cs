@@ -356,7 +356,7 @@ namespace Mynt.Core.TradeManagers
 
                 var minimumDate = _strategy.GetMinimumDateTime();
                 var candleDate = _strategy.GetCurrentCandleDateTime();
-                var candles = await _api.GetTickerHistory(market, minimumDate, _strategy.IdealPeriod);
+                var candles = await _api.GetTickerHistory(market, _strategy.IdealPeriod, minimumDate);
 
                 // We eliminate all candles that aren't needed for the dataset incl. the last one (if it's the current running candle).
                 candles = candles.Where(x => x.Timestamp >= minimumDate && x.Timestamp < candleDate).ToList();
