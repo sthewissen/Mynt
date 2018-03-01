@@ -30,7 +30,7 @@ namespace Mynt.Core.Binance
                 AutoTimestamp = true
             };
 
-            this._isDryRunning = Constants.IsDryRunning;
+            this._isDryRunning = Settings.IsDryRunning;
         }
 
         #region IExchangeApi Implementations

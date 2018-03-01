@@ -35,8 +35,8 @@ namespace Mynt.Core.TradeManagers
         public async Task Initialize()
         {
             // First initialize a few things
-            _orderTable = await ConnectionManager.GetTableConnection(Constants.OrderTableName, Constants.IsDryRunning);
-            _traderTable = await ConnectionManager.GetTableConnection(Constants.TraderTableName, Constants.IsDryRunning);
+            _orderTable = await ConnectionManager.GetTableConnection(Constants.OrderTableName, Settings.IsDryRunning);
+            _traderTable = await ConnectionManager.GetTableConnection(Constants.TraderTableName, Settings.IsDryRunning);
 
             _activeTrades = _orderTable.CreateQuery<Trade>().Where(x => x.IsOpen).ToList();
             _currentTraders = _traderTable.CreateQuery<Trader>().ToList();
