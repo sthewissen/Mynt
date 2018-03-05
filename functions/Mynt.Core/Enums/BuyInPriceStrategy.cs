@@ -10,6 +10,7 @@ namespace Mynt.Core.Enums
     {
         AskLastBalance,
         PercentageBelowBid,
-        MatchCurrentBid
+        MatchCurrentBid,
+        SignalCandleClose
     }
 }

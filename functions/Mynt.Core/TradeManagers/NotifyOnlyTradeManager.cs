@@ -40,8 +40,9 @@ namespace Mynt.Core.TradeManagers
                     // Depending on what we have more of we create trades.
                     // The amount here is an indication and will probably not be precisely what you get.
                     var ticker = await _api.GetTicker(trade.Pair);
-                    var openRate = GetTargetBid(ticker);
-                    
+                    var openRate = GetTargetBid(ticker, trade.SignalCandle);
+                    var stop = openRate * (1 + Constants.StopLossPercentage);
+
                     // Get the order ID, this is the most important because we need this to check
                     // up on our trade. We update the data below later when the final data is present.
                     await SendNotification($"{_strategy.Name}: Buy some {trade.Pair} at {openRate:0.0000000 BTC}.");
@@ -148,9 +149,8 @@ namespace Mynt.Core.TradeManagers
         /// <summary>
         /// Calculates bid target between current ask price and last price.
         /// </summary>
-        /// <param name="tick"></param>
         /// <returns></returns>
-        private double GetTargetBid(Ticker tick)
+        private double GetTargetBid(Ticker tick, Candle signalCandle)
         {
             if (Constants.BuyInPriceStrategy == BuyInPriceStrategy.AskLastBalance)
             {
@@ -158,6 +158,10 @@ namespace Mynt.Core.TradeManagers
                 if (tick.Ask < tick.Last) return tick.Ask;
 
                 return tick.Ask + Constants.AskLastBalance * (tick.Last - tick.Ask);
+            }
+            else if (Constants.BuyInPriceStrategy == BuyInPriceStrategy.SignalCandleClose)
+            {
+                return signalCandle.Close;
             }
             else if (Constants.BuyInPriceStrategy == BuyInPriceStrategy.MatchCurrentBid)
             {
@@ -167,6 +171,11 @@ namespace Mynt.Core.TradeManagers
             {
                 return Math.Round(tick.Bid * (1 - Constants.BuyInPricePercentage), 8);
             }
+        }
+
+        public async Task UpdateRunningTrades()
+        {
+            await Task.FromResult(true);
         }
 
         private async Task SendNotification(string message)

@@ -303,7 +303,7 @@ namespace Mynt.Core.TradeManagers
 
             // The amount here is an indication and will probably not be precisely what you get.
             var ticker = await _api.GetTicker(pair);
-            var openRate = GetTargetBid(ticker);
+            var openRate = GetTargetBid(ticker, signalCandle);
             var amount = btcToSpend / openRate;
             var amountYouGet = (btcToSpend * (1 - Constants.TransactionFeePercentage)) / openRate;
 
@@ -311,7 +311,7 @@ namespace Mynt.Core.TradeManagers
             // up on our trade. We update the data below later when the final data is present.
             var orderId = await _api.Buy(pair, amount, openRate);
 
-            await SendNotification($"Buying {pair} at ±{openRate:0.0000000 BTC} which was spotted at bid: {ticker.Bid:0.00000000}, " +
+            await SendNotification($"Buying {pair} at ±{openRate:0.00000000 BTC} which was spotted at bid: {ticker.Bid:0.00000000}, " +
                                    $"ask: {ticker.Ask:0.00000000}, " +
                                    $"last: {ticker.Last:0.00000000}, " +
                                    $"({amountYouGet:0.0000} units).");
@@ -405,7 +405,7 @@ namespace Mynt.Core.TradeManagers
         /// </summary>
         /// <param name="tick"></param>
         /// <returns></returns>
-        private double GetTargetBid(Ticker tick)
+        private double GetTargetBid(Ticker tick, Candle signalCandle)
         {
             if (Constants.BuyInPriceStrategy == BuyInPriceStrategy.AskLastBalance)
             {
@@ -413,6 +413,10 @@ namespace Mynt.Core.TradeManagers
                 if (tick.Ask < tick.Last) return tick.Ask;
 
                 return tick.Ask + Constants.AskLastBalance * (tick.Last - tick.Ask);
+            }
+            else if (Constants.BuyInPriceStrategy == BuyInPriceStrategy.SignalCandleClose)
+            {
+                return signalCandle.Close;
             }
             else if (Constants.BuyInPriceStrategy == BuyInPriceStrategy.MatchCurrentBid)
             {

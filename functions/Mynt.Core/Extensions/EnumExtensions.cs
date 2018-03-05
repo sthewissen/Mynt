@@ -13,7 +13,7 @@ namespace Mynt.Core.Extensions
         {
             switch (period)
             {
-                case Core.Enums.Period.Minute:
+                case Period.Minute:
                     return 1;
                 case Period.FiveMinutes:
                     return 5;
