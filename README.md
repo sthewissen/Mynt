@@ -7,6 +7,12 @@ Finding this useful? Consider a donation!
 | BTC | 13myncc3ie6iGjSmJHCdzahwaKizX7NBB1 |
 | ETH | 0x4398c958468bEDB41DdEF4C297eB543c6d26f440 |
 
+---
+
+Want to have a chat? [Come find us on Slack!]
+
+<a href="https://join.slack.com/t/mynt-bot/signup"><img src="https://upload.wikimedia.org/wikipedia/commons/b/b9/Slack_Technologies_Logo.svg" alt="Join us on Slack!" width="100" /></a>
+
 # Mynt
 This is an Azure Functions-based cryptocurrency trading bot. It uses the following cloud components to function:
 
@@ -47,4 +53,5 @@ Feel like this bot is missing a feature? Pull requests are welcome! A few pointe
 - If you are unsure, discuss the feature in an issue before a PR.
 
    [Freqtrade]: <https://github.com/gcarq/freqtrade>
+   [Come find us on Slack!]: <https://join.slack.com/t/mynt-bot/signup>
    [one of my blogposts]: <https://www.thewissen.io/building-cryptocurrency-trading-bot-using-azure-part-1>
