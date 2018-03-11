@@ -53,5 +53,5 @@ Feel like this bot is missing a feature? Pull requests are welcome! A few pointe
 - If you are unsure, discuss the feature in an issue before a PR.
 
    [Freqtrade]: <https://github.com/gcarq/freqtrade>
-   [Come find us on Slack!]: <https://join.slack.com/t/mynt-bot/signup>
+   [Come find us on Slack!]: <https://join.slack.com/t/mynt-bot/shared_invite/enQtMzI3ODgzNTE1OTg3LTMyMGQyNTUxNTg2ODEwMjBjMDE0YzI5NDU3ZGI0MzVjMjBhYzBlNWE5MTMwMzIyZTViNmM2YTUxYzZhYjcyMTA>
    [one of my blogposts]: <https://www.thewissen.io/building-cryptocurrency-trading-bot-using-azure-part-1>
