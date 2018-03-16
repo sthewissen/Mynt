@@ -7,6 +7,7 @@ using Binance.Net.Objects;
 using Mynt.Core.Binance;
 using Mynt.Core.Enums;
 using System.Drawing;
+using Mynt.Core.Indicators;
 using Mynt.Core.Models;
 
 namespace Mynt.ResistanceSupportFinder
@@ -27,7 +28,7 @@ namespace Mynt.ResistanceSupportFinder
             var supDev = (decimal)5;
 
             var api = new BinanceApi();
-            var candles = await api.GetTickerHistory(market, DateTime.Now.AddDays(-500), Period.Day);
+            var candles = await api.GetTickerHistory(market, Period.Day, DateTime.Now.AddDays(-500));
             var validSupport = new List<SupportResistanceLevel>();
 
             var symbolInfo = await api.GetSymbolInfo(market);

@@ -13,16 +13,19 @@ namespace Mynt.Core.TradeManagers
     {
         private readonly IExchangeApi _api;
         private readonly INotificationManager _notification;
+        private readonly string _buyMessage;
+        private readonly string _sellMessage;
         private readonly ITradingStrategy _strategy;
         private readonly Action<string> _log;
 
-        public NotifyOnlyTradeManager(IExchangeApi api, ITradingStrategy strat, INotificationManager notificationManager,
-            Action<string> log)
+        public NotifyOnlyTradeManager(IExchangeApi api, ITradingStrategy strat, INotificationManager notificationManager, string buyMessage, string sellMessage, Action<string> log)
         {
             _api = api;
             _strategy = strat;
             _log = log;
             _notification = notificationManager;
+            _buyMessage = buyMessage;
+            _sellMessage = sellMessage;
         }
 
         /// <summary>
@@ -43,9 +46,14 @@ namespace Mynt.Core.TradeManagers
                     var openRate = GetTargetBid(ticker, trade.SignalCandle);
                     var stop = openRate * (1 + Constants.StopLossPercentage);
 
-                    // Get the order ID, this is the most important because we need this to check
-                    // up on our trade. We update the data below later when the final data is present.
-                    await SendNotification($"{_strategy.Name}: Buy some {trade.Pair} at {openRate:0.0000000 BTC}.");
+                    if (trade.TradeAdvice.TradeAdvice == TradeAdvice.Buy)
+                    {
+                        await SendNotification($"ℹ️ {_strategy.Name} - #{trade.Pair} at {openRate:0.00000000 BTC}\n" + _buyMessage);
+                    }
+                    else if (trade.TradeAdvice.TradeAdvice == TradeAdvice.Sell)
+                    {
+                        await SendNotification($"ℹ️ {_strategy.Name} - #{trade.Pair} at {openRate:0.00000000 BTC}\n" + _sellMessage);
+                    }
                 }
             }
             else
@@ -80,8 +88,7 @@ namespace Mynt.Core.TradeManagers
             {
                 var signal = await GetStrategySignal(market.MarketName);
 
-                // A match was made, buy that please!
-                if (signal != null && signal.TradeAdvice.TradeAdvice == TradeAdvice.Buy)
+                if (signal != null && signal.TradeAdvice.TradeAdvice != TradeAdvice.Hold)
                 {
                     pairs.Add(new TradeSignal()
                     {
@@ -138,7 +145,7 @@ namespace Mynt.Core.TradeManagers
                     SignalCandle = _strategy.GetSignalCandle(candles)
                 };
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 // Couldn't get a buy signal for this market, no problem. Let's skip it.
                 _log($"Couldn't get buy signal for {market}...");

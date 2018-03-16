@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
 using Mynt.Core.Binance;
+using Mynt.Core.NotificationManagers;
 using Mynt.Core.Strategies;
 using Mynt.Core.TradeManagers;
 
@@ -16,6 +17,12 @@ namespace Mynt.Functions
             try
             {
                 log.Info("Starting processing...");
+                
+                if (Core.Constants.ImmediatelyPlaceSellOrder && Core.Constants.EnableTrailingStop)
+                {
+                    log.Info("Can't have both ImmediatelyPlaceSellOrder and EnableTrailingStop enabled. Please disable one of them to continue...");
+                    return;
+                }
 
                 // Call the Bittrex Trade manager with the strategy of our choosing.
                 var manager = new GenericTradeManager(

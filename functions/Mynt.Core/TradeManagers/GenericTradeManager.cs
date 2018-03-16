@@ -260,6 +260,10 @@ namespace Mynt.Core.TradeManagers
                 Constants.AlwaysTradeList.Contains(x.CurrencyPair.BaseCurrency)) &&
                 x.CurrencyPair.QuoteCurrency.ToUpper() == "BTC").ToList();
 
+            // If there are items on the only trade list remove the rest
+            foreach (var item in Constants.OnlyTradeList)
+                markets.RemoveAll(x => x.CurrencyPair.BaseCurrency != item);
+
             // Remove existing trades from the list to check.
             foreach (var trade in _activeTrades)
                 markets.RemoveAll(x => x.MarketName == trade.Market);
@@ -390,7 +394,7 @@ namespace Mynt.Core.TradeManagers
                     TradeAdvice = advice,
                     Pair = market,
                     SignalCandle = _strategy.GetSignalCandle(candles)
-                }; 
+                };
             }
             catch (Exception)
             {
@@ -632,7 +636,7 @@ namespace Mynt.Core.TradeManagers
                     {
                         trader.IsBusy = false;
                         trader.CurrentBalance += order.CloseProfit.Value;
-                        trader.CurrentBalance = Math.Round(trader.CurrentBalance,8);
+                        trader.CurrentBalance = Math.Round(trader.CurrentBalance, 8);
                         trader.LastUpdated = DateTime.UtcNow;
                     }
 
