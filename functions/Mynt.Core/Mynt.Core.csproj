@@ -291,6 +291,7 @@
     <Compile Include="Settings.cs" />
     <Compile Include="Strategies\BaseStrategy.cs" />
     <Compile Include="Strategies\BigThree.cs" />
+    <Compile Include="Strategies\CloudBreaker.cs" />
     <Compile Include="Strategies\QuickCrossover.cs" />
     <Compile Include="Strategies\DailyEngulfing.cs" />
     <Compile Include="Strategies\FourHourEngulfing.cs" />
@@ -302,6 +303,7 @@
     <Compile Include="Strategies\SmaCrossover.cs" />
     <Compile Include="Strategies\TheScalper.cs" />
     <Compile Include="Providers\CoreTradingStrategyProvider.cs" />
+    <Compile Include="Strategies\TripleM.cs" />
     <Compile Include="Strategies\Wvf.cs" />
     <Compile Include="Interfaces\ITradeManager.cs" />
     <Compile Include="Strategies\WvfExtended.cs" />
