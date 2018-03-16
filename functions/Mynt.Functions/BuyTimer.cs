@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
+using Mynt.Core;
 using Mynt.Core.Strategies;
 using Mynt.Core.TradeManagers;
 using Mynt.Core.Binance;
@@ -19,7 +20,8 @@ namespace Mynt.Functions
             {
                 log.Info("Starting processing...");
 
-                if (Core.Constants.ImmediatelyPlaceSellOrder && Core.Constants.EnableTrailingStop)
+                var settings = new Constants();
+                if (settings.ImmediatelyPlaceSellOrder && settings.EnableTrailingStop)
                 {
                     log.Info("Can't have both ImmediatelyPlaceSellOrder and EnableTrailingStop enabled. Please disable one of them to continue...");
                     return;
@@ -27,9 +29,10 @@ namespace Mynt.Functions
 
                 // Call the trade manager with the strategy of our choosing.
                 var manager = new GenericTradeManager(
-                    new BinanceApi(), 
+                    new BinanceApi(settings), 
                     new BollingerAwe(), 
-                    null, (a) => log.Info(a)
+                    null, (a) => log.Info(a),
+                    settings
                 );
 
                 // Call the process method to start processing the current situation.

@@ -20,17 +20,19 @@ namespace Mynt.Core.Binance
         private readonly BinanceClient _client;
         private readonly bool _isDryRunning;
         private BinanceExchangeInfo _exchangeInfo;
+        private readonly Constants _settings;
 
-        public BinanceApi()
+        public BinanceApi(Constants settings)
         {
+            _settings = settings;
             // Initialise the general client with config
-            _client = new BinanceClient(Settings.BinanceApiKey, Settings.BinanceApiSecret)
+            _client = new BinanceClient(_settings.BinanceApiKey, _settings.BinanceApiSecret)
             {
                 TradeRulesBehaviour = TradeRulesBehaviour.AutoComply,
                 AutoTimestamp = true
             };
 
-            this._isDryRunning = Settings.IsDryRunning;
+            this._isDryRunning = _settings.IsDryRunning;
         }
 
         #region IExchangeApi Implementations

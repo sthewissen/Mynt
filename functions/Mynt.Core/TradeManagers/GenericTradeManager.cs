@@ -23,20 +23,21 @@ namespace Mynt.Core.TradeManagers
         private List<Trader> _currentTraders;
         private TableBatchOperation _orderBatch;
         private TableBatchOperation _traderBatch;
-
-        public GenericTradeManager(IExchangeApi api, ITradingStrategy strat, INotificationManager notificationManager, Action<string> log)
+        private readonly Constants _settings;
+        public GenericTradeManager(IExchangeApi api, ITradingStrategy strat, INotificationManager notificationManager, Action<string> log, Constants settings)
         {
             _api = api;
             _strategy = strat;
             _log = log;
             _notification = notificationManager;
+            _settings = settings;
         }
 
         public async Task Initialize()
         {
             // First initialize a few things
-            _orderTable = await ConnectionManager.GetTableConnection(Constants.OrderTableName, Settings.IsDryRunning);
-            _traderTable = await ConnectionManager.GetTableConnection(Constants.TraderTableName, Settings.IsDryRunning);
+            _orderTable = await ConnectionManager.GetTableConnection(_settings.TableStorageConnectionString, _settings.OrderTableName, _settings.IsDryRunning);
+            _traderTable = await ConnectionManager.GetTableConnection(_settings.TableStorageConnectionString, _settings.TraderTableName, _settings.IsDryRunning);
 
             _activeTrades = _orderTable.CreateQuery<Trade>().Where(x => x.IsOpen).ToList();
             _currentTraders = _traderTable.CreateQuery<Trader>().ToList();
@@ -61,7 +62,7 @@ namespace Mynt.Core.TradeManagers
             await Initialize();
 
             // This means an order to buy has been open for an entire buy cycle.
-            if (Constants.CancelUnboughtOrdersEachCycle)
+            if (_settings.CancelUnboughtOrdersEachCycle)
                 await CancelUnboughtOrders();
 
             // Check active trades against our strategy.
@@ -109,14 +110,14 @@ namespace Mynt.Core.TradeManagers
         {
             var tableBatch = new TableBatchOperation();
 
-            for (var i = 0; i < Constants.MaxNumberOfConcurrentTrades; i++)
+            for (var i = 0; i < _settings.MaxNumberOfConcurrentTrades; i++)
             {
                 var newTrader = new Trader()
                 {
-                    CurrentBalance = Constants.AmountOfBtcToInvestPerTrader,
+                    CurrentBalance = _settings.AmountOfBtcToInvestPerTrader,
                     IsBusy = false,
                     LastUpdated = DateTime.UtcNow,
-                    StakeAmount = Constants.AmountOfBtcToInvestPerTrader,
+                    StakeAmount = _settings.AmountOfBtcToInvestPerTrader,
                     RowKey = Guid.NewGuid().ToString().Replace("-", string.Empty),
                     PartitionKey = "TRADER"
                 };
@@ -256,12 +257,12 @@ namespace Mynt.Core.TradeManagers
 
             // Check if there are markets matching our volume.
             markets = markets.Where(x =>
-                (x.BaseVolume > Constants.MinimumAmountOfVolume ||
-                Constants.AlwaysTradeList.Contains(x.CurrencyPair.BaseCurrency)) &&
+                (x.BaseVolume > _settings.MinimumAmountOfVolume ||
+                 _settings.AlwaysTradeList.Contains(x.CurrencyPair.BaseCurrency)) &&
                 x.CurrencyPair.QuoteCurrency.ToUpper() == "BTC").ToList();
 
             // If there are items on the only trade list remove the rest
-            foreach (var item in Constants.OnlyTradeList)
+            foreach (var item in _settings.OnlyTradeList)
                 markets.RemoveAll(x => x.CurrencyPair.BaseCurrency != item);
 
             // Remove existing trades from the list to check.
@@ -269,7 +270,7 @@ namespace Mynt.Core.TradeManagers
                 markets.RemoveAll(x => x.MarketName == trade.Market);
 
             // Remove items that are on our blacklist.
-            foreach (var market in Constants.MarketBlackList)
+            foreach (var market in _settings.MarketBlackList)
                 markets.RemoveAll(x => x.CurrencyPair.BaseCurrency == market);
 
             // Prioritize markets with high volume.
@@ -301,15 +302,15 @@ namespace Mynt.Core.TradeManagers
         private async Task<Trade> CreateBuyOrder(Trader freeTrader, string pair, Candle signalCandle)
         {
             // Take the amount to invest per trader OR the current balance for this trader.
-            var btcToSpend = freeTrader.CurrentBalance > Constants.AmountOfBtcToInvestPerTrader
-                ? Constants.AmountOfBtcToInvestPerTrader
+            var btcToSpend = freeTrader.CurrentBalance > _settings.AmountOfBtcToInvestPerTrader
+                ? _settings.AmountOfBtcToInvestPerTrader
                 : freeTrader.CurrentBalance;
 
             // The amount here is an indication and will probably not be precisely what you get.
             var ticker = await _api.GetTicker(pair);
             var openRate = GetTargetBid(ticker, signalCandle);
             var amount = btcToSpend / openRate;
-            var amountYouGet = (btcToSpend * (1 - Constants.TransactionFeePercentage)) / openRate;
+            var amountYouGet = (btcToSpend * (1 - _settings.TransactionFeePercentage)) / openRate;
 
             // Get the order ID, this is the most important because we need this to check
             // up on our trade. We update the data below later when the final data is present.
@@ -338,7 +339,7 @@ namespace Mynt.Core.TradeManagers
                 RowKey = $"MNT{(DateTime.MaxValue.Ticks - DateTime.UtcNow.Ticks):d19}"
             };
 
-            if (Constants.PlaceFirstStopAtSignalCandleLow)
+            if (_settings.PlaceFirstStopAtSignalCandleLow)
             {
                 trade.StopLossRate = signalCandle.Low;
                 _log($"Automatic stop set at signal candle low {signalCandle.Low:0.00000000}");
@@ -411,24 +412,24 @@ namespace Mynt.Core.TradeManagers
         /// <returns></returns>
         private double GetTargetBid(Ticker tick, Candle signalCandle)
         {
-            if (Constants.BuyInPriceStrategy == BuyInPriceStrategy.AskLastBalance)
+            if (_settings.BuyInPriceStrategy == BuyInPriceStrategy.AskLastBalance)
             {
                 // If the ask is below the last, we can get it on the cheap.
                 if (tick.Ask < tick.Last) return tick.Ask;
 
-                return tick.Ask + Constants.AskLastBalance * (tick.Last - tick.Ask);
+                return tick.Ask + _settings.AskLastBalance * (tick.Last - tick.Ask);
             }
-            else if (Constants.BuyInPriceStrategy == BuyInPriceStrategy.SignalCandleClose)
+            else if (_settings.BuyInPriceStrategy == BuyInPriceStrategy.SignalCandleClose)
             {
                 return signalCandle.Close;
             }
-            else if (Constants.BuyInPriceStrategy == BuyInPriceStrategy.MatchCurrentBid)
+            else if (_settings.BuyInPriceStrategy == BuyInPriceStrategy.MatchCurrentBid)
             {
                 return tick.Bid;
             }
             else
             {
-                return Math.Round(tick.Bid * (1 - Constants.BuyInPricePercentage), 8);
+                return Math.Round(tick.Bid * (1 - _settings.BuyInPricePercentage), 8);
             }
         }
 
@@ -476,9 +477,9 @@ namespace Mynt.Core.TradeManagers
                     trade.IsBuying = false;
 
                     // If this is enabled we place a sell order as soon as our buy order got filled.
-                    if (Constants.ImmediatelyPlaceSellOrder)
+                    if (_settings.ImmediatelyPlaceSellOrder)
                     {
-                        var sellPrice = Math.Round(trade.OpenRate * (1 + Constants.ImmediatelyPlaceSellOrderAtProfit), 8);
+                        var sellPrice = Math.Round(trade.OpenRate * (1 + _settings.ImmediatelyPlaceSellOrderAtProfit), 8);
                         var orderId = await _api.Sell(trade.Market, trade.Quantity, sellPrice);
 
                         trade.CloseRate = sellPrice;
@@ -559,14 +560,14 @@ namespace Mynt.Core.TradeManagers
             _log($"Should sell {trade.Market}? Profit: {(currentProfit * 100):0.00}%...");
 
             // Let's not do a stoploss for now...
-            if (currentProfit < Constants.StopLossPercentage)
+            if (currentProfit < _settings.StopLossPercentage)
             {
-                _log($"Stop loss hit: {Constants.StopLossPercentage}%");
+                _log($"Stop loss hit: {_settings.StopLossPercentage}%");
                 return SellType.StopLoss;
             }
 
             // Check if time matches and current rate is above threshold
-            foreach (var item in Constants.ReturnOnInvestment)
+            foreach (var item in _settings.ReturnOnInvestment)
             {
                 var timeDiff = (utcNow - trade.OpenDate).TotalSeconds / 60;
 
@@ -578,17 +579,17 @@ namespace Mynt.Core.TradeManagers
             }
 
             // Only run this when we're past our starting percentage for trailing stop.
-            if (Constants.EnableTrailingStop)
+            if (_settings.EnableTrailingStop)
             {
                 // If the current rate is below our current stoploss percentage, close the trade.
                 if (trade.StopLossRate.HasValue && currentRateBid < trade.StopLossRate.Value)
                     return SellType.TrailingStopLoss;
 
                 // The new stop would be at a specific percentage above our starting point.
-                var newStopRate = trade.OpenRate * (1 + (currentProfit - Constants.TrailingStopPercentage));
+                var newStopRate = trade.OpenRate * (1 + (currentProfit - _settings.TrailingStopPercentage));
 
                 // Only update the trailing stop when its above our starting percentage and higher than the previous one.
-                if (currentProfit > Constants.TrailingStopStartingPercentage && (trade.StopLossRate < newStopRate || !trade.StopLossRate.HasValue))
+                if (currentProfit > _settings.TrailingStopStartingPercentage && (trade.StopLossRate < newStopRate || !trade.StopLossRate.HasValue))
                 {
                     // The current profit percentage is high enough to create the trailing stop value.
                     trade.StopLossRate = newStopRate;
