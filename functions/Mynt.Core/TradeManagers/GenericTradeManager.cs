@@ -186,8 +186,10 @@ namespace Mynt.Core.TradeManagers
 
             // Do we even have enough funds to invest?
             if (currentBtcBalance.Available < freeTrader.CurrentBalance)
-                throw new Exception("Insufficient BTC funds to perform a trade.");
-
+            {
+                _log($"Insufficient BTC funds ({currentBtcBalance.Available}) to perform a {signal} trade. Skipping this trade.");
+                return;
+            }
             var order = await CreateBuyOrder(freeTrader, signal.Pair, signal.SignalCandle);
 
             // We found a trade and have set it all up!
