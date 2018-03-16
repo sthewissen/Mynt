@@ -14,11 +14,12 @@ namespace Mynt.Core.Bittrex
     {
         private BittrexClient _api;
         private readonly bool _dryRun;
-
-        public BittrexApi(bool dryrun = true)
+        private readonly Constants _settings;
+        public BittrexApi(Constants settings, bool dryrun = true)
         {
+            _settings = settings;
             _dryRun = dryrun;
-            _api = new BittrexClient(Constants.BittrexApiKey, Constants.BittrexApiSecret);
+            _api = new BittrexClient(_settings.BittrexApiKey, _settings.BittrexApiSecret);
             Task.Factory.StartNew(CheckMarketExistance);
         }
 
@@ -26,7 +27,7 @@ namespace Mynt.Core.Bittrex
         {
             var markets = await GetMarkets();
 
-            foreach (var market in Constants.MarketBlackList)
+            foreach (var market in _settings.MarketBlackList)
             {
                 if (!markets.Select(x => x.MarketName).Contains(market))
                     throw new Exception($"Pair {market} is not available at Bittrex");

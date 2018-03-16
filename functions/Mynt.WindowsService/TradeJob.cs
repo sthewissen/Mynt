@@ -27,8 +27,10 @@ namespace Mynt.WindowsService
         {
             log.Info($"Ready to shuffle your g0ldz!");
 
+            var settings = new Constants();
+
             // Call the Bittrex Trade manager with the strategy of our choosing.
-            var manager = new GenericTradeManager(new BittrexApi(), new BigThree(), null, (a) => log.Info(a));
+            var manager = new GenericTradeManager(new BittrexApi(settings), new BigThree(), null, (a) => log.Info(a), settings);
 
             // Call the process method to start processing the current situation.
             manager.CheckStrategySignals().GetAwaiter().GetResult();
