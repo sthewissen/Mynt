@@ -13,7 +13,9 @@ namespace Mynt.BackTester.Console
         {
             string coinsToBuyCsv = System.Configuration.ConfigurationManager.AppSettings["CoinsToBuy"];
 
-            var backTester = new BackTester(GetTradingStrategies(), new BittrexApi(true), new CsvDataStorage("DataStorage"), coinsToBuyCsv);
+            var settings = new Core.Constants();
+
+            var backTester = new BackTester(GetTradingStrategies(), new BittrexApi(settings, true), new CsvDataStorage("DataStorage"), coinsToBuyCsv);
             try
             {
                 backTester.WriteIntro();

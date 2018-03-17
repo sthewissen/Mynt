@@ -27,7 +27,9 @@ namespace Mynt.ResistanceSupportFinder
             var xDev = (decimal)2;
             var supDev = (decimal)5;
 
-            var api = new BinanceApi();
+            var settings = new Core.Constants();
+
+            var api = new BinanceApi(settings);
             var candles = await api.GetTickerHistory(market, Period.Day, DateTime.Now.AddDays(-500));
             var validSupport = new List<SupportResistanceLevel>();
 

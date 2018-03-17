@@ -17,8 +17,9 @@ namespace Mynt.Core.TradeManagers
         private readonly string _sellMessage;
         private readonly ITradingStrategy _strategy;
         private readonly Action<string> _log;
+        private readonly Constants _settings;
 
-        public NotifyOnlyTradeManager(IExchangeApi api, ITradingStrategy strat, INotificationManager notificationManager, string buyMessage, string sellMessage, Action<string> log)
+        public NotifyOnlyTradeManager(IExchangeApi api, ITradingStrategy strat, INotificationManager notificationManager, string buyMessage, string sellMessage, Action<string> log, Constants settings)
         {
             _api = api;
             _strategy = strat;
@@ -26,6 +27,7 @@ namespace Mynt.Core.TradeManagers
             _notification = notificationManager;
             _buyMessage = buyMessage;
             _sellMessage = sellMessage;
+            _settings = settings;
         }
 
         /// <summary>
@@ -44,7 +46,7 @@ namespace Mynt.Core.TradeManagers
                     // The amount here is an indication and will probably not be precisely what you get.
                     var ticker = await _api.GetTicker(trade.Pair);
                     var openRate = GetTargetBid(ticker, trade.SignalCandle);
-                    var stop = openRate * (1 + Constants.StopLossPercentage);
+                    var stop = openRate * (1 + _settings.StopLossPercentage);
 
                     if (trade.TradeAdvice.TradeAdvice == TradeAdvice.Buy)
                     {
@@ -75,12 +77,12 @@ namespace Mynt.Core.TradeManagers
 
             // Check if there are markets matching our volume.
             markets = markets.Where(x =>
-                (x.BaseVolume > Constants.MinimumAmountOfVolume ||
-                Constants.AlwaysTradeList.Contains(x.CurrencyPair.BaseCurrency)) &&
+                (x.BaseVolume > _settings.MinimumAmountOfVolume ||
+                 _settings.AlwaysTradeList.Contains(x.CurrencyPair.BaseCurrency)) &&
                 x.CurrencyPair.QuoteCurrency.ToUpper() == "BTC").ToList();
 
             // Remove items that are on our blacklist.
-            foreach (var market in Constants.MarketBlackList)
+            foreach (var market in _settings.MarketBlackList)
                 markets.RemoveAll(x => x.CurrencyPair.BaseCurrency == market);
 
             // Prioritize markets with high volume.
@@ -159,24 +161,24 @@ namespace Mynt.Core.TradeManagers
         /// <returns></returns>
         private double GetTargetBid(Ticker tick, Candle signalCandle)
         {
-            if (Constants.BuyInPriceStrategy == BuyInPriceStrategy.AskLastBalance)
+            if (_settings.BuyInPriceStrategy == BuyInPriceStrategy.AskLastBalance)
             {
                 // If the ask is below the last, we can get it on the cheap.
                 if (tick.Ask < tick.Last) return tick.Ask;
 
-                return tick.Ask + Constants.AskLastBalance * (tick.Last - tick.Ask);
+                return tick.Ask + _settings.AskLastBalance * (tick.Last - tick.Ask);
             }
-            else if (Constants.BuyInPriceStrategy == BuyInPriceStrategy.SignalCandleClose)
+            else if (_settings.BuyInPriceStrategy == BuyInPriceStrategy.SignalCandleClose)
             {
                 return signalCandle.Close;
             }
-            else if (Constants.BuyInPriceStrategy == BuyInPriceStrategy.MatchCurrentBid)
+            else if (_settings.BuyInPriceStrategy == BuyInPriceStrategy.MatchCurrentBid)
             {
                 return tick.Bid;
             }
             else
             {
-                return Math.Round(tick.Bid * (1 - Constants.BuyInPricePercentage), 8);
+                return Math.Round(tick.Bid * (1 - _settings.BuyInPricePercentage), 8);
             }
         }
 

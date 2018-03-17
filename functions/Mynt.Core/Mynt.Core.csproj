@@ -288,7 +288,6 @@
     <Compile Include="Models\Opportunity.cs" />
     <Compile Include="NotificationManagers\TelegramNotificationManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Settings.cs" />
     <Compile Include="Strategies\BaseStrategy.cs" />
     <Compile Include="Strategies\BigThree.cs" />
     <Compile Include="Strategies\CloudBreaker.cs" />
