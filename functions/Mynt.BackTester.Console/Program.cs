@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using Mynt.Core.Api;
+using Mynt.Core.Binance;
 using Mynt.Core.Bittrex;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Strategies;
@@ -14,8 +16,21 @@ namespace Mynt.BackTester.Console
             string coinsToBuyCsv = System.Configuration.ConfigurationManager.AppSettings["CoinsToBuy"];
 
             var settings = new Core.Constants();
+            settings.IsDryRunning = true;
 
-            var backTester = new BackTester(GetTradingStrategies(), new BittrexApi(settings, true), new CsvDataStorage("DataStorage"), coinsToBuyCsv);
+            IExchangeApi api;
+            // Use Bittrex if API Key provided
+            // or Binance if it's not (one of both should be set)
+            if (!String.IsNullOrEmpty(settings.BittrexApiKey))
+            {
+                api = new BittrexApi(settings, true);
+            }
+            else
+            {
+                api = new BinanceApi(settings);
+            }
+
+            var backTester = new BackTester(GetTradingStrategies(), api, new CsvDataStorage("DataStorage"), coinsToBuyCsv);
             try
             {
                 backTester.WriteIntro();
