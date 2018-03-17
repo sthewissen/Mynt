@@ -9,7 +9,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Mynt.Core.Api;
 using Mynt.Core.Binance;
+using Mynt.Core.Interfaces;
 
 namespace Mynt.WindowsService
 {
@@ -29,8 +31,31 @@ namespace Mynt.WindowsService
 
             var settings = new Core.Constants();
 
-            // Call the Bittrex Trade manager with the strategy of our choosing.
-            var manager = new GenericTradeManager(new BittrexApi(settings), new BigThree(), null, (a) => log.Info(a), settings);
+            IExchangeApi api;
+            // Use Bittrex if API Key provided
+            // or Binance if it's not (one of both should be set)
+            if (!String.IsNullOrEmpty(settings.BittrexApiKey))
+            {
+                api = new BittrexApi(settings);
+            }
+            else
+            {
+                api = new BinanceApi(settings);
+            }
+
+            // Default strategy
+            var strategy = new BigThree();
+
+            // Use Telegram if settings set up in config
+            INotificationManager notificationManager = null;
+            var telegramOptions = new TelegramNotificationManagerOptions();
+            if (!String.IsNullOrWhiteSpace(telegramOptions.TelegramChatId))
+            {
+                notificationManager = new TelegramNotificationManager(telegramOptions);
+            }
+
+            // Call the Trade manager with the strategy of our choosing.
+            var manager = new GenericTradeManager(api, strategy, notificationManager, (a) => log.Info(a), settings);
 
             // Call the process method to start processing the current situation.
             manager.CheckStrategySignals().GetAwaiter().GetResult();
