@@ -22,9 +22,10 @@ namespace Mynt.Core.Api.BlockChain
         {
             if (_api != null) return;
 
+            var settings = new Constants();
             var httpClient = new HttpClient()
             {
-                BaseAddress = new Uri(Constants.BlockChainApiRoot)
+                BaseAddress = new Uri(settings.BlockChainApiRoot)
             };
 
             httpClient.DefaultRequestHeaders.Accept.Clear();

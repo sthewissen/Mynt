@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 
 namespace Mynt.Extensibility
 {
@@ -22,7 +23,8 @@ namespace Mynt.Extensibility
 
         public static IEnumerable<Type> GetTypes<T>() where T:class
         {
-            var assemblyNames = Directory.GetFiles(Directory.GetCurrentDirectory(), "*.*")
+            var currentDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            var assemblyNames = Directory.GetFiles(currentDirectory, "*.*")
                 .Where(s => s.EndsWith(".dll") || s.EndsWith(".exe"));
             List<Type> results = new List<Type>();
             foreach (var assemblyName in assemblyNames)

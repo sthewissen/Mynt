@@ -58,6 +58,10 @@
       <Project>{10c20036-7ad4-4a18-a4fa-5662e0b121c4}</Project>
       <Name>Mynt.BackTester</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Mynt.Core.Binance\Mynt.Core.Binance.csproj">
+      <Project>{F34D0F30-7063-48BE-80A9-B7974A7ECF76}</Project>
+      <Name>Mynt.Core.Binance</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Mynt.Core.Bittrex\Mynt.Core.Bittrex.csproj">
       <Project>{626d9760-282c-4adf-8c56-dba91de01e87}</Project>
       <Name>Mynt.Core.Bittrex</Name>
