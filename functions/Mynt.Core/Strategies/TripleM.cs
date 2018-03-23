@@ -13,7 +13,7 @@ namespace Mynt.Core.Strategies
     {
         public override string Name => "Triple M";
         public override int MinimumAmountOfCandles => 105;
-        public override Period IdealPeriod => Period.FiveMinutes;
+        public override Period IdealPeriod => Period.Hour;
 
         public override List<ITradeAdvice> Prepare(List<Candle> candles)
         {
@@ -31,13 +31,13 @@ namespace Mynt.Core.Strategies
                     result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
                 else
                 {
-                    if (// closes[i] > opens[i] && // Closed green
+                    if (closes[i] > opens[i] && // Closed green
                         ((ema7[i] > ema99[i] && ema7[i - 1] < ema99[i - 1]) ||
                         (ema7[i] > ema25[i] && ema7[i - 1] < ema25[i - 1])) && // Crossover 
-                        // ema7[i] > ema25[i] && // Above the 25 EMA
-                        // ema7[i] > ema99[i] && // Above the 99 EMA
-                        closes[i] > ema7[i]) // &&
-                        // opens[i] > ema7[i])
+                        ema7[i] > ema25[i] && // Above the 25 EMA
+                        ema7[i] > ema99[i] && // Above the 99 EMA
+                        closes[i] > ema7[i] &&
+                        opens[i] > ema7[i])
                         result.Add(new SimpleTradeAdvice(TradeAdvice.Buy));
                     else
                         result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));

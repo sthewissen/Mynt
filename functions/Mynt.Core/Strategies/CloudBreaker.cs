@@ -22,7 +22,7 @@ namespace Mynt.Core.Strategies
             var closes = candles.Select(x => x.Close).ToList();
             var ichi = candles.Ichimoku();
             var rsi = candles.Rsi();
-            var displacement = 30;
+            var displacement = 30; // A displacement is needed for the cloud because it is drawn into the future.
 
             for (int i = 0; i < candles.Count; i++)
             {
