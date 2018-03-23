@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Binance.Net;
-using BinanceNet = Binance.Net;
+﻿using Binance.Net;
 using Binance.Net.Objects;
 using Mynt.Core.Api;
 using Mynt.Core.Enums;
+using Mynt.Core.Extensions;
 using Mynt.Core.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using OrderSide = Binance.Net.Objects.OrderSide;
 using OrderStatus = Binance.Net.Objects.OrderStatus;
 using OrderType = Binance.Net.Objects.OrderType;
@@ -30,7 +30,7 @@ namespace Mynt.Core.Binance
                 AutoTimestamp = true
             };
 
-            this._isDryRunning = Constants.IsDryRunning;
+            this._isDryRunning = Settings.IsDryRunning;
         }
 
         #region IExchangeApi Implementations
@@ -230,33 +230,10 @@ namespace Mynt.Core.Binance
                 Volume = (double)result.Data.Volume
             };
         }
-        
-        #endregion
 
-        public async Task<DateTime> GetServerTime()
+        public async Task<List<Candle>> GetTickerHistory(string market, Period period, DateTime startDate, DateTime? endDate = null)
         {
-            var result = await _client.GetServerTimeAsync();
-
-            if (!result.Success) throw new Exception(result.Error.Message);
-
-            return result.Data;
-        }
-
-        public async Task<BinanceSymbol> GetSymbolInfo(string symbol)
-        {
-            if (_exchangeInfo == null)
-            {
-                var result = await _client.GetExchangeInfoAsync();
-                if (!result.Success) throw new Exception(result.Error.Message);
-                _exchangeInfo = result.Data;
-            }
-
-            return _exchangeInfo.Symbols.FirstOrDefault(x => x.SymbolName == symbol);
-        }
-
-        public async Task<List<Candle>> GetTickerHistory(string market, DateTime startDate, Period period)
-        {
-            var endTime = DateTime.UtcNow;
+            var endTime = endDate == null? DateTime.UtcNow: endDate.Value;
             var start = startDate;
             var candles = new List<BinanceKline>();
 
@@ -282,6 +259,48 @@ namespace Mynt.Core.Binance
             ).ToList();
         }
 
+        public async Task<List<Candle>> GetTickerHistory(string market, Period period, int length)
+        {
+            var stepSize = period.ToMinutesEquivalent();
+            var endTime = DateTime.UtcNow;
+            var startDate = endTime.AddMinutes(-stepSize * length);
+            var candles = await GetTickerHistory(market, period, startDate);
+
+            // Add extra candles if we didn't get enough for some reason.
+            while (candles.Count < length)
+            {
+                endTime = startDate;
+                startDate = endTime.AddMinutes(stepSize * (candles.Count - length));
+                var candlesticksToAdd = await GetTickerHistory(market, period, startDate, endTime);
+                candles.AddRange(candlesticksToAdd);
+            }
+
+            return candles.OrderBy(_ => _.Timestamp).ToList(); ;
+        }
+
+        #endregion
+
+        public async Task<DateTime> GetServerTime()
+        {
+            var result = await _client.GetServerTimeAsync();
+
+            if (!result.Success) throw new Exception(result.Error.Message);
+
+            return result.Data;
+        }
+
+        public async Task<BinanceSymbol> GetSymbolInfo(string symbol)
+        {
+            if (_exchangeInfo == null)
+            {
+                var result = await _client.GetExchangeInfoAsync();
+                if (!result.Success) throw new Exception(result.Error.Message);
+                _exchangeInfo = result.Data;
+            }
+
+            return _exchangeInfo.Symbols.FirstOrDefault(x => x.SymbolName == symbol);
+        }
+        
         public async Task<string> BuyWithStopLimit(string market, double quantity, double rate, double limit)
         {
             if (_isDryRunning)

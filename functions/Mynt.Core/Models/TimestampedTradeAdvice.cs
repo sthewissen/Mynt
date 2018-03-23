@@ -13,16 +13,21 @@ namespace Mynt.Core.Models
 
         private readonly TradeAdvice tradeAdvice;
 
-        public TimestampedTradeAdvice(DateTime timestamp, TradeAdvice tradeAdvice)
+        private readonly double price;
+
+        public TimestampedTradeAdvice(DateTime timestamp, TradeAdvice tradeAdvice, double price = double.NaN)
         {
-            this.tradeAdvice = tradeAdvice;
             this.timestamp = timestamp;
+            this.tradeAdvice = tradeAdvice;
+            this.price = price;
         }
 
         public DateTime Timestamp => timestamp;
 
         public TradeAdvice TradeAdvice => tradeAdvice;
 
+        public double Price => price;
+        
         public override string ToString()
         {
             return $"TradeAdvice at {timestamp.ToString()}: {tradeAdvice.ToString()}";

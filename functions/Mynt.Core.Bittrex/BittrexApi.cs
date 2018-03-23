@@ -194,14 +194,41 @@ namespace Mynt.Core.Bittrex
             return result.Result;
         }
 
-        public async Task<List<Core.Models.Candle>> GetTickerHistory(string market, DateTime startDate, Core.Enums.Period period = Core.Enums.Period.FiveMinutes)
+        public async Task<List<Core.Models.Candle>> GetTickerHistory(string market, Core.Enums.Period period, DateTime startDate, DateTime? endDate = null)
         {
             var result = await _api.GetTickerHistory(market, startDate.ToUnixTimestamp(), period.ToBittrexEquivalent());
 
             if (!result.Success)
                 throw new Exception($"Bittrex API failure {result.Message}");
 
-            return result.Result.ToGenericCandles();
+            if (endDate.HasValue)
+            {
+                return result.Result.Where(_ => _.T.AddMinutes(period.ToMinutesEquivalent()) < endDate.Value).ToList().ToGenericCandles();
+            }
+            else
+            {
+                return result.Result.ToGenericCandles();
+
+            }
+        }
+
+        public async Task<List<Core.Models.Candle>> GetTickerHistory(string market, Core.Enums.Period period, int length)
+        {
+            var stepSize = period.ToMinutesEquivalent();
+            var endTime = DateTime.UtcNow;
+            var startDate = endTime.AddMinutes(-stepSize * length);
+            var candles = await GetTickerHistory(market, period, startDate);
+
+            // Add extra candles if we didn't get enough for some reason.
+            while (candles.Count < length)
+            {
+                endTime = startDate;
+                startDate = endTime.AddMinutes(stepSize * (candles.Count - length));
+                var candlesticksToAdd = await GetTickerHistory(market, period, startDate);
+                candles.AddRange(candlesticksToAdd);
+            }
+
+            return candles.OrderBy(_ => _.Timestamp).ToList();
         }
 
         public Task<OrderBook> GetOrderBook(string market)

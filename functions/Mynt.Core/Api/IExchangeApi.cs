@@ -26,6 +26,8 @@ namespace Mynt.Core.Api
 
         Task<OrderBook> GetOrderBook(string market);
 
-        Task<List<Candle>> GetTickerHistory(string market, DateTime startDate, Period period);
+        Task<List<Candle>> GetTickerHistory(string market, Period period, DateTime startDate, DateTime? endDate = null);
+        
+        Task<List<Candle>> GetTickerHistory(string market, Period period, int length);
     }
 }

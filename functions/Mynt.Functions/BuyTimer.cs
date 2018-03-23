@@ -5,6 +5,7 @@ using Microsoft.Azure.WebJobs.Host;
 using Mynt.Core.Strategies;
 using Mynt.Core.TradeManagers;
 using Mynt.Core.Binance;
+using Mynt.Core.NotificationManagers;
 
 namespace Mynt.Functions
 {
@@ -17,6 +18,12 @@ namespace Mynt.Functions
             try
             {
                 log.Info("Starting processing...");
+
+                if (Core.Constants.ImmediatelyPlaceSellOrder && Core.Constants.EnableTrailingStop)
+                {
+                    log.Info("Can't have both ImmediatelyPlaceSellOrder and EnableTrailingStop enabled. Please disable one of them to continue...");
+                    return;
+                }
 
                 // Call the trade manager with the strategy of our choosing.
                 var manager = new GenericTradeManager(

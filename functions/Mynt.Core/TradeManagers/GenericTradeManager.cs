@@ -35,8 +35,8 @@ namespace Mynt.Core.TradeManagers
         public async Task Initialize()
         {
             // First initialize a few things
-            _orderTable = await ConnectionManager.GetTableConnection(Constants.OrderTableName, Constants.IsDryRunning);
-            _traderTable = await ConnectionManager.GetTableConnection(Constants.TraderTableName, Constants.IsDryRunning);
+            _orderTable = await ConnectionManager.GetTableConnection(Constants.OrderTableName, Settings.IsDryRunning);
+            _traderTable = await ConnectionManager.GetTableConnection(Constants.TraderTableName, Settings.IsDryRunning);
 
             _activeTrades = _orderTable.CreateQuery<Trade>().Where(x => x.IsOpen).ToList();
             _currentTraders = _traderTable.CreateQuery<Trader>().ToList();
@@ -177,10 +177,8 @@ namespace Mynt.Core.TradeManagers
         /// <summary>
         /// Creates a new trade in our system and opens a buy order.
         /// </summary>
-        /// <param name="freeTrader"></param>
-        /// <param name="trade"></param>
         /// <returns></returns>
-        private async Task CreateNewTrade(Trader freeTrader, string trade)
+        private async Task CreateNewTrade(Trader freeTrader, TradeSignal signal)
         {
             // Get our Bitcoin balance from the exchange
             var currentBtcBalance = await _api.GetBalance("BTC");
@@ -189,7 +187,7 @@ namespace Mynt.Core.TradeManagers
             if (currentBtcBalance.Available < freeTrader.CurrentBalance)
                 throw new Exception("Insufficient BTC funds to perform a trade.");
 
-            var order = await CreateBuyOrder(freeTrader, trade);
+            var order = await CreateBuyOrder(freeTrader, signal.Pair, signal.SignalCandle);
 
             // We found a trade and have set it all up!
             if (order != null)
@@ -220,7 +218,7 @@ namespace Mynt.Core.TradeManagers
                 var signal = await GetStrategySignal(trade.Market);
 
                 // If the strategy is telling us to sell we need to do so.
-                if (signal != null && signal.TradeAdvice == TradeAdvice.Sell)
+                if (signal != null && signal.TradeAdvice.TradeAdvice == TradeAdvice.Sell)
                 {
                     if ((trade.IsSelling && trade.SellType == SellType.Immediate))
                     {
@@ -250,17 +248,21 @@ namespace Mynt.Core.TradeManagers
         /// if one pair triggers the buy signal a new trade record gets created.
         /// </summary>
         /// <returns></returns>
-        private async Task<List<string>> FindBuyOpportunities()
+        private async Task<List<TradeSignal>> FindBuyOpportunities()
         {
             // Retrieve our current markets
             var markets = await _api.GetMarketSummaries();
-            var pairs = new List<string>();
+            var pairs = new List<TradeSignal>();
 
             // Check if there are markets matching our volume.
             markets = markets.Where(x =>
                 (x.BaseVolume > Constants.MinimumAmountOfVolume ||
                 Constants.AlwaysTradeList.Contains(x.CurrencyPair.BaseCurrency)) &&
                 x.CurrencyPair.QuoteCurrency.ToUpper() == "BTC").ToList();
+
+            // If there are items on the only trade list remove the rest
+            foreach (var item in Constants.OnlyTradeList)
+                markets.RemoveAll(x => x.CurrencyPair.BaseCurrency != item);
 
             // Remove existing trades from the list to check.
             foreach (var trade in _activeTrades)
@@ -276,9 +278,14 @@ namespace Mynt.Core.TradeManagers
                 var signal = await GetStrategySignal(market.MarketName);
 
                 // A match was made, buy that please!
-                if (signal != null && signal.TradeAdvice == TradeAdvice.Buy)
+                if (signal != null && signal.TradeAdvice.TradeAdvice == TradeAdvice.Buy)
                 {
-                    pairs.Add(market.MarketName);
+                    pairs.Add(new TradeSignal()
+                    {
+                        Pair = market.MarketName,
+                        TradeAdvice = signal.TradeAdvice,
+                        SignalCandle = signal.SignalCandle
+                    });
                 }
             }
 
@@ -291,7 +298,7 @@ namespace Mynt.Core.TradeManagers
         /// <param name="freeTrader">The trader placing the order</param>
         /// <param name="pair">The pair we're buying</param>
         /// <returns></returns>
-        private async Task<Trade> CreateBuyOrder(Trader freeTrader, string pair)
+        private async Task<Trade> CreateBuyOrder(Trader freeTrader, string pair, Candle signalCandle)
         {
             // Take the amount to invest per trader OR the current balance for this trader.
             var btcToSpend = freeTrader.CurrentBalance > Constants.AmountOfBtcToInvestPerTrader
@@ -300,7 +307,7 @@ namespace Mynt.Core.TradeManagers
 
             // The amount here is an indication and will probably not be precisely what you get.
             var ticker = await _api.GetTicker(pair);
-            var openRate = GetTargetBid(ticker);
+            var openRate = GetTargetBid(ticker, signalCandle);
             var amount = btcToSpend / openRate;
             var amountYouGet = (btcToSpend * (1 - Constants.TransactionFeePercentage)) / openRate;
 
@@ -308,12 +315,12 @@ namespace Mynt.Core.TradeManagers
             // up on our trade. We update the data below later when the final data is present.
             var orderId = await _api.Buy(pair, amount, openRate);
 
-            await SendNotification($"Buying {pair} at {openRate:0.0000000 BTC} which was spotted at bid: {ticker.Bid:0.00000000}, " +
+            await SendNotification($"Buying {pair} at ±{openRate:0.00000000 BTC} which was spotted at bid: {ticker.Bid:0.00000000}, " +
                                    $"ask: {ticker.Ask:0.00000000}, " +
                                    $"last: {ticker.Last:0.00000000}, " +
                                    $"({amountYouGet:0.0000} units).");
 
-            return new Trade()
+            var trade = new Trade()
             {
                 TraderId = freeTrader.RowKey,
                 Market = pair,
@@ -330,6 +337,14 @@ namespace Mynt.Core.TradeManagers
                 SellType = SellType.None,
                 RowKey = $"MNT{(DateTime.MaxValue.Ticks - DateTime.UtcNow.Ticks):d19}"
             };
+
+            if (Constants.PlaceFirstStopAtSignalCandleLow)
+            {
+                trade.StopLossRate = signalCandle.Low;
+                _log($"Automatic stop set at signal candle low {signalCandle.Low:0.00000000}");
+            }
+
+            return trade;
         }
 
         /// <summary>
@@ -337,7 +352,7 @@ namespace Mynt.Core.TradeManagers
         /// </summary>
         /// <param name="market">The market we're going to check against.</param>
         /// <returns></returns>
-        private async Task<ITradeAdvice> GetStrategySignal(string market)
+        private async Task<TradeSignal> GetStrategySignal(string market)
         {
             try
             {
@@ -345,26 +360,41 @@ namespace Mynt.Core.TradeManagers
 
                 var minimumDate = _strategy.GetMinimumDateTime();
                 var candleDate = _strategy.GetCurrentCandleDateTime();
-                var candles = await _api.GetTickerHistory(market, minimumDate, _strategy.IdealPeriod);
+                var candles = await _api.GetTickerHistory(market, _strategy.IdealPeriod, minimumDate);
 
                 // We eliminate all candles that aren't needed for the dataset incl. the last one (if it's the current running candle).
                 candles = candles.Where(x => x.Timestamp >= minimumDate && x.Timestamp < candleDate).ToList();
 
                 // Not enough candles to perform what we need to do.
                 if (candles.Count < _strategy.MinimumAmountOfCandles)
-                    return new SimpleTradeAdvice(TradeAdvice.Hold);
+                {
+                    _log($"Not enough candle data for {market}...");
+                    return new TradeSignal
+                    {
+                        TradeAdvice = new SimpleTradeAdvice(TradeAdvice.Hold),
+                        Pair = market
+                    };
+                }
 
                 // Get the date for the last candle.
                 var signalDate = candles[candles.Count - 1].Timestamp;
 
                 // This is an outdated candle...
                 if (signalDate < _strategy.GetSignalDate())
+                {
+                    _log($"Outdated candle for {market}...");
                     return null;
+                }
 
                 // This calculates an advice for the next timestamp.
                 var advice = _strategy.Forecast(candles);
 
-                return advice;
+                return new TradeSignal
+                {
+                    TradeAdvice = advice,
+                    Pair = market,
+                    SignalCandle = _strategy.GetSignalCandle(candles)
+                };
             }
             catch (Exception)
             {
@@ -379,7 +409,7 @@ namespace Mynt.Core.TradeManagers
         /// </summary>
         /// <param name="tick"></param>
         /// <returns></returns>
-        private double GetTargetBid(Ticker tick)
+        private double GetTargetBid(Ticker tick, Candle signalCandle)
         {
             if (Constants.BuyInPriceStrategy == BuyInPriceStrategy.AskLastBalance)
             {
@@ -387,6 +417,14 @@ namespace Mynt.Core.TradeManagers
                 if (tick.Ask < tick.Last) return tick.Ask;
 
                 return tick.Ask + Constants.AskLastBalance * (tick.Last - tick.Ask);
+            }
+            else if (Constants.BuyInPriceStrategy == BuyInPriceStrategy.SignalCandleClose)
+            {
+                return signalCandle.Close;
+            }
+            else if (Constants.BuyInPriceStrategy == BuyInPriceStrategy.MatchCurrentBid)
+            {
+                return tick.Bid;
             }
             else
             {
@@ -598,6 +636,7 @@ namespace Mynt.Core.TradeManagers
                     {
                         trader.IsBusy = false;
                         trader.CurrentBalance += order.CloseProfit.Value;
+                        trader.CurrentBalance = Math.Round(trader.CurrentBalance, 8);
                         trader.LastUpdated = DateTime.UtcNow;
                     }
 

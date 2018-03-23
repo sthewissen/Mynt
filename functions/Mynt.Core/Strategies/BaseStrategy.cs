@@ -14,14 +14,21 @@ namespace Mynt.Core.Strategies
 
         public DateTime GetCurrentCandleDateTime()
         {
-            var minutes = IdealPeriod == Period.Minute || IdealPeriod == Period.FiveMinutes || IdealPeriod == Period.QuarterOfAnHour || IdealPeriod == Period.HalfAnHour ? DateTime.UtcNow.Minute : 0;
-            return new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day, DateTime.UtcNow.Hour, minutes, 0, 0);
+            var minutes = IdealPeriod == Period.Minute || 
+                IdealPeriod == Period.FiveMinutes || 
+                IdealPeriod == Period.QuarterOfAnHour ||
+                IdealPeriod == Period.HalfAnHour ? DateTime.UtcNow.Minute : 0;
+
+            var hour = IdealPeriod == Period.Day ? 0 : DateTime.UtcNow.Hour;
+
+            return new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day, hour, minutes, 0, 0);
         }
 
         public DateTime GetSignalDate()
         {
             var minutes = IdealPeriod == Period.Minute || IdealPeriod == Period.FiveMinutes || IdealPeriod == Period.QuarterOfAnHour || IdealPeriod == Period.HalfAnHour ? DateTime.UtcNow.Minute : 0;
-            var current = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day, DateTime.UtcNow.Hour, minutes, 0, 0);
+            var hour = IdealPeriod == Period.Day ? 0 : DateTime.UtcNow.Hour;
+            var current = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day, hour, minutes, 0, 0);
 
             switch (IdealPeriod)
             {
@@ -48,8 +55,9 @@ namespace Mynt.Core.Strategies
 
         public DateTime GetMinimumDateTime()
         {
+            var hour = IdealPeriod == Period.Day ? 0 : DateTime.UtcNow.Hour;
             var minutes = IdealPeriod == Period.Minute || IdealPeriod == Period.FiveMinutes || IdealPeriod == Period.QuarterOfAnHour || IdealPeriod == Period.HalfAnHour ? DateTime.UtcNow.Minute : 0;
-            var current = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day, DateTime.UtcNow.Hour, minutes, 0, 0);
+            var current = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day, hour, minutes, 0, 0);
 
             switch (IdealPeriod)
             {
@@ -73,6 +81,8 @@ namespace Mynt.Core.Strategies
                     throw new ArgumentOutOfRangeException(nameof(IdealPeriod));
             }
         }
+
+        public abstract Candle GetSignalCandle(List<Candle> candles);
 
         public abstract List<ITradeAdvice> Prepare(List<Candle> candles);
 

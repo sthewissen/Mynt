@@ -13,32 +13,18 @@ namespace Mynt.ResistanceSupportFinder
 
         public List<DateTime> Hits { get; set; }
 
-        public double Conviction => (double) Price;
+        public double Conviction => (AmountOfHitsScore + FirstTimeHitScore + LastTimeHitScore);
 
-        public int HitScore => Hits.Count;
+        public int AmountOfHits => Hits.Count;
 
-        public int FirstTime => (DateTime.UtcNow - Hits.First()).Days;
+        public int FirstTimeHit => (DateTime.UtcNow - Hits.First()).Days;
 
-        public int LastTime => (DateTime.UtcNow - Hits.Last()).Days;
+        public int LastTimeHit => (DateTime.UtcNow - Hits.Last()).Days;
 
-        public int TimeScore
-        {
-            get
-            {
-                var dates = Hits.OrderBy(x => x).ToList();
-                int total = 0;
-
-                for (int i = 0; i < dates.Count; i++)
-                {
-                    if (i > 0)
-                    {
-                        total += (dates[i] - dates[i - 1]).Days;
-                    }
-                }
-
-                return total;
-            }
-        }
+        public int AmountOfHitsScore { get; set; }
+        public int FractalHitsScore { get; set; }
+        public int FirstTimeHitScore { get; set; }
+        public int LastTimeHitScore { get; set; }
     }
 
     public enum LevelType

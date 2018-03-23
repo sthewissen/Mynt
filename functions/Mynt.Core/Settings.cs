@@ -8,6 +8,21 @@ namespace Mynt.Core
 {
     public static class Settings
     {
+        public static bool IsDryRunning
+        {
+            get
+            {
+                try
+                {
+                    return AppSettings.Get<bool>("IsDryRunning");
+                }
+                catch
+                {
+                    return Constants.IsDryRunning;
+                }
+            }
+        }
+
         public static string BinanceApiKey
         {
             get

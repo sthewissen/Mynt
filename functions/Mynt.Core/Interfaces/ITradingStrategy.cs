@@ -16,6 +16,8 @@ namespace Mynt.Core.Interfaces
         DateTime GetMinimumDateTime();
         DateTime GetSignalDate();
 
+        Candle GetSignalCandle(List<Candle> candles);
+
         /// <summary>
         /// Gets a list of trade advices, one for each of the candles provided as input.
         /// </summary>

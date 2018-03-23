@@ -21,5 +21,20 @@ namespace Mynt.Core.Indicators
 
             throw new Exception("Could not calculate RSI!");
         }
+
+        public static List<double?> Rsi(this List<double> source, int period = 14)
+        {
+            int outBegIdx, outNbElement;
+            double[] rsiValues = new double[source.Count];
+
+            var ema = TicTacTec.TA.Library.Core.Rsi(0, source.Count - 1, source.ToArray(), period, out outBegIdx, out outNbElement, rsiValues);
+
+            if (ema == TicTacTec.TA.Library.Core.RetCode.Success)
+            {
+                return FixIndicatorOrdering(rsiValues.ToList(), outBegIdx, outNbElement);
+            }
+
+            throw new Exception("Could not calculate RSI!");
+        }
     }
 }

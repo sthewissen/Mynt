@@ -373,16 +373,6 @@ namespace Mynt.BackTester
             if (currentProfit < stopLossPercentage)
                 return SellType.StopLoss;
 
-            if (currentProfit < trade.StopLossAnchor)
-                return SellType.StopLossAnchor;
-
-            // Set a stop loss anchor to minimize losses.
-            foreach (var item in stopLossAnchors)
-            {
-                if (currentProfit > item)
-                    trade.StopLossAnchor = item - 0.01;
-            }
-
             // Check if time matches and current rate is above threshold
             foreach (var item in returnOnInvestment)
             {
@@ -616,7 +606,6 @@ namespace Mynt.BackTester
 
         public async System.Threading.Tasks.Task RefreshCandleData()
         {
-            DateTime startDate = DateTime.Now.AddMinutes(-5 * 6000);
             var period = Period.FiveMinutes;
 
             List<string> writtenFiles = new List<string>();
@@ -625,7 +614,7 @@ namespace Mynt.BackTester
             {
                 WriteColoredLine($"\tRefreshing {coinToBuy}", ConsoleColor.DarkGreen);
 
-                var candles = await exchangeApi.GetTickerHistory(coinToBuy, startDate, period);
+                var candles = await exchangeApi.GetTickerHistory(coinToBuy, period, 6000);
                 var jsonPath = GetJsonFilePath(coinToBuy);
 
                 if (File.Exists(jsonPath))

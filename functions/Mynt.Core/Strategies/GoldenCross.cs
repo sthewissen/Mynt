@@ -7,19 +7,19 @@ using Mynt.Core.Models;
 
 namespace Mynt.Core.Strategies
 {
-    public class SmaCrossover : BaseStrategy
+    public class GoldenCross : BaseStrategy
     {
-        public override string Name => "SMA Crossover";
-        public override int MinimumAmountOfCandles => 26;
-        public override Period IdealPeriod => Period.Hour;
+        public override string Name => "Golden Cross";
+        public override int MinimumAmountOfCandles => 202;
+        public override Period IdealPeriod => Period.Day;
 
         public override List<ITradeAdvice> Prepare(List<Candle> candles)
         {
             {
                 var result = new List<ITradeAdvice>();
 
-                var sma12 = candles.Sma(12);
-                var sma26 = candles.Sma(26);
+                var sma50 = candles.Sma(50);
+                var sma200 = candles.Sma(200);
 
                 for (int i = 0; i < candles.Count; i++)
                 {
@@ -27,10 +27,10 @@ namespace Mynt.Core.Strategies
                     if (i == 0)
                         result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
                     // When the fast SMA moves above the slow SMA, we have a positive cross-over
-                    else if (sma12[i] < sma26[i] && sma12[i - 1] > sma26[i])
+                    else if (sma50[i] < sma200[i] && sma50[i - 1] > sma200[i])
                         result.Add(new SimpleTradeAdvice(TradeAdvice.Buy));
                     // When the slow SMA moves above the fast SMA, we have a negative cross-over
-                    else if (sma12[i] > sma26[i] && sma12[i - 1] < sma26[i])
+                    else if (sma50[i] > sma200[i] && sma50[i - 1] < sma200[i])
                         result.Add(new SimpleTradeAdvice(TradeAdvice.Sell));
                     else
                         result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));

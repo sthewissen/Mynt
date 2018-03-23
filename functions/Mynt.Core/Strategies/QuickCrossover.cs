@@ -1,25 +1,27 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using Mynt.Core.Enums;
 using Mynt.Core.Indicators;
-using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
 
 namespace Mynt.Core.Strategies
 {
-    public class TheScalper : BaseStrategy
+    public class QuickCrossover : BaseStrategy
     {
-        public override string Name => "The Scalper";
-        public override int MinimumAmountOfCandles => 200;
+        public override string Name => "Quick Crossover";
+        public override int MinimumAmountOfCandles => 50;
         public override Period IdealPeriod => Period.Hour;
 
         public override List<ITradeAdvice> Prepare(List<Candle> candles)
         {
             var result = new List<ITradeAdvice>();
-
-            var stoch = candles.Stoch();
-            var sma200 = candles.Sma(200);
-            var closes = candles.Select(x => x.Close).ToList();
+            var fastMa = candles.Ema(5);
+            var slowMa = candles.Ema(10);
+            var hl2 = candles.Select(x => (x.High + x.Low) / 2).ToList();
+            var rsi = hl2.Rsi(10);
 
             for (int i = 0; i < candles.Count; i++)
             {
@@ -27,17 +29,15 @@ namespace Mynt.Core.Strategies
                     result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
                 else
                 {
-                    if (sma200[i] < closes[i] && // Candles above the SMA
-                        stoch.K[i - 1] <= stoch.D[i - 1] && // K below 20, oversold
-                        stoch.K[i] > stoch.D[i] &&
-                        stoch.D[i - 1] < 20 &&
-                        stoch.K[i - 1] < 20 // && // K below 20, oversold
-                        )
+                    if (fastMa[i] > slowMa[i] && fastMa[i-1] < slowMa[i-1] &&
+                        rsi[i] > 50 && rsi[i-1] < 50)
                         result.Add(new SimpleTradeAdvice(TradeAdvice.Buy));
                     else
                         result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
                 }
             }
+
+
 
             return result;
         }
@@ -53,4 +53,3 @@ namespace Mynt.Core.Strategies
         }
     }
 }
-
