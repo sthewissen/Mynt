@@ -26,7 +26,7 @@ namespace Mynt.Functions
                     return;
                 }
 
-                // Call the Bittrex Trade manager with the strategy of our choosing.
+                // Initialize the trade manager with the strategy of our choosing.
                 var manager = new GenericTradeManager(
                     new BinanceApi(settings),
                     new TheScalper(),

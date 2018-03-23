@@ -27,10 +27,10 @@ namespace Mynt.Functions
                     return;
                 }
 
-                // Call the trade manager with the strategy of our choosing.
+                // Initialize the trade manager with the strategy of our choosing.
                 var manager = new GenericTradeManager(
-                    new BinanceApi(settings), 
-                    new BollingerAwe(), 
+                    new BinanceApi(settings),
+                    new BollingerAwe(),
                     null, (a) => log.Info(a),
                     settings
                 );
