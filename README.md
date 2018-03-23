@@ -1,3 +1,5 @@
+![Mynt](https://raw.githubusercontent.com/sthewissen/Mynt/master/myntlogo.png)
+
 Finding this useful? Consider a donation!
 
 | Coin | Address |
@@ -26,6 +28,8 @@ This bot was first mentioned in [one of my blogposts].
 * [Strategies](https://github.com/sthewissen/Mynt/wiki/Strategies)
 * [Notifications](https://github.com/sthewissen/Mynt/wiki/Notifications)
 * [Backtesting](https://github.com/sthewissen/Mynt/wiki/Backtesting)
+
+---
 
 ### Additional tools used
 
