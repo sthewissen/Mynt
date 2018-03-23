@@ -17,6 +17,7 @@ namespace Mynt.Core
             }
         }
     }
+
     public class Constants : BaseSettings
     {
         public Constants()
@@ -34,7 +35,6 @@ namespace Mynt.Core
         }
 
         public bool IsDryRunning { get; set; } = false;
-        public string BlockChainApiRoot { get; set; } = "https://blockchain.info";
 
         // Bittrex settings
         public string BittrexApiKey { get; set; } = "";
@@ -93,7 +93,7 @@ namespace Mynt.Core
         // "Sell when 5 minutes have passed and profit is at 3%".
         public List<(int Duration, double Profit)> ReturnOnInvestment { get; set; } = new List<ValueTuple<int, double>>()
         {
-           // new ValueTuple<int, double>(1440, 0.02),
+            // new ValueTuple<int, double>(1440, 0.02),
         };
 
         // These are the markets we don't want to trade on
