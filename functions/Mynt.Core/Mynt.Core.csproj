@@ -309,6 +309,8 @@
     <Compile Include="Models\OrderBook.cs" />
     <Compile Include="Models\OrderBookEntry.cs" />
     <Compile Include="TradeManagers\PortfolioLedger.cs" />
+    <Compile Include="NotificationManagers\SlackNotificationManagerOptions.cs" />
+    <Compile Include="NotificationManagers\DiscordNotificationManagerOptions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

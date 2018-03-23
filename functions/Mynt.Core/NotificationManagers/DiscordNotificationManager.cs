@@ -8,7 +8,12 @@ namespace Mynt.Core.NotificationManagers
 {
     public class DiscordNotificationManager : INotificationManager
     {
-        private readonly string DiscordWebhookUrl = "https://discordapp.com/api/webhooks/{WEBHOOK.ID}/{WEBHOOK.TOKEN}";
+        private readonly string _discordWebhookUrl;
+
+        public DiscordNotificationManager(DiscordNotificationManagerOptions settings)
+        {
+            _discordWebhookUrl = $"https://discordapp.com/api/webhooks/{settings.DiscordWebhookId}/{settings.DiscordWebhookToken}";
+        }
 
         public async Task<bool> SendNotification(string message)
         {
@@ -18,7 +23,7 @@ namespace Mynt.Core.NotificationManagers
                 var payloadJson = JsonConvert.SerializeObject(payload);
 
                 var httpClient = new HttpClient();
-                var response = await httpClient.PostAsync(DiscordWebhookUrl,
+                var response = await httpClient.PostAsync(_discordWebhookUrl,
                     new StringContent(payloadJson, Encoding.UTF8, "application/json"));
 
                 return true;
