@@ -2,10 +2,9 @@
 
 Finding this useful? Consider a donation!
 
-| Coin | Address |
-| ------- | ------ |
-| BTC | 13myncc3ie6iGjSmJHCdzahwaKizX7NBB1 |
-| ETH | 0x4398c958468bEDB41DdEF4C297eB543c6d26f440 |
+[![Donate with Bitcoin](https://en.cryptobadges.io/badge/small/13myncc3ie6iGjSmJHCdzahwaKizX7NBB1)](https://en.cryptobadges.io/donate/13myncc3ie6iGjSmJHCdzahwaKizX7NBB1)
+
+[![Donate with Ethereum](https://en.cryptobadges.io/badge/small/0x4398c958468bEDB41DdEF4C297eB543c6d26f440)](https://en.cryptobadges.io/donate/0x4398c958468bEDB41DdEF4C297eB543c6d26f440)
 
 ---
 
