@@ -1,0 +1,30 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="SHORTCUT ICON" href="~/Images/Favicon/favicon.ico" />
+    <title>@ViewBag.Title</title>
+    @Styles.Render("~/Content/css")
+    @Styles.Render("~/Content/jquery")
+</head>
+<body>
+@Scripts.Render("~/bundles/jquery")
+
+@RenderBody()
+
+@Scripts.Render("~/bundles/modernizr")
+@RenderSection("scripts", required: false)
+@Scripts.Render("~/bundles/bootstrap")
+@Scripts.Render("~/bundles/jqueryunobajax")
+@Scripts.Render("~/Scripts/handlerBar.js")
+
+<script language="javascript">
+    var site = site || {};
+    site.baseUrl = site.baseUrl || "";
+    $(document).ready(function () {
+        register();
+    });
+</script>
+</body>
+</html>
