@@ -8,9 +8,9 @@ namespace Mynt.Core.Models
 {
     public class Ticker
     {
-        public double Bid { get; set; }
-        public double Ask { get; set; }
-        public double Last { get; set; }
-        public double Volume { get; set; }
+        public decimal Bid { get; set; }
+        public decimal Ask { get; set; }
+        public decimal Last { get; set; }
+        public decimal Volume { get; set; }
     }
 }

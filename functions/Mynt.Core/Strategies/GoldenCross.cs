@@ -13,10 +13,10 @@ namespace Mynt.Core.Strategies
         public override int MinimumAmountOfCandles => 202;
         public override Period IdealPeriod => Period.Day;
 
-        public override List<ITradeAdvice> Prepare(List<Candle> candles)
+        public override List<TradeAdvice> Prepare(List<Candle> candles)
         {
             {
-                var result = new List<ITradeAdvice>();
+                var result = new List<TradeAdvice>();
 
                 var sma50 = candles.Sma(50);
                 var sma200 = candles.Sma(200);
@@ -25,15 +25,15 @@ namespace Mynt.Core.Strategies
                 {
                     // Since we look back 1 candle, the first candle can never be a signal.
                     if (i == 0)
-                        result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
+                        result.Add(TradeAdvice.Hold);
                     // When the fast SMA moves above the slow SMA, we have a positive cross-over
                     else if (sma50[i] < sma200[i] && sma50[i - 1] > sma200[i])
-                        result.Add(new SimpleTradeAdvice(TradeAdvice.Buy));
+                        result.Add(TradeAdvice.Buy);
                     // When the slow SMA moves above the fast SMA, we have a negative cross-over
                     else if (sma50[i] > sma200[i] && sma50[i - 1] < sma200[i])
-                        result.Add(new SimpleTradeAdvice(TradeAdvice.Sell));
+                        result.Add(TradeAdvice.Sell);
                     else
-                        result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
+                        result.Add(TradeAdvice.Hold);
                 }
 
                 return result;
@@ -45,7 +45,7 @@ namespace Mynt.Core.Strategies
             return candles.Last();
         }
 
-        public override ITradeAdvice Forecast(List<Candle> candles)
+        public override TradeAdvice Forecast(List<Candle> candles)
         {
             return Prepare(candles).LastOrDefault();
         }

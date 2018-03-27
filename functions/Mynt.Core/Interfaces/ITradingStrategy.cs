@@ -27,7 +27,7 @@ namespace Mynt.Core.Interfaces
         /// <returns>
         /// A list of trade advices. The length of the list matches the length of the input list.
         /// </returns>
-        List<ITradeAdvice> Prepare(List<Candle> candles);
+        List<TradeAdvice> Prepare(List<Candle> candles);
 
         /// <summary>
         /// Given a list of candles, this method forecasts what will happen next and returns 
@@ -39,6 +39,6 @@ namespace Mynt.Core.Interfaces
         /// <returns>
         /// A trade advice based on the forecast.
         /// </returns>
-        ITradeAdvice Forecast(List<Candle> candles);
+        TradeAdvice Forecast(List<Candle> candles);
     }
 }

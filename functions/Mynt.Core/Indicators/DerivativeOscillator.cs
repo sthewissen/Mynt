@@ -9,7 +9,7 @@ namespace Mynt.Core.Indicators
 {
     public static partial class Extensions
     {
-        public static List<double?> DerivativeOscillator(this List<Candle> source)
+        public static List<decimal?> DerivativeOscillator(this List<Candle> source)
         {
             var rsi = source.Rsi();
             var ema1 = rsi.Where(x => x.HasValue).Select(x => x.Value).ToList().Ema(5);
@@ -22,7 +22,7 @@ namespace Mynt.Core.Indicators
             for (int i = ema2.Count; i < source.Count; i++)
                 ema2.Insert(0, null);
 
-            var derivativeOsc = new List<double?>();
+            var derivativeOsc = new List<decimal?>();
 
             for (int i = 0; i < sma.Count; i++)
             {

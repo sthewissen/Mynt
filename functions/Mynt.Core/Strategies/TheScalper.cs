@@ -13,9 +13,9 @@ namespace Mynt.Core.Strategies
         public override int MinimumAmountOfCandles => 200;
         public override Period IdealPeriod => Period.Hour;
 
-        public override List<ITradeAdvice> Prepare(List<Candle> candles)
+        public override List<TradeAdvice> Prepare(List<Candle> candles)
         {
-            var result = new List<ITradeAdvice>();
+            var result = new List<TradeAdvice>();
 
             var stoch = candles.Stoch();
             var sma200 = candles.Sma(200);
@@ -24,7 +24,7 @@ namespace Mynt.Core.Strategies
             for (int i = 0; i < candles.Count; i++)
             {
                 if (i < 1)
-                    result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
+                    result.Add(TradeAdvice.Hold);
                 else
                 {
                     if (sma200[i] < closes[i] && // Candles above the SMA
@@ -33,9 +33,9 @@ namespace Mynt.Core.Strategies
                         stoch.D[i - 1] < 20 &&
                         stoch.K[i - 1] < 20 // && // K below 20, oversold
                         )
-                        result.Add(new SimpleTradeAdvice(TradeAdvice.Buy));
+                        result.Add(TradeAdvice.Buy);
                     else
-                        result.Add(new SimpleTradeAdvice(TradeAdvice.Hold));
+                        result.Add(TradeAdvice.Hold);
                 }
             }
 
@@ -47,7 +47,7 @@ namespace Mynt.Core.Strategies
             return candles.Last();
         }
 
-        public override ITradeAdvice Forecast(List<Candle> candles)
+        public override TradeAdvice Forecast(List<Candle> candles)
         {
             return Prepare(candles).LastOrDefault();
         }

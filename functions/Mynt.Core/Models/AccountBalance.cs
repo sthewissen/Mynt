@@ -10,11 +10,11 @@ namespace Mynt.Core.Models
     {
         private readonly string currency;
 
-        private readonly double available;
+        private readonly decimal available;
 
-        private readonly double pending;
+        private readonly decimal pending;
 
-        public AccountBalance(string currency, double available, double pending)
+        public AccountBalance(string currency, decimal available, decimal pending)
         {
             this.currency = currency;
             this.available = available;
@@ -23,10 +23,10 @@ namespace Mynt.Core.Models
 
         public string Currency => currency;
 
-        public double Balance => available + pending;
+        public decimal Balance => available + pending;
 
-        public double Available => available;
+        public decimal Available => available;
 
-        public double Pending => pending;
+        public decimal Pending => pending;
     }
 }

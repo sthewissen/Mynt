@@ -9,14 +9,17 @@ namespace Mynt.Core.Indicators
 {
     public static partial class Extensions
     {
-        public static List<double?> Mfi(this List<Candle> source, int period = 14)
+        public static List<decimal?> Mfi(this List<Candle> source, int period = 14)
         {
             int outBegIdx, outNbElement;
             double[] mfiValues = new double[source.Count];
 
-            var mfi = TicTacTec.TA.Library.Core.Mfi(0, source.Count - 1, source.Select(x => x.High).ToArray(),
-                 source.Select(x => x.Low).ToArray(), source.Select(x => x.Close).ToArray(),
-                 source.Select(x => x.Volume).ToArray(), period, out outBegIdx, out outNbElement, mfiValues);
+            var highs = source.Select(x => Convert.ToDouble(x.High)).ToArray();
+            var lows = source.Select(x => Convert.ToDouble(x.Low)).ToArray();
+            var closes = source.Select(x => Convert.ToDouble(x.Close)).ToArray();
+            var volumes = source.Select(x => Convert.ToDouble(x.Volume)).ToArray();
+
+            var mfi = TicTacTec.TA.Library.Core.Mfi(0, source.Count - 1, highs, lows, closes, volumes, period, out outBegIdx, out outNbElement, mfiValues);
 
             if (mfi == TicTacTec.TA.Library.Core.RetCode.Success)
             {

@@ -14,8 +14,9 @@ namespace Mynt.Core.Indicators
             int outBegIdx, outNbElement;
             double[] mamaValues = new double[source.Count];
             double[] famaValues = new double[source.Count];
+            var closes = source.Select(x => Convert.ToDouble(x.Close)).ToArray();
 
-            var mfi = TicTacTec.TA.Library.Core.Mama(0, source.Count - 1, source.Select(x => x.Close).ToArray(),
+            var mfi = TicTacTec.TA.Library.Core.Mama(0, source.Count - 1, closes,
                 fastLimit, slowLimit, out outBegIdx, out outNbElement, mamaValues, famaValues);
 
             if (mfi == TicTacTec.TA.Library.Core.RetCode.Success)
@@ -33,7 +34,7 @@ namespace Mynt.Core.Indicators
 
     public class MamaItem
     {
-        public List<double?> Mama { get; set; }
-        public List<double?> Fama { get; set; }
+        public List<decimal?> Mama { get; set; }
+        public List<decimal?> Fama { get; set; }
     }
 }

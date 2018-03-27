@@ -7,7 +7,7 @@ namespace Mynt.Core.Indicators
 {
     public static partial class Extensions
     {
-        public static List<double?> Cci(this List<Candle> source, int period = 14)
+        public static List<decimal?> Cci(this List<Candle> source, int period = 14)
         {
             int outBegIdx, outNbElement;
             double[] cciValues = new double[source.Count];

@@ -9,5 +9,7 @@
         PendingCancel,
         Rejected,
         Expired,
+        Error,
+        Unknown
     }
 }

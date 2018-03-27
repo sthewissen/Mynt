@@ -11,9 +11,9 @@ namespace Mynt.Core.Indicators
         {
             try
             {
-                var highs = source.Select(x => Convert.ToDouble(x.High)).ToList();
-                var lows = source.Select(x => Convert.ToDouble(x.Low)).ToList();
-                var closes = source.Select(x => Convert.ToDouble(x.Close)).Skip(displacement).ToList();
+                var highs = source.Select(x => x.High).ToList();
+                var lows = source.Select(x => x.Low).ToList();
+                var closes = source.Select(x => x.Close).Skip(displacement).ToList();
 
                 var ichi = new IchimokuItem();
 
@@ -22,7 +22,7 @@ namespace Mynt.Core.Indicators
                 ichi.SenkouSpanB = Donchian(source, laggingSpanPeriods, highs, lows);
 
                 // SenkouSpanA is calculated...
-                ichi.SenkouSpanA = new List<double?>();
+                ichi.SenkouSpanA = new List<decimal?>();
 
                 for (int i = 0; i < ichi.TenkanSen.Count; i++)
                 {
@@ -37,11 +37,11 @@ namespace Mynt.Core.Indicators
                 }
 
                 // Add the ChikouSpan
-                ichi.ChikouSpan = new List<double?>();
+                ichi.ChikouSpan = new List<decimal?>();
 
                 for (int i = 0; i < source.Count; i++)
                 {
-                    if(i < closes.Count)
+                    if (i < closes.Count)
                         ichi.ChikouSpan.Add(closes[i]);
                     else
                         ichi.ChikouSpan.Add(null);
@@ -55,10 +55,10 @@ namespace Mynt.Core.Indicators
             }
         }
 
-        private static List<double?> Donchian(List<Candle> source, int period, List<double> highs, List<double> lows)
+        private static List<decimal?> Donchian(List<Candle> source, int period, List<decimal> highs, List<decimal> lows)
         {
             // Calculate the Tenkan-sen
-            var result = new List<double?>();
+            var result = new List<decimal?>();
 
             for (var i = 0; i < source.Count; i++)
             {
@@ -86,11 +86,11 @@ namespace Mynt.Core.Indicators
 
     public class IchimokuItem
     {
-        public List<double?> TenkanSen { get; set; }
-        public List<double?> KijunSen { get; set; }
-        public List<double?> SenkouSpanA { get; set; }
-        public List<double?> SenkouSpanB { get; set; }
-        public List<double?> ChikouSpan { get; set; }
+        public List<decimal?> TenkanSen { get; set; }
+        public List<decimal?> KijunSen { get; set; }
+        public List<decimal?> SenkouSpanA { get; set; }
+        public List<decimal?> SenkouSpanB { get; set; }
+        public List<decimal?> ChikouSpan { get; set; }
     }
 }
 

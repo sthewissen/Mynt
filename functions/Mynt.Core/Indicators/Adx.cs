@@ -7,7 +7,7 @@ namespace Mynt.Core.Indicators
 {
     public static partial class Extensions
     {
-        public static List<double?> Adx(this List<Candle> source, int period = 14)
+        public static List<decimal?> Adx(this List<Candle> source, int period = 14)
         {
             int outBegIdx, outNbElement;
             double[] adxValues = new double[source.Count];
@@ -20,7 +20,7 @@ namespace Mynt.Core.Indicators
 
             if (adx == TicTacTec.TA.Library.Core.RetCode.Success)
             {
-                return FixIndicatorOrdering(adxValues.ToList(), outBegIdx,outNbElement);
+                return FixIndicatorOrdering(adxValues.ToList(), outBegIdx, outNbElement);
             }
 
             throw new Exception("Could not calculate EMA!");

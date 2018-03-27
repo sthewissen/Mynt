@@ -8,7 +8,7 @@ namespace Mynt.Core.Indicators
 {
     public static partial class Extensions
     {
-        public static List<double?> Sar(this List<Candle> source, double accelerationFactor = 0.02, double maximumAccelerationFactor = 0.2)
+        public static List<decimal?> Sar(this List<Candle> source, double accelerationFactor = 0.02, double maximumAccelerationFactor = 0.2)
         {
             int outBegIdx, outNbElement;
             double[] sarValues = new double[source.Count];

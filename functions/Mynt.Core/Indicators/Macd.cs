@@ -13,8 +13,9 @@ namespace Mynt.Core.Indicators
             double[] macdValues = new double[source.Count];
             double[] signalValues = new double[source.Count];
             double[] histValues = new double[source.Count];
+            var closes = source.Select(x => Convert.ToDouble(x.Close)).ToArray();
 
-            var macd = TicTacTec.TA.Library.Core.Macd(0, source.Count - 1, source.Select(x => x.Close).ToArray(),
+            var macd = TicTacTec.TA.Library.Core.Macd(0, source.Count - 1, closes,
                 fastPeriod, slowPeriod, signalPeriod, out outBegIdx, out outNbElement, macdValues, signalValues, histValues);
 
             if (macd == TicTacTec.TA.Library.Core.RetCode.Success)
@@ -33,8 +34,8 @@ namespace Mynt.Core.Indicators
 
     public class MacdItem
     {
-        public List<double?> Macd { get; set; }
-        public List<double?> Signal { get; set; }
-        public List<double?> Hist { get; set; }
+        public List<decimal?> Macd { get; set; }
+        public List<decimal?> Signal { get; set; }
+        public List<decimal?> Hist { get; set; }
     }
 }

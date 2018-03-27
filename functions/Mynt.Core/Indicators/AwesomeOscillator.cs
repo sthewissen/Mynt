@@ -7,13 +7,13 @@ namespace Mynt.Core.Indicators
 {
     public static partial class Extensions
     {
-        public static List<double?> AwesomeOscillator(this List<Candle> source, bool returnRaw = false)
+        public static List<decimal?> AwesomeOscillator(this List<Candle> source, bool returnRaw = false)
         {
             // Calculate our Moving Averages
             var smaFast = source.Select(x => (x.High + x.Low) / 2).ToList().Sma(5);
             var smaSlow = source.Select(x => (x.High + x.Low) / 2).ToList().Sma(34);
 
-            var result = new List<double?>();
+            var result = new List<decimal?>();
 
             for (var i = 0; i < smaFast.Count; i++)
             {

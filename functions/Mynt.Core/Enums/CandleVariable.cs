@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace Mynt.Core.Enums
 {
-    public enum BuyInPriceStrategy
+    public enum CandleVariable
     {
-        AskLastBalance = 0,
-        PercentageBelowBid = 1,
-        MatchCurrentBid = 2,
-        SignalCandleClose = 3
+        High,
+        Low,
+        Close,
+        Open
     }
 }

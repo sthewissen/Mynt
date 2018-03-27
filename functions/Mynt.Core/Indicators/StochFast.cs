@@ -13,8 +13,11 @@ namespace Mynt.Core.Indicators
             double[] kValues = new double[source.Count];
             double[] dValues = new double[source.Count];
 
-            var tema = TicTacTec.TA.Library.Core.StochF(0, source.Count - 1, source.Select(x => x.High).ToArray(),
-                 source.Select(x => x.Low).ToArray(), source.Select(x => x.Close).ToArray(), fastKPeriod, fastDPeriod,
+            var highs = source.Select(x => Convert.ToDouble(x.High)).ToArray();
+            var lows = source.Select(x => Convert.ToDouble(x.Low)).ToArray();
+            var closes = source.Select(x => Convert.ToDouble(x.Close)).ToArray();
+
+            var tema = TicTacTec.TA.Library.Core.StochF(0, source.Count - 1, highs, lows, closes, fastKPeriod, fastDPeriod,
                  fastDmaType, out outBegIdx, out outNbElement, kValues, dValues);
 
             if (tema == TicTacTec.TA.Library.Core.RetCode.Success)

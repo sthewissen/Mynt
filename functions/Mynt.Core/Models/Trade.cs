@@ -1,21 +1,21 @@
 ﻿using System;
-using Microsoft.WindowsAzure.Storage.Table;
+using Mynt.Core.Enums;
 
 namespace Mynt.Core.Models
 {
-    public class Trade : TableEntity
+    public class Trade
     {
         public string TraderId { get; set; }
 
         public string Market { get; set; }
 
-        public double OpenRate { get; set; }
-        public double? CloseRate { get; set; }
-        public double? CloseProfit { get; set; }
-        public double? CloseProfitPercentage { get; set; }
+        public decimal OpenRate { get; set; }
+        public decimal? CloseRate { get; set; }
+        public decimal? CloseProfit { get; set; }
+        public decimal? CloseProfitPercentage { get; set; }
 
-        public double StakeAmount { get; set; }
-        public double Quantity { get; set; }
+        public decimal StakeAmount { get; set; }
+        public decimal Quantity { get; set; }
 
         public bool IsOpen { get; set; }
         public bool IsBuying { get; set; }
@@ -29,7 +29,7 @@ namespace Mynt.Core.Models
         public DateTime? CloseDate { get; set; }
 
         public string StrategyUsed { get; set; }
-        public double? StopLossRate { get; set; }
+        public decimal? StopLossRate { get; set; }
         public SellType SellType { get; set; }
 
         public Trade()

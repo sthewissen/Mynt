@@ -13,8 +13,9 @@ namespace Mynt.Core.Indicators
             double[] upperValues = new double[source.Count];
             double[] middleValues = new double[source.Count];
             double[] lowerValues = new double[source.Count];
+            var closes = source.Select(x => Convert.ToDouble(x.Close)).ToArray();
 
-            var bbands = TicTacTec.TA.Library.Core.Bbands(0, source.Count - 1, source.Select(x => x.Close).ToArray(),
+            var bbands = TicTacTec.TA.Library.Core.Bbands(0, source.Count - 1, closes,
                 period, devUp, devDown, type, out outBegIdx, out outNbElement, upperValues, middleValues, lowerValues);
 
             if (bbands == TicTacTec.TA.Library.Core.RetCode.Success)
@@ -33,8 +34,8 @@ namespace Mynt.Core.Indicators
 
     public class Bband
     {
-        public List<double?> UpperBand { get; set; }
-        public List<double?> MiddleBand { get; set; }
-        public List<double?> LowerBand { get; set; }
+        public List<decimal?> UpperBand { get; set; }
+        public List<decimal?> MiddleBand { get; set; }
+        public List<decimal?> LowerBand { get; set; }
     }
 }

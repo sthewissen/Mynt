@@ -84,8 +84,8 @@ namespace Mynt.Core.Strategies
 
         public abstract Candle GetSignalCandle(List<Candle> candles);
 
-        public abstract List<ITradeAdvice> Prepare(List<Candle> candles);
+        public abstract List<TradeAdvice> Prepare(List<Candle> candles);
 
-        public abstract ITradeAdvice Forecast(List<Candle> candles);
+        public abstract TradeAdvice Forecast(List<Candle> candles);
     }
 }

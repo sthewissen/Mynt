@@ -9,10 +9,10 @@ namespace Mynt.Core.Models
     public class Candle
     {
         public DateTime Timestamp { get; set; }
-        public double High { get; set; }
-        public double Low { get; set; }
-        public double Open { get; set; }
-        public double Close { get; set; }
-        public double Volume { get; set; }
+        public decimal High { get; set; }
+        public decimal Low { get; set; }
+        public decimal Open { get; set; }
+        public decimal Close { get; set; }
+        public decimal Volume { get; set; }
     }
 }
