@@ -1,0 +1,9 @@
+﻿@{
+    Layout = "~/Views/Shared/_Frame.cshtml";
+}
+@Html.Partial("Utilities/_Loadingbar")
+@Html.Partial("Navigations/_Navigation")
+
+<div id="body-content" class="container">
+    @RenderBody()
+</div>
