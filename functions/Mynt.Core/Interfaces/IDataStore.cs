@@ -18,9 +18,4 @@ namespace Mynt.Core.Interfaces
         Task SaveTradersAsync(List<Trader> traders);
         Task SaveTraderAsync(Trader trader);
     }
-
-    public interface IDataStoreOptions
-    {
-        
-    }
 }
