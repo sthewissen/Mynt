@@ -1,10 +1,13 @@
 ﻿using System;
-using Microsoft.WindowsAzure.Storage.Table;
+using System.ComponentModel.DataAnnotations;
 
-namespace Mynt.Data.AzureTableStorage
+namespace Mynt.Data.SQLite
 {
-    internal class TraderAdapter : TableEntity
+    public class TraderAdapter
     {
+        [Key]
+        public int TraderId { get; set; }
+
         public string Identifier { get; set; }
         public double StakeAmount { get; set; }
         public double CurrentBalance { get; set; }
