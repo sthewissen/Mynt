@@ -21,4 +21,8 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Mynt.Core\Mynt.Core.csproj" />
+    <ProjectReference Include="..\Mynt.Data.AzureTableStorage\Mynt.Data.AzureTableStorage.csproj" />
+  </ItemGroup>
 </Project>

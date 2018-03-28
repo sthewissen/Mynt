@@ -2,6 +2,8 @@
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
+using Mynt.Core.Enums;
+using Mynt.Core.Exchanges;
 
 namespace Mynt.Functions
 {
@@ -14,7 +16,10 @@ namespace Mynt.Functions
             {
                 log.Info("Starting processing...");
 
+                var exchange = new BaseExchange(new ExchangeOptions(Exchange.Binance));
+                var balance = await exchange.GetBalance("BTC");
 
+                log.Info($"Current BTC balance: {balance.Balance.ToString()}");
 
                 log.Info("Done...");
             }
