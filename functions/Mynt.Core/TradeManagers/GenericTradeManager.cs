@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Mynt.Core.Enums;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
@@ -13,17 +14,17 @@ namespace Mynt.Core.TradeManagers
         private readonly IExchangeApi _api;
         private readonly INotificationManager _notification;
         private readonly ITradingStrategy _strategy;
-        private readonly Action<string> _log;
+        private readonly ILogger _logger;
         private List<Trade> _activeTrades;
         private List<Trader> _currentTraders;
         private readonly IDataStore _dataStore;
         private readonly TradeOptions _settings;
 
-        public GenericTradeManager(IExchangeApi api, ITradingStrategy strat, INotificationManager notificationManager, Action<string> log, TradeOptions settings, IDataStore dataStore)
+        public GenericTradeManager(IExchangeApi api, ITradingStrategy strat, INotificationManager notificationManager, ILogger logger, TradeOptions settings, IDataStore dataStore)
         {
             _api = api;
             _strategy = strat;
-            _log = log;
+            _logger = logger;
             _notification = notificationManager;
             _dataStore = dataStore;
             _settings = settings;
@@ -86,7 +87,7 @@ namespace Mynt.Core.TradeManagers
                 }
                 else
                 {
-                    _log("No trade opportunities found...");
+                    _logger.LogInformation("No trade opportunities found...");
                 }
             }
         }
@@ -174,7 +175,7 @@ namespace Mynt.Core.TradeManagers
             // Do we even have enough funds to invest?
             if (currentBtcBalance.Available < freeTrader.CurrentBalance)
             {
-                _log($"Insufficient BTC funds ({currentBtcBalance.Available}) to perform a {signal.Pair} trade. Skipping this trade.");
+                _logger.LogWarning("Insufficient BTC funds ({Available}) to perform a {Pair} trade. Skipping this trade.", currentBtcBalance.Available, signal.Pair);
                 return;
             }
 
@@ -184,7 +185,7 @@ namespace Mynt.Core.TradeManagers
             if (order != null)
             {
                 // Send a notification that we found something suitable
-                _log($"New trade signal {order.Market}...");
+                _logger.LogInformation("New trade signal {market}...", order.Market);
 
                 // Update the trader to busy
                 freeTrader.LastUpdated = DateTime.UtcNow;
@@ -327,7 +328,7 @@ namespace Mynt.Core.TradeManagers
             if (_settings.PlaceFirstStopAtSignalCandleLow)
             {
                 trade.StopLossRate = signalCandle.Low;
-                _log($"Automatic stop set at signal candle low {signalCandle.Low:0.00000000}");
+                _logger.LogInformation("Automatic stop set at signal candle low {Low}", signalCandle.Low.ToString("0.00000000"));
             }
 
             return trade;
@@ -342,7 +343,7 @@ namespace Mynt.Core.TradeManagers
         {
             try
             {
-                _log($"Checking market {market}...");
+                _logger.LogInformation("Checking market {Market}...", market);
 
                 var minimumDate = _strategy.GetMinimumDateTime();
                 var candleDate = _strategy.GetCurrentCandleDateTime();
@@ -354,7 +355,7 @@ namespace Mynt.Core.TradeManagers
                 // Not enough candles to perform what we need to do.
                 if (candles.Count < _strategy.MinimumAmountOfCandles)
                 {
-                    _log($"Not enough candle data for {market}...");
+                    _logger.LogWarning("Not enough candle data for {Market}...", market);
                     return new TradeSignal
                     {
                         TradeAdvice = TradeAdvice.Hold,
@@ -368,7 +369,7 @@ namespace Mynt.Core.TradeManagers
                 // This is an outdated candle...
                 if (signalDate < _strategy.GetSignalDate())
                 {
-                    _log($"Outdated candle for {market}...");
+                    _logger.LogInformation("Outdated candle for {Market}...", market);
                     return null;
                 }
 
@@ -382,10 +383,10 @@ namespace Mynt.Core.TradeManagers
                     SignalCandle = _strategy.GetSignalCandle(candles)
                 };
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 // Couldn't get a buy signal for this market, no problem. Let's skip it.
-                _log($"Couldn't get buy signal for {market}...");
+                _logger.LogError(ex, "Couldn't get buy signal for {Market}...", market);
                 return null;
             }
         }
@@ -519,7 +520,7 @@ namespace Mynt.Core.TradeManagers
                 else if (sellType == SellType.TrailingStopLossUpdated)
                 {
                     // Update the stop loss for this trade, which was set in ShouldSell.
-                    _log($"Updated the trailing stop loss for {trade.Market} to {trade.StopLossRate.Value:0.00000000}");
+                    _logger.LogInformation("Updated the trailing stop loss for {Market} to {StopLoss}", trade.Market, trade.StopLossRate.Value.ToString("0.00000000"));
                     await _dataStore.SaveTradeAsync(trade);
                 }
             }
@@ -536,12 +537,12 @@ namespace Mynt.Core.TradeManagers
         {
             var currentProfit = (currentRateBid - trade.OpenRate) / trade.OpenRate;
 
-            _log($"Should sell {trade.Market}? Profit: {(currentProfit * 100):0.00}%...");
+            _logger.LogInformation("Should sell {Market}? Profit: {Profit}%...", trade.Market, (currentProfit * 100).ToString("0.00"));
 
             // Let's not do a stoploss for now...
             if (currentProfit < _settings.StopLossPercentage)
             {
-                _log($"Stop loss hit: {_settings.StopLossPercentage}%");
+                _logger.LogInformation("Stop loss hit: {StopLoss}%", _settings.StopLossPercentage);
                 return SellType.StopLoss;
             }
 
@@ -552,7 +553,7 @@ namespace Mynt.Core.TradeManagers
 
                 if (timeDiff > item.Duration && currentProfit > item.Profit)
                 {
-                    _log($"Timer hit: {timeDiff} mins, profit {item.Profit:0.00}%");
+                    _logger.LogInformation("Timer hit: {TimeDifference} mins, profit {Profit}%", timeDiff, item.Profit.ToString("0.00"));
                     return SellType.Timed;
                 }
             }

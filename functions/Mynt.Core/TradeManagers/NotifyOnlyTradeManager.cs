@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace Mynt.Core.TradeManagers
 {
@@ -15,14 +16,14 @@ namespace Mynt.Core.TradeManagers
         private readonly string _buyMessage;
         private readonly string _sellMessage;
         private readonly ITradingStrategy _strategy;
-        private readonly Action<string> _log;
+        private readonly ILogger _logger;
         private readonly TradeOptions _settings;
 
-        public NotifyOnlyTradeManager(IExchangeApi api, ITradingStrategy strat, INotificationManager notificationManager, string buyMessage, string sellMessage, Action<string> log, TradeOptions settings)
+        public NotifyOnlyTradeManager(IExchangeApi api, ITradingStrategy strat, INotificationManager notificationManager, string buyMessage, string sellMessage, ILogger logger, TradeOptions settings)
         {
             _api = api;
             _strategy = strat;
-            _log = log;
+            _logger = logger;
             _notification = notificationManager;
             _buyMessage = buyMessage;
             _sellMessage = sellMessage;
@@ -59,7 +60,7 @@ namespace Mynt.Core.TradeManagers
             }
             else
             {
-                _log("No trade opportunities found...");
+                _logger.LogInformation("No trade opportunities found...");
             }
         }
 
@@ -112,7 +113,7 @@ namespace Mynt.Core.TradeManagers
         {
             try
             {
-                _log($"Checking market {market}...");
+                _logger.LogInformation("Checking market {Market}...", market);
 
                 var minimumDate = _strategy.GetMinimumDateTime();
                 var candleDate = _strategy.GetCurrentCandleDateTime();
@@ -149,7 +150,7 @@ namespace Mynt.Core.TradeManagers
             catch (Exception ex)
             {
                 // Couldn't get a buy signal for this market, no problem. Let's skip it.
-                _log($"Couldn't get buy signal for {market}...");
+                _logger.LogError(ex, "Couldn't get buy signal for {Market}...", market);
                 return null;
             }
         }
