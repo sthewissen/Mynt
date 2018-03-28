@@ -1,9 +1,16 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.Functions", "Mynt.Functions\Mynt.Functions.csproj", "{7840233D-6CDA-4535-8F58-3F2235FD63AD}"
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2036
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mynt.Functions", "Mynt.Functions\Mynt.Functions.csproj", "{7840233D-6CDA-4535-8F58-3F2235FD63AD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.Core", "Mynt.Core\Mynt.Core.csproj", "{0D33270E-D419-4839-9CCB-3DD2DE277A67}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mynt.Core", "Mynt.Core\Mynt.Core.csproj", "{0D33270E-D419-4839-9CCB-3DD2DE277A67}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.Common", "Mynt.Common\Mynt.Common.csproj", "{004C84B9-5C84-43DF-A733-05E280391C5C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.Presentation", "Mynt.Presentation\Mynt.Presentation.csproj", "{CAD9BD95-3C81-432C-A599-BE4275FAE8C6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.Presentation.Tests", "Mynt.Presentation.Tests\Mynt.Presentation.Tests.csproj", "{653BFBFF-ED35-482D-A2E8-538AD42E1806}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,5 +26,23 @@ Global
 		{0D33270E-D419-4839-9CCB-3DD2DE277A67}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0D33270E-D419-4839-9CCB-3DD2DE277A67}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0D33270E-D419-4839-9CCB-3DD2DE277A67}.Release|Any CPU.Build.0 = Release|Any CPU
+		{004C84B9-5C84-43DF-A733-05E280391C5C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{004C84B9-5C84-43DF-A733-05E280391C5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{004C84B9-5C84-43DF-A733-05E280391C5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{004C84B9-5C84-43DF-A733-05E280391C5C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CAD9BD95-3C81-432C-A599-BE4275FAE8C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CAD9BD95-3C81-432C-A599-BE4275FAE8C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CAD9BD95-3C81-432C-A599-BE4275FAE8C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CAD9BD95-3C81-432C-A599-BE4275FAE8C6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{653BFBFF-ED35-482D-A2E8-538AD42E1806}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{653BFBFF-ED35-482D-A2E8-538AD42E1806}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{653BFBFF-ED35-482D-A2E8-538AD42E1806}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{653BFBFF-ED35-482D-A2E8-538AD42E1806}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {35CC3FD1-AEF6-4D70-B533-5A986455247F}
 	EndGlobalSection
 EndGlobal
