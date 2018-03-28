@@ -12,6 +12,7 @@ namespace Mynt.Core.TradeManagers
         public bool IsDryRunning { get; set; } = false;
         public int MaxNumberOfConcurrentTrades { get; set; } = 2;
         public decimal AmountOfBtcToInvestPerTrader { get; set; } = 0.01m;
+        public decimal TransactionFeePercentage { get; set; } = 0.0025m;
 
         // If we go below this profit percentage, we sell immediately.
         public decimal StopLossPercentage { get; set; } = -0.07m;

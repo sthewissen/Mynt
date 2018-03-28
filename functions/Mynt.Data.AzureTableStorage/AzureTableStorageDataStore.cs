@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
@@ -10,14 +9,20 @@ namespace Mynt.Data.AzureTableStorage
 {
     public class AzureTableStorageDataStore : IDataStore
     {
+        private readonly AzureTableStorageOptions _options;
         private CloudTable _orderTable;
         private CloudTable _traderTable;
 
         public AzureTableStorageDataStore(AzureTableStorageOptions options)
         {
+            _options = options;
+        }
+
+        public async Task InitializeAsync()
+        {
             // First initialize a few things
-            _orderTable = GetTableConnection(options.ConnectionString, "orders").Result;
-            _traderTable = GetTableConnection(options.ConnectionString, "traders").Result;
+            _orderTable = await GetTableConnection(_options.ConnectionString, "orders");
+            _traderTable = await GetTableConnection(_options.ConnectionString, "traders");
         }
 
         private static async Task<CloudTable> GetTableConnection(string connectionString, string tableName)
