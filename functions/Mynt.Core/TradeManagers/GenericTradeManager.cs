@@ -30,7 +30,7 @@ namespace Mynt.Core.TradeManagers
             _settings = settings;
         }
 
-        public async Task Initialize()
+        private async Task Initialize()
         {
             // First initialize a few things
             await _dataStore.InitializeAsync();
@@ -52,7 +52,7 @@ namespace Mynt.Core.TradeManagers
         /// Checks if new trades can be started.
         /// </summary>
         /// <returns></returns>
-        public async Task CheckStrategySignals()
+        public async Task LookForNewTrades()
         {
             // Initialize the things we'll be using throughout the process.
             await Initialize();
@@ -433,7 +433,7 @@ namespace Mynt.Core.TradeManagers
 
         #region UPDATE TRADES
 
-        public async Task UpdateRunningTrades()
+        public async Task UpdateExistingTrades()
         {
             // Get our current trades.
             await Initialize();

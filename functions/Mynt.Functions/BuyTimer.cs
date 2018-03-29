@@ -2,8 +2,13 @@
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
+using Microsoft.Extensions.Logging;
 using Mynt.Core.Enums;
 using Mynt.Core.Exchanges;
+using Mynt.Core.Notifications;
+using Mynt.Core.Strategies;
+using Mynt.Core.TradeManagers;
+using Mynt.Data.AzureTableStorage;
 
 namespace Mynt.Functions
 {
@@ -16,10 +21,28 @@ namespace Mynt.Functions
             {
                 log.Info("Starting processing...");
 
-                var exchange = new BaseExchange(new ExchangeOptions(Exchange.Binance));
-                var balance = await exchange.GetBalance("BTC");
+                //// Either use the default options as defined in TradeOptions or override them.
+                //// You can override them using the property setters here or by providing keys in your configuration mechanism
+                //// matching the property names in this class.
 
-                log.Info($"Current BTC balance: {balance.Balance.ToString()}");
+                // var options = new TradeOptions()
+                // {
+                //    MarketBlackList = new List<string> { "TRX", "XVG" }
+                // };
+
+                //// Initialize a Trade Manager instance that will run using the settings provided below.
+                //// Once again, you can use the default values for the settings defined in te Options classes below.
+                //// You can also override them here or using the configuration mechanism of your choosing.
+                //var tradeManager = new GenericTradeManager(
+                //    api: new BaseExchange(new ExchangeOptions(Exchange.Binance)),
+                //    dataStore: new AzureTableStorageDataStore(new AzureTableStorageOptions()),
+                //    logger: ???,
+                //    notificationManager: new TelegramNotificationManager(new TelegramNotificationOptions()),
+                //    settings: options,
+                //    strategy: new TheScalper());
+
+                //// Start running this thing!
+                //await tradeManager.LookForNewTrades();
 
                 log.Info("Done...");
             }
