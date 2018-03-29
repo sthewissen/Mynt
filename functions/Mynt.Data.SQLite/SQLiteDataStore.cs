@@ -16,6 +16,11 @@ namespace Mynt.Data.SQLite
             // TODO: Get some decent instance of the SQLiteContext.
         }
 
+        public Task InitializeAsync()
+        {
+            return Task.CompletedTask; // TODO
+        }
+
         public Task<List<Trade>> GetActiveTradesAsync()
         {
             var trades = _context.Trades.Where(x => x.IsOpen).ToList();
@@ -58,6 +63,14 @@ namespace Mynt.Data.SQLite
         public Task SaveTradesAsync(List<Trade> trades)
         {
             throw new NotImplementedException();
+        }
+
+        public Task<List<Trader>> GetTradersAsync()
+        {
+            var traders = _context.Traders.ToList();
+            var items = Mapping.Mapper.Map<List<Trader>>(traders);
+
+            return Task.FromResult(items);
         }
     }
 }
