@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
@@ -15,41 +16,41 @@ namespace Mynt.Functions
     public static class BuyTimer
     {
         [FunctionName("BuyTimer")]
-        public static async Task Run([TimerTrigger("10 1 * * * *")]TimerInfo buyTimer, TraceWriter log)
+        public static async Task Run([TimerTrigger("10 1 * * * *")]TimerInfo buyTimer, ILogger log)
         {
             try
             {
-                log.Info("Starting processing...");
+                log.LogInformation("Starting processing...");
 
-                //// Either use the default options as defined in TradeOptions or override them.
-                //// You can override them using the property setters here or by providing keys in your configuration mechanism
-                //// matching the property names in this class.
+                // Either use the default options as defined in TradeOptions or override them.
+                // You can override them using the property setters here or by providing keys in your configuration mechanism
+                // matching the property names in this class.
 
-                // var options = new TradeOptions()
-                // {
-                //    MarketBlackList = new List<string> { "TRX", "XVG" }
-                // };
+                 var options = new TradeOptions()
+                 {
+                    MarketBlackList = new List<string> { "TRX", "XVG" }
+                 };
 
-                //// Initialize a Trade Manager instance that will run using the settings provided below.
-                //// Once again, you can use the default values for the settings defined in te Options classes below.
-                //// You can also override them here or using the configuration mechanism of your choosing.
-                //var tradeManager = new GenericTradeManager(
-                //    api: new BaseExchange(new ExchangeOptions(Exchange.Binance)),
-                //    dataStore: new AzureTableStorageDataStore(new AzureTableStorageOptions()),
-                //    logger: ???,
-                //    notificationManager: new TelegramNotificationManager(new TelegramNotificationOptions()),
-                //    settings: options,
-                //    strategy: new TheScalper());
+                // Initialize a Trade Manager instance that will run using the settings provided below.
+                // Once again, you can use the default values for the settings defined in te Options classes below.
+                // You can also override them here or using the configuration mechanism of your choosing.
+                var tradeManager = new GenericTradeManager(
+                    api: new BaseExchange(new ExchangeOptions(Exchange.Binance)),
+                    dataStore: new AzureTableStorageDataStore(new AzureTableStorageOptions()),
+                    logger: log,
+                    notificationManager: new TelegramNotificationManager(new TelegramNotificationOptions()),
+                    settings: options,
+                    strategy: new TheScalper());
 
-                //// Start running this thing!
-                //await tradeManager.LookForNewTrades();
+                // Start running this thing!
+                await tradeManager.LookForNewTrades();
 
-                log.Info("Done...");
+                log.LogInformation("Done...");
             }
             catch (Exception ex)
             {
                 // If anything goes wrong log an error to Azure.
-                log.Error(ex.Message + ex.StackTrace);
+                log.LogError(ex.Message + ex.StackTrace);
             }
         }
     }
