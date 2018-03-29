@@ -19,10 +19,10 @@ namespace Mynt.Core.TradeManagers
         private readonly ILogger _logger;
         private readonly TradeOptions _settings;
 
-        public NotifyOnlyTradeManager(IExchangeApi api, ITradingStrategy strat, INotificationManager notificationManager, string buyMessage, string sellMessage, ILogger logger, TradeOptions settings)
+        public NotifyOnlyTradeManager(IExchangeApi api, ITradingStrategy strategy, INotificationManager notificationManager, string buyMessage, string sellMessage, ILogger logger, TradeOptions settings)
         {
             _api = api;
-            _strategy = strat;
+            _strategy = strategy;
             _logger = logger;
             _notification = notificationManager;
             _buyMessage = buyMessage;
@@ -180,11 +180,6 @@ namespace Mynt.Core.TradeManagers
             {
                 return Math.Round(tick.Bid * (1 - _settings.BuyInPricePercentage), 8);
             }
-        }
-
-        public async Task UpdateRunningTrades()
-        {
-            await Task.FromResult(true);
         }
 
         private async Task SendNotification(string message)

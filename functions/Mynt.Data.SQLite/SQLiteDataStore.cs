@@ -64,5 +64,13 @@ namespace Mynt.Data.SQLite
         {
             throw new NotImplementedException();
         }
+
+        public Task<List<Trader>> GetTradersAsync()
+        {
+            var traders = _context.Traders.ToList();
+            var items = Mapping.Mapper.Map<List<Trader>>(traders);
+
+            return Task.FromResult(items);
+        }
     }
 }

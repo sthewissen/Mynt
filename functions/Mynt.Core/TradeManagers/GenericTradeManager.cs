@@ -20,10 +20,10 @@ namespace Mynt.Core.TradeManagers
         private readonly IDataStore _dataStore;
         private readonly TradeOptions _settings;
 
-        public GenericTradeManager(IExchangeApi api, ITradingStrategy strat, INotificationManager notificationManager, ILogger logger, TradeOptions settings, IDataStore dataStore)
+        public GenericTradeManager(IExchangeApi api, ITradingStrategy strategy, INotificationManager notificationManager, ILogger logger, TradeOptions settings, IDataStore dataStore)
         {
             _api = api;
-            _strategy = strat;
+            _strategy = strategy;
             _logger = logger;
             _notification = notificationManager;
             _dataStore = dataStore;
@@ -38,14 +38,14 @@ namespace Mynt.Core.TradeManagers
             _activeTrades = await _dataStore.GetActiveTradesAsync();
             _currentTraders = await _dataStore.GetBusyTradersAsync();
 
-            // Create our trader records if they don't exist yet.
+            // Create our trader records if no traders exist yet.
             if (_currentTraders.Count == 0)
             {
                 await CreateTradersIfNoneExist();
-
-                // try that again
-                _currentTraders = await _dataStore.GetBusyTradersAsync();
             }
+
+            // Get a list of our busy traders
+            _currentTraders = await _dataStore.GetBusyTradersAsync();
         }
 
         /// <summary>
@@ -101,6 +101,7 @@ namespace Mynt.Core.TradeManagers
         private async Task CreateTradersIfNoneExist()
         {
             var traders = new List<Trader>();
+
             for (var i = 0; i < _settings.MaxNumberOfConcurrentTrades; i++)
             {
                 var newTrader = new Trader()
@@ -133,29 +134,33 @@ namespace Mynt.Core.TradeManagers
             // Only trigger if there are orders still buying.
             if (_activeTrades.Any(x => x.IsBuying))
             {
-                // Loop our current buying trades if there are any.
+                // Loop our current trades that are still looking to buy if there are any.
                 foreach (var trade in _activeTrades.Where(x => x.IsBuying))
                 {
-                    // Cancel our open buy order.
+                    // Cancel our open buy order on the exchange.
                     await _api.CancelOrder(trade.BuyOrderId, trade.Market);
 
-                    // Update the buy order.
+                    // Update the buy order in our data storage.
                     trade.IsBuying = false;
                     trade.OpenOrderId = null;
                     trade.IsOpen = false;
                     trade.SellType = SellType.Cancelled;
                     trade.CloseDate = DateTime.UtcNow;
 
+                    // Update the order
+                    await _dataStore.SaveTradeAsync(trade);
+
                     // Handle the trader that was dedicated to this order.
                     var currentTrader = _currentTraders.FirstOrDefault(x => x.Identifier == trade.TraderId);
 
+                    // If there is a trader, update that as well...
                     if (currentTrader != null)
                     {
                         currentTrader.IsBusy = false;
                         currentTrader.LastUpdated = DateTime.UtcNow;
 
                         // Update the trader to indicate that we're not busy anymore.
-                        await _dataStore.SaveTradeAsync(trade);
+                        await _dataStore.SaveTraderAsync(currentTrader);
                     }
 
                     await SendNotification($"Cancelled {trade.Market} buy order.");
@@ -175,7 +180,7 @@ namespace Mynt.Core.TradeManagers
             // Do we even have enough funds to invest?
             if (currentBtcBalance.Available < freeTrader.CurrentBalance)
             {
-                _logger.LogWarning("Insufficient BTC funds ({Available}) to perform a {Pair} trade. Skipping this trade.", currentBtcBalance.Available, signal.Pair);
+                _logger.LogWarning("Insufficient funds ({Available}) to perform a {Pair} trade. Skipping this trade.", currentBtcBalance.Available, signal.Pair);
                 return;
             }
 
@@ -184,6 +189,9 @@ namespace Mynt.Core.TradeManagers
             // We found a trade and have set it all up!
             if (order != null)
             {
+                // Save the order.
+                await _dataStore.SaveTradeAsync(order);
+
                 // Send a notification that we found something suitable
                 _logger.LogInformation("New trade signal {market}...", order.Market);
 
@@ -191,6 +199,7 @@ namespace Mynt.Core.TradeManagers
                 freeTrader.LastUpdated = DateTime.UtcNow;
                 freeTrader.IsBusy = true;
 
+                // Save the new trader state.
                 await _dataStore.SaveTraderAsync(freeTrader);
             }
         }
@@ -312,6 +321,7 @@ namespace Mynt.Core.TradeManagers
 
             var trade = new Trade()
             {
+                TraderId = freeTrader.Identifier,
                 Market = pair,
                 StakeAmount = btcToSpend,
                 OpenRate = openRate,
@@ -446,7 +456,6 @@ namespace Mynt.Core.TradeManagers
         {
             // There are trades that have an open order ID set & no sell order id set
             // that means its a buy trade that is waiting to get bought. See if we can update that first.
-
             foreach (var trade in _activeTrades.Where(x => x.OpenOrderId != null && x.SellOrderId == null))
             {
                 var exchangeOrder = await _api.GetOrder(trade.BuyOrderId, trade.Market);
