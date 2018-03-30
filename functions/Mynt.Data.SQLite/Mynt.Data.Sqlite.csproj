@@ -2,6 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>Mynt.Data.Sqlite</RootNamespace>
+    <AssemblyName>Mynt.Data.Sqlite</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

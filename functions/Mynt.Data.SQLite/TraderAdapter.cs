@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Mynt.Data.SQLite
+namespace Mynt.Data.Sqlite
 {
     public class TraderAdapter
     {

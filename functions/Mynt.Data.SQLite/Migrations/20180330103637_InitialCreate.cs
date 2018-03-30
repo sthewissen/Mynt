@@ -2,31 +2,14 @@
 using System;
 using System.Collections.Generic;
 
-namespace Mynt.Data.SQLite.Migrations
+namespace Mynt.Data.Sqlite.Migrations
 {
     public partial class InitialCreate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Traders",
-                columns: table => new
-                {
-                    TraderId = table.Column<int>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    CurrentBalance = table.Column<double>(nullable: false),
-                    Identifier = table.Column<string>(nullable: true),
-                    IsBusy = table.Column<bool>(nullable: false),
-                    LastUpdated = table.Column<DateTime>(nullable: false),
-                    StakeAmount = table.Column<double>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Traders", x => x.TraderId);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Trades",
+                name: "Orders",
                 columns: table => new
                 {
                     TradeId = table.Column<int>(nullable: false)
@@ -53,17 +36,34 @@ namespace Mynt.Data.SQLite.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Trades", x => x.TradeId);
+                    table.PrimaryKey("PK_Orders", x => x.TradeId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Traders",
+                columns: table => new
+                {
+                    TraderId = table.Column<int>(nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    CurrentBalance = table.Column<double>(nullable: false),
+                    Identifier = table.Column<string>(nullable: true),
+                    IsBusy = table.Column<bool>(nullable: false),
+                    LastUpdated = table.Column<DateTime>(nullable: false),
+                    StakeAmount = table.Column<double>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Traders", x => x.TraderId);
                 });
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Traders");
+                name: "Orders");
 
             migrationBuilder.DropTable(
-                name: "Trades");
+                name: "Traders");
         }
     }
 }

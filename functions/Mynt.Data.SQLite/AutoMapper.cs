@@ -2,7 +2,7 @@
 using AutoMapper;
 using Mynt.Core.Models;
 
-namespace Mynt.Data.SQLite
+namespace Mynt.Data.Sqlite
 {
     public static class Mapping
     {

@@ -10,5 +10,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mynt.Data.SqlServer\Mynt.Data.SqlServer.csproj" />
+    <ProjectReference Include="..\Mynt.Data.SQLite\Mynt.Data.SQLite.csproj" />
   </ItemGroup>
 </Project>

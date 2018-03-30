@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Mynt.Core.Enums;
 
-namespace Mynt.Data.SQLite
+namespace Mynt.Data.Sqlite
 {
     public class TradeAdapter
     {

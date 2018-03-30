@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.Data.SqlServer", "Mynt
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.TestConsole", "Mynt.TestConsole\Mynt.TestConsole.csproj", "{043D744B-F3F6-4CD0-A9EA-16A7B85DF55D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.Data.Sqlite", "Mynt.Data.SQLite\Mynt.Data.SQLite.csproj", "{F5934EEF-3636-4A9D-86FA-660B9E8F40B8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,5 +45,9 @@ Global
 		{043D744B-F3F6-4CD0-A9EA-16A7B85DF55D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{043D744B-F3F6-4CD0-A9EA-16A7B85DF55D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{043D744B-F3F6-4CD0-A9EA-16A7B85DF55D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5934EEF-3636-4A9D-86FA-660B9E8F40B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5934EEF-3636-4A9D-86FA-660B9E8F40B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5934EEF-3636-4A9D-86FA-660B9E8F40B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5934EEF-3636-4A9D-86FA-660B9E8F40B8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

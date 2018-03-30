@@ -6,13 +6,13 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Storage.Internal;
 using Mynt.Core.Enums;
-using Mynt.Data.SQLite;
+using Mynt.Data.Sqlite;
 using System;
 
-namespace Mynt.Data.SQLite.Migrations
+namespace Mynt.Data.Sqlite.Migrations
 {
-    [DbContext(typeof(SQLiteContext))]
-    partial class SQLiteContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(MyntDbContext))]
+    partial class MyntDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
@@ -20,7 +20,7 @@ namespace Mynt.Data.SQLite.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "2.0.2-rtm-10011");
 
-            modelBuilder.Entity("Mynt.Data.SQLite.TradeAdapter", b =>
+            modelBuilder.Entity("Mynt.Data.Sqlite.TradeAdapter", b =>
                 {
                     b.Property<int>("TradeId")
                         .ValueGeneratedOnAdd();
@@ -65,10 +65,10 @@ namespace Mynt.Data.SQLite.Migrations
 
                     b.HasKey("TradeId");
 
-                    b.ToTable("Trades");
+                    b.ToTable("Orders");
                 });
 
-            modelBuilder.Entity("Mynt.Data.SQLite.TraderAdapter", b =>
+            modelBuilder.Entity("Mynt.Data.Sqlite.TraderAdapter", b =>
                 {
                     b.Property<int>("TraderId")
                         .ValueGeneratedOnAdd();

@@ -10,7 +10,7 @@ namespace Mynt.Data.SqlServer
 {
     public class SqlServerDataStore : IDataStore
     {
-        private MyntDbContext _context;
+        private readonly MyntDbContext _context;
 
         public SqlServerDataStore(SqlServerOptions options)
         {

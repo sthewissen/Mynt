@@ -17,6 +17,12 @@ namespace Mynt.TestConsole
                 ConnectionString = "<INSERT CONNECTION STRING>"
             });
 
+            // OR using Sqlite...
+            // var sqlStore = new SqliteDataStore(new SqliteOptions
+            // {
+            //     ConnectionString = "Data Source=Mynt.sqlite"
+            // });
+
             // Create a trader
             sqlStore.SaveTraderAsync(new Trader { Identifier=Guid.NewGuid().ToString(), StakeAmount=0.01m, CurrentBalance=0.01m }).Wait();
 
