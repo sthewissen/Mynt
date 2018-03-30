@@ -13,7 +13,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{E9BA3CE1-0
 		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.Data.SQLite", "Mynt.Data.SQLite\Mynt.Data.SQLite.csproj", "{AF4BB8D9-94C1-45B0-BAA6-C163CE79AB71}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.Data.SqlServer", "Mynt.Data.SqlServer\Mynt.Data.SqlServer.csproj", "{8F96E6F8-B933-4C5A-9592-21A2209385DA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.TestConsole", "Mynt.TestConsole\Mynt.TestConsole.csproj", "{043D744B-F3F6-4CD0-A9EA-16A7B85DF55D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,9 +35,13 @@ Global
 		{E48797FD-0018-45FC-BD28-8C0F9BB1D27D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E48797FD-0018-45FC-BD28-8C0F9BB1D27D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E48797FD-0018-45FC-BD28-8C0F9BB1D27D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AF4BB8D9-94C1-45B0-BAA6-C163CE79AB71}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AF4BB8D9-94C1-45B0-BAA6-C163CE79AB71}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AF4BB8D9-94C1-45B0-BAA6-C163CE79AB71}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AF4BB8D9-94C1-45B0-BAA6-C163CE79AB71}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8F96E6F8-B933-4C5A-9592-21A2209385DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F96E6F8-B933-4C5A-9592-21A2209385DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F96E6F8-B933-4C5A-9592-21A2209385DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F96E6F8-B933-4C5A-9592-21A2209385DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{043D744B-F3F6-4CD0-A9EA-16A7B85DF55D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{043D744B-F3F6-4CD0-A9EA-16A7B85DF55D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{043D744B-F3F6-4CD0-A9EA-16A7B85DF55D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{043D744B-F3F6-4CD0-A9EA-16A7B85DF55D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
