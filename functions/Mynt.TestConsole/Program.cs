@@ -17,9 +17,18 @@ namespace Mynt.TestConsole
                 ConnectionString = "<INSERT CONNECTION STRING>"
             });
 
+            // Create a trader
             sqlStore.SaveTraderAsync(new Trader { Identifier=Guid.NewGuid().ToString(), StakeAmount=0.01m, CurrentBalance=0.01m }).Wait();
 
+            // Retrieve it
             var traders = sqlStore.GetTradersAsync().Result;
+
+            foreach(var item in traders)
+            {
+                Console.WriteLine(item.Identifier);
+            }
+
+            Console.ReadLine();
         }
     }
 }
