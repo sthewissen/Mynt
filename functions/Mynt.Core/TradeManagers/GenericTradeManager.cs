@@ -106,6 +106,7 @@ namespace Mynt.Core.TradeManagers
             {
                 var newTrader = new Trader()
                 {
+                    Identifier = $"Trader{i}",
                     CurrentBalance = _settings.AmountOfBtcToInvestPerTrader,
                     IsBusy = false,
                     LastUpdated = DateTime.UtcNow,
