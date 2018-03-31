@@ -9,7 +9,6 @@ namespace Mynt.Core.TradeManagers
     public class TradeOptions : BaseSettings
     {
         // Trader settings
-        public bool IsDryRunning { get; set; } = false;
         public int MaxNumberOfConcurrentTrades { get; set; } = 2;
         public decimal AmountOfBtcToInvestPerTrader { get; set; } = 0.01m;
         public decimal TransactionFeePercentage { get; set; } = 0.0025m;
@@ -64,7 +63,6 @@ namespace Mynt.Core.TradeManagers
 
         public TradeOptions()
         {
-            TrySetFromConfig(() => IsDryRunning = AppSettings.Get<bool>(nameof(IsDryRunning)));
             TrySetFromConfig(() => MaxNumberOfConcurrentTrades = AppSettings.Get<int>(nameof(MaxNumberOfConcurrentTrades)));
             TrySetFromConfig(() => AmountOfBtcToInvestPerTrader = AppSettings.Get<decimal>(nameof(AmountOfBtcToInvestPerTrader)));
 

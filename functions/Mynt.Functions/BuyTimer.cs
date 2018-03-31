@@ -34,7 +34,7 @@ namespace Mynt.Functions
                 // Initialize a Trade Manager instance that will run using the settings provided below.
                 // Once again, you can use the default values for the settings defined in te Options classes below.
                 // You can also override them here or using the configuration mechanism of your choosing.
-                var tradeManager = new GenericTradeManager(
+                var tradeManager = new LiveTradeManager(
                     api: new BaseExchange(new ExchangeOptions(Exchange.Binance)),
                     dataStore: new AzureTableStorageDataStore(new AzureTableStorageOptions()),
                     logger: log,

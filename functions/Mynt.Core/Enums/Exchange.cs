@@ -4,6 +4,8 @@ namespace Mynt.Core.Enums
     public enum Exchange
     {
         Binance,
-        Bittrex
+        Bitfinex,
+        Bittrex,
+        Poloniex
     }
 }

@@ -25,8 +25,14 @@ namespace Mynt.Core.Exchanges
                 case Exchange.Binance:
                     _api = new ExchangeSharp.ExchangeBinanceAPI();
                     break;
+                case Exchange.Bitfinex:
+                    _api = new ExchangeSharp.ExchangeBitfinexAPI();
+                    break;
                 case Exchange.Bittrex:
                     _api = new ExchangeSharp.ExchangeBittrexAPI();
+                    break;
+                case Exchange.Poloniex:
+                    _api = new ExchangeSharp.ExchangePoloniexAPI();
                     break;
             }
 

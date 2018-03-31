@@ -9,7 +9,7 @@ using Mynt.Core.Models;
 
 namespace Mynt.Core.TradeManagers
 {
-    public class GenericTradeManager
+    public class LiveTradeManager
     {
         private readonly IExchangeApi _api;
         private readonly INotificationManager _notification;
@@ -20,7 +20,7 @@ namespace Mynt.Core.TradeManagers
         private readonly IDataStore _dataStore;
         private readonly TradeOptions _settings;
 
-        public GenericTradeManager(IExchangeApi api, ITradingStrategy strategy, INotificationManager notificationManager, ILogger logger, TradeOptions settings, IDataStore dataStore)
+        public LiveTradeManager(IExchangeApi api, ITradingStrategy strategy, INotificationManager notificationManager, ILogger logger, TradeOptions settings, IDataStore dataStore)
         {
             _api = api;
             _strategy = strategy;
