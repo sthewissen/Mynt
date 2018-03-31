@@ -58,7 +58,7 @@ namespace Mynt.Data.AzureTableStorage
             var items = new List<TradeAdapter>();
             do
             {
-                var results = await _traderTable.ExecuteQuerySegmentedAsync(query, token);
+                var results = await _orderTable.ExecuteQuerySegmentedAsync(query, token);
                 items.AddRange(results);
                 token = results.ContinuationToken;
             } while (token != null);

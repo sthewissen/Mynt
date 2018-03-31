@@ -13,9 +13,11 @@ namespace Mynt.Core.Configuration
         public static T Get<T>(string key)
         {
             var appSetting = ConfigurationManager.AppSettings[key];
+
             if (string.IsNullOrWhiteSpace(appSetting)) throw new KeyNotFoundException($"AppSetting not found: '{key}'");
 
             var converter = TypeDescriptor.GetConverter(typeof(T));
+
             return (T)(converter.ConvertFromInvariantString(appSetting));
         }
     }
