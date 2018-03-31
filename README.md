@@ -1,18 +1,20 @@
 <img src="https://raw.githubusercontent.com/sthewissen/Mynt/master/img/myntlogo.png" alt="Mynt" width="400" />
 
+## Donating to support further development
+
 Finding this useful? Consider a donation!
 
 [![Donate with Bitcoin](https://en.cryptobadges.io/badge/small/13myncc3ie6iGjSmJHCdzahwaKizX7NBB1)](https://en.cryptobadges.io/donate/13myncc3ie6iGjSmJHCdzahwaKizX7NBB1)
 
 [![Donate with Ethereum](https://en.cryptobadges.io/badge/small/0x4398c958468bEDB41DdEF4C297eB543c6d26f440)](https://en.cryptobadges.io/donate/0x4398c958468bEDB41DdEF4C297eB543c6d26f440)
 
----
+## Get in touch!
 
 Want to have a chat? [Come find us on Slack!]
 
 <a href="https://join.slack.com/t/mynt-bot/signup"><img src="https://upload.wikimedia.org/wikipedia/commons/b/b9/Slack_Technologies_Logo.svg" alt="Join us on Slack!" width="100" /></a>
 
-# About the project...
+## About the project...
 This is an Azure Functions-based cryptocurrency trading bot. It uses the following cloud components to function:
 
 - Azure Functions
