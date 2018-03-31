@@ -8,21 +8,6 @@ using System.Threading.Tasks;
 
 namespace Mynt.Core.Configuration
 {
-    public class Settings : BaseSettings
-    {
-        public Settings()
-        {
-            TrySetFromConfig(() => TableStorageConnectionString = AppSettings.Get<string>(nameof(TableStorageConnectionString)));
-            TrySetFromConfig(() => OrderTableName = AppSettings.Get<string>(nameof(OrderTableName)));
-            TrySetFromConfig(() => TraderTableName = AppSettings.Get<string>(nameof(TraderTableName)));
-        }
-
-        // Azure settings
-        public string TableStorageConnectionString { get; set; } = "";
-        public string OrderTableName { get; set; } = "orders";
-        public string TraderTableName { get; set; } = "traders";
-    }
-
     public static class AppSettings
     {
         public static T Get<T>(string key)

@@ -53,6 +53,9 @@ namespace Mynt.Core.TradeManagers
         public List<(int Duration, decimal Profit)> ReturnOnInvestment { get; set; } = new List<ValueTuple<int, decimal>> {};
 
         // These are the markets we don't want to trade on
+        public List<string> QuoteCurrencies { get; set; } = new List<string> { "BTC" };
+
+        // These are the markets we don't want to trade on
         public List<string> MarketBlackList { get; set; } = new List<string> {};
 
         // These are the markets we want to trade on regardless of volume
@@ -93,6 +96,13 @@ namespace Mynt.Core.TradeManagers
                     var separatedList = list.Split('|').ToList();
                     ReturnOnInvestment = separatedList.Select(x => new ValueTuple<int, decimal>(Convert.ToInt32(x.Split(':')[0]), Convert.ToDecimal(x.Split(':')[1]))).ToList();
                 }
+            });
+
+            TrySetFromConfig(() => {
+                var list = AppSettings.Get<string>(nameof(QuoteCurrencies));
+
+                if (list != null)
+                    QuoteCurrencies = list.Split(',').ToList();
             });
 
             TrySetFromConfig(() => {

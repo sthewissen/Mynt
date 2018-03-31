@@ -44,17 +44,17 @@ namespace Mynt.Core.TradeManagers
                 {
                     // Depending on what we have more of we create trades.
                     // The amount here is an indication and will probably not be precisely what you get.
-                    var ticker = await _api.GetTicker(trade.Pair);
+                    var ticker = await _api.GetTicker(trade.MarketName);
                     var openRate = GetTargetBid(ticker, trade.SignalCandle);
                     var stop = openRate * (1 + _settings.StopLossPercentage);
 
                     if (trade.TradeAdvice == TradeAdvice.Buy)
                     {
-                        await SendNotification($"ℹ️ {_strategy.Name} - #{trade.Pair} at {openRate:0.00000000 BTC}\n" + _buyMessage);
+                        await SendNotification($"ℹ️ {_strategy.Name} - #{trade.MarketName} at {openRate:0.00000000}\n" + _buyMessage);
                     }
                     else if (trade.TradeAdvice == TradeAdvice.Sell)
                     {
-                        await SendNotification($"ℹ️ {_strategy.Name} - #{trade.Pair} at {openRate:0.00000000 BTC}\n" + _sellMessage);
+                        await SendNotification($"ℹ️ {_strategy.Name} - #{trade.MarketName} at {openRate:0.00000000}\n" + _sellMessage);
                     }
                 }
             }
@@ -79,7 +79,7 @@ namespace Mynt.Core.TradeManagers
             markets = markets.Where(x =>
                 (x.Volume > _settings.MinimumAmountOfVolume ||
                  _settings.AlwaysTradeList.Contains(x.CurrencyPair.BaseCurrency)) &&
-                x.CurrencyPair.QuoteCurrency.ToUpper() == "BTC").ToList();
+                 _settings.QuoteCurrencies.Contains(x.CurrencyPair.QuoteCurrency.ToUpper())).ToList();
 
             // Remove items that are on our blacklist.
             foreach (var market in _settings.MarketBlackList)
@@ -94,7 +94,7 @@ namespace Mynt.Core.TradeManagers
                 {
                     pairs.Add(new TradeSignal()
                     {
-                        Pair = market.MarketName,
+                        MarketName = market.MarketName,
                         TradeAdvice = signal.TradeAdvice,
                         SignalCandle = signal.SignalCandle
                     });
@@ -127,7 +127,7 @@ namespace Mynt.Core.TradeManagers
                     return new TradeSignal
                     {
                         TradeAdvice = TradeAdvice.Hold,
-                        Pair = market
+                    MarketName = market
                     };
 
                 // Get the date for the last candle.
@@ -143,7 +143,7 @@ namespace Mynt.Core.TradeManagers
                 return new TradeSignal
                 {
                     TradeAdvice = advice,
-                    Pair = market,
+                    MarketName = market,
                     SignalCandle = _strategy.GetSignalCandle(candles)
                 };
             }

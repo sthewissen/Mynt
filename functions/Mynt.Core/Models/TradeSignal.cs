@@ -10,7 +10,9 @@ namespace Mynt.Core.Models
 {
     public class TradeSignal
     {
-        public string Pair { get; set; }
+        public string MarketName { get; set; }
+        public string QuoteCurrency { get; set; }
+        public string BaseCurrency { get; set; }
         public decimal Price { get; set; }
         public TradeAdvice TradeAdvice { get; set; }
         public Candle SignalCandle { get; set; }
