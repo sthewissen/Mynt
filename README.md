@@ -8,12 +8,6 @@ Finding this useful? Consider a donation!
 
 [![Donate with Ethereum](https://en.cryptobadges.io/badge/small/0x4398c958468bEDB41DdEF4C297eB543c6d26f440)](https://en.cryptobadges.io/donate/0x4398c958468bEDB41DdEF4C297eB543c6d26f440)
 
-## Get in touch!
-
-Want to have a chat? [Come find us on Slack!]
-
-<a href="https://join.slack.com/t/mynt-bot/signup"><img src="https://upload.wikimedia.org/wikipedia/commons/b/b9/Slack_Technologies_Logo.svg" alt="Join us on Slack!" width="100" /></a>
-
 ## About the project...
 This is an Azure Functions-based cryptocurrency trading bot. It uses the following cloud components to function:
 
@@ -23,6 +17,12 @@ This is an Azure Functions-based cryptocurrency trading bot. It uses the followi
 A lot of the logic is based on the [Freqtrade] bot and was converted to C#. The bot currently supports trading on the Bittrex exchange. This software was primarily created for educational purposes only. Don't risk money which you are afraid to lose. This bot was first mentioned in [one of my blogposts].
 
 ![Build status](https://sthewissen.visualstudio.com/_apis/public/build/definitions/c865956c-413b-4c44-b678-45d3026ae0b0/11/badge)
+
+## Get in touch!
+
+Want to have a chat? [Come find us on Slack!]
+
+<a href="https://join.slack.com/t/mynt-bot/signup"><img src="https://upload.wikimedia.org/wikipedia/commons/b/b9/Slack_Technologies_Logo.svg" alt="Join us on Slack!" width="100" /></a>
 
 ---
 
