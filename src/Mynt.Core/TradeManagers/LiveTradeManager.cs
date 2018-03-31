@@ -9,7 +9,7 @@ using Mynt.Core.Models;
 
 namespace Mynt.Core.TradeManagers
 {
-    public class GenericTradeManager
+    public class LiveTradeManager
     {
         private readonly IExchangeApi _api;
         private readonly INotificationManager _notification;
@@ -20,7 +20,7 @@ namespace Mynt.Core.TradeManagers
         private readonly IDataStore _dataStore;
         private readonly TradeOptions _settings;
 
-        public GenericTradeManager(IExchangeApi api, ITradingStrategy strategy, INotificationManager notificationManager, ILogger logger, TradeOptions settings, IDataStore dataStore)
+        public LiveTradeManager(IExchangeApi api, ITradingStrategy strategy, INotificationManager notificationManager, ILogger logger, TradeOptions settings, IDataStore dataStore)
         {
             _api = api;
             _strategy = strategy;
@@ -176,16 +176,16 @@ namespace Mynt.Core.TradeManagers
         private async Task CreateNewTrade(Trader freeTrader, TradeSignal signal)
         {
             // Get our Bitcoin balance from the exchange
-            var currentBtcBalance = await _api.GetBalance("BTC");
+            var currentBtcBalance = await _api.GetBalance(signal.QuoteCurrency);
 
             // Do we even have enough funds to invest?
             if (currentBtcBalance.Available < freeTrader.CurrentBalance)
             {
-                _logger.LogWarning("Insufficient funds ({Available}) to perform a {Pair} trade. Skipping this trade.", currentBtcBalance.Available, signal.Pair);
+                _logger.LogWarning("Insufficient funds ({Available}) to perform a {MarketName} trade. Skipping this trade.", currentBtcBalance.Available, signal.MarketName);
                 return;
             }
 
-            var order = await CreateBuyOrder(freeTrader, signal.Pair, signal.SignalCandle);
+            var order = await CreateBuyOrder(freeTrader, signal.MarketName, signal.SignalCandle);
 
             // We found a trade and have set it all up!
             if (order != null)
@@ -258,7 +258,7 @@ namespace Mynt.Core.TradeManagers
             markets = markets.Where(x =>
                 (x.Volume > _settings.MinimumAmountOfVolume ||
                  _settings.AlwaysTradeList.Contains(x.CurrencyPair.BaseCurrency)) &&
-                x.CurrencyPair.QuoteCurrency.ToUpper() == "BTC").ToList();
+                 _settings.QuoteCurrencies.Contains(x.CurrencyPair.QuoteCurrency.ToUpper())).ToList();
 
             // If there are items on the only trade list remove the rest
             foreach (var item in _settings.OnlyTradeList)
@@ -282,7 +282,7 @@ namespace Mynt.Core.TradeManagers
                 {
                     pairs.Add(new TradeSignal
                     {
-                        Pair = market.MarketName,
+                        MarketName = market.MarketName,
                         TradeAdvice = signal.TradeAdvice,
                         SignalCandle = signal.SignalCandle
                     });
@@ -315,7 +315,7 @@ namespace Mynt.Core.TradeManagers
             // up on our trade. We update the data below later when the final data is present.
             var orderId = await _api.Buy(pair, amount, openRate);
 
-            await SendNotification($"Buying {pair} at ±{openRate:0.00000000 BTC} which was spotted at bid: {ticker.Bid:0.00000000}, " +
+            await SendNotification($"Buying {pair} at ±{openRate:0.00000000} which was spotted at bid: {ticker.Bid:0.00000000}, " +
                                    $"ask: {ticker.Ask:0.00000000}, " +
                                    $"last: {ticker.Last:0.00000000}, " +
                                    $"({amountYouGet:0.0000} units).");
@@ -370,7 +370,7 @@ namespace Mynt.Core.TradeManagers
                     return new TradeSignal
                     {
                         TradeAdvice = TradeAdvice.Hold,
-                        Pair = market
+                        MarketName = market
                     };
                 }
 
@@ -390,7 +390,7 @@ namespace Mynt.Core.TradeManagers
                 return new TradeSignal
                 {
                     TradeAdvice = advice,
-                    Pair = market,
+                    MarketName = market,
                     SignalCandle = _strategy.GetSignalCandle(candles)
                 };
             }

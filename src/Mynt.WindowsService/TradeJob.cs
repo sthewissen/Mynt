@@ -32,18 +32,20 @@ namespace Mynt.WindowsService
 
             var binanceSettings = new ExchangeOptions(Exchange.Binance);
             var bittrexSettings = new ExchangeOptions(Exchange.Bittrex);
+            var bitfinexSettings = new ExchangeOptions(Exchange.Bitfinex);
+            var poloniexSettings = new ExchangeOptions(Exchange.Poloniex);
 
             IExchangeApi api;
-            // Use Bittrex if API Key provided
-            // or Binance if it's not (one of both should be set)
+
+            // Use an API key if provided (one of these should be set)
             if (!String.IsNullOrEmpty(bittrexSettings.ApiKey))
-            {
                 api = new BaseExchange(bittrexSettings);
-            }
-            else
-            {
+            else if (!String.IsNullOrEmpty(binanceSettings.ApiKey))
                 api = new BaseExchange(binanceSettings);
-            }
+            else if (!String.IsNullOrEmpty(bitfinexSettings.ApiKey))
+                api = new BaseExchange(bitfinexSettings);
+            else if (!String.IsNullOrEmpty(poloniexSettings.ApiKey))
+                api = new BaseExchange(poloniexSettings);
 
             
             // Default strategy
@@ -59,7 +61,7 @@ namespace Mynt.WindowsService
 
             var tradeSettings = new TradeOptions();
             // Call the Trade manager with the strategy of our choosing.
-            var manager = new GenericTradeManager(api, strategy, notificationManager, logger, tradeSettings, new AzureTableStorageDataStore(new AzureTableStorageOptions()));
+            var manager = new LiveTradeManager(api, strategy, notificationManager, logger, tradeSettings, new AzureTableStorageDataStore(new AzureTableStorageOptions()));
 
             // Call the process method to start processing the current situation.
             manager.LookForNewTrades().GetAwaiter().GetResult();
