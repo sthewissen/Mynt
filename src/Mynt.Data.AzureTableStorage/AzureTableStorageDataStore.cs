@@ -53,7 +53,7 @@ namespace Mynt.Data.AzureTableStorage
 
         public async Task<List<Trade>> GetActiveTradesAsync()
         {
-            var query = new TableQuery<TradeAdapter>().Where(TableQuery.GenerateFilterConditionForBool("IsOpen", QueryComparisons.Equal, false));
+            var query = new TableQuery<TradeAdapter>().Where(TableQuery.GenerateFilterConditionForBool("IsOpen", QueryComparisons.Equal, true));
             TableContinuationToken token = null;
             var items = new List<TradeAdapter>();
             do

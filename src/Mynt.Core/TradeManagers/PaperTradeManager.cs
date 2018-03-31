@@ -336,13 +336,13 @@ namespace Mynt.Core.TradeManagers
         /// <returns></returns>
         private async Task CreateNewTrade(Trader freeTrader, TradeSignal signal)
         {
-            // Get our Bitcoin balance from the exchange
-            var currentQuoteBalance = await _api.GetBalance(signal.QuoteCurrency);
+            // We don't get a balance from the exchange, let's just assume it is always enough.
+            var currentQuoteBalance = 9999;
 
             // Do we even have enough funds to invest?
-            if (currentQuoteBalance.Available < freeTrader.CurrentBalance)
+            if (currentQuoteBalance < freeTrader.CurrentBalance)
             {
-                _logger.LogWarning("Insufficient funds ({Available}) to perform a {MarketName} trade. Skipping this trade.", currentQuoteBalance.Available, signal.MarketName);
+                _logger.LogWarning("Insufficient funds ({Available}) to perform a {MarketName} trade. Skipping this trade.", currentQuoteBalance, signal.MarketName);
                 return;
             }
 
