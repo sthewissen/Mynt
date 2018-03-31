@@ -1,4 +1,4 @@
-![Mynt](https://raw.githubusercontent.com/sthewissen/Mynt/master/img/myntlogo.png)
+<img src="https://raw.githubusercontent.com/sthewissen/Mynt/master/img/myntlogo.png" alt="Mynt" width="400" />
 
 Finding this useful? Consider a donation!
 
@@ -12,7 +12,7 @@ Want to have a chat? [Come find us on Slack!]
 
 <a href="https://join.slack.com/t/mynt-bot/signup"><img src="https://upload.wikimedia.org/wikipedia/commons/b/b9/Slack_Technologies_Logo.svg" alt="Join us on Slack!" width="100" /></a>
 
-# Mynt
+# About the project...
 This is an Azure Functions-based cryptocurrency trading bot. It uses the following cloud components to function:
 
 - Azure Functions
