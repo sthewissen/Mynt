@@ -1,4 +1,6 @@
-![Mynt](https://raw.githubusercontent.com/sthewissen/Mynt/master/img/myntlogo.png)
+<img src="https://raw.githubusercontent.com/sthewissen/Mynt/master/img/myntlogo.png" alt="Mynt" width="400" />
+
+## Donating to support further development
 
 Finding this useful? Consider a donation!
 
@@ -6,21 +8,19 @@ Finding this useful? Consider a donation!
 
 [![Donate with Ethereum](https://en.cryptobadges.io/badge/small/0x4398c958468bEDB41DdEF4C297eB543c6d26f440)](https://en.cryptobadges.io/donate/0x4398c958468bEDB41DdEF4C297eB543c6d26f440)
 
----
+## Get in touch!
 
 Want to have a chat? [Come find us on Slack!]
 
 <a href="https://join.slack.com/t/mynt-bot/signup"><img src="https://upload.wikimedia.org/wikipedia/commons/b/b9/Slack_Technologies_Logo.svg" alt="Join us on Slack!" width="100" /></a>
 
-# Mynt
+## About the project...
 This is an Azure Functions-based cryptocurrency trading bot. It uses the following cloud components to function:
 
 - Azure Functions
 - Azure Table Storage
 
-A lot of the logic is based on the [Freqtrade] bot and was converted to C#. The bot currently supports trading on the Bittrex exchange. This software was primarily created for educational purposes only. Don't risk money which you are afraid to lose. The bot runs at a pre-defined interval of 1 hour, since that matches the candle data it retrieves from the exchange. This can be changed by altering the CRON expression on the `TradeTimer` function. Do keep in mind that unless you also change the logic for retrieving the candles you're still looking at 1 hour intervals.
-
-This bot was first mentioned in [one of my blogposts].
+A lot of the logic is based on the [Freqtrade] bot and was converted to C#. The bot currently supports trading on the Bittrex exchange. This software was primarily created for educational purposes only. Don't risk money which you are afraid to lose. This bot was first mentioned in [one of my blogposts].
 
 ![Build status](https://sthewissen.visualstudio.com/_apis/public/build/definitions/c865956c-413b-4c44-b678-45d3026ae0b0/11/badge)
 
