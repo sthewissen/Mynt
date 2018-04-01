@@ -28,8 +28,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Mynt.Core\Mynt.Core.csproj" />
     <ProjectReference Include="..\..\src\Mynt.Data.AzureTableStorage\Mynt.Data.AzureTableStorage.csproj" />
-    <ProjectReference Include="..\Mynt.Core\Mynt.Core.csproj" />
-    <ProjectReference Include="..\Mynt.Data.AzureTableStorage\Mynt.Data.AzureTableStorage.csproj" />
   </ItemGroup>
 
 </Project>

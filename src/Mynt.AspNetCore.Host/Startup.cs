@@ -44,6 +44,7 @@ namespace Mynt.AspNetCore.Host
             var bittrex = Configuration.GetSection("Bittrex").Get<ExchangeOptions>();
             var bitfinex = Configuration.GetSection("Bitfinex").Get<ExchangeOptions>();
             var poloniex = Configuration.GetSection("Poloniex").Get<ExchangeOptions>();
+
             if (!String.IsNullOrEmpty(bittrex?.ApiKey))
             {
                 bittrex.Exchange = Exchange.Bittrex;

@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Mynt.Core.TradeManagers
+namespace Mynt.Core.Interfaces
 {
     public interface ITradeManager
     {
