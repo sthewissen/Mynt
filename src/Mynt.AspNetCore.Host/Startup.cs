@@ -53,17 +53,18 @@ namespace Mynt.AspNetCore.WindowsService
                 services.AddSingleton<IExchangeApi>(i => new BaseExchange(binance));
             }
 
+            // Major TODO, coming soon
                 services.AddSingleton<ITradingStrategy, TheScalper>()
                 .AddSingleton<INotificationManager, TelegramNotificationManager>()
                     .AddSingleton<TelegramNotificationOptions>() // TODO
 
                 .AddSingleton<IDataStore, AzureTableStorageDataStore>()
                     .AddSingleton<AzureTableStorageOptions>() // TODO
-                .AddSingleton<LiveTradeManager>()
+                .AddSingleton<PaperTradeManager>()
                 .AddSingleton(i => new TradeOptions())
 
-                .AddSingleton<ILogger>(i => i.GetService<ILogger<LiveTradeManager>>())
-                .AddSingleton<IHostedService>(i => new TimedHostedService(i.GetService<ILogger<TimedHostedService>>(), TimeSpan.FromHours(1), TimeSpan.Zero, TimeSpan.FromMinutes(1), i.GetService<LiveTradeManager>()));
+                .AddSingleton<ILogger>(i => i.GetService<ILogger<PaperTradeManager>>())
+                .AddSingleton<IHostedService>(i => new TimedHostedService(i.GetService<ILogger<TimedHostedService>>(), TimeSpan.FromHours(1), TimeSpan.Zero, TimeSpan.FromMinutes(1), i.GetService<PaperTradeManager>()));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

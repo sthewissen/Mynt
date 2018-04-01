@@ -15,12 +15,12 @@ namespace Mynt.AspNetCore.WindowsService.Hosting
         private TimeSpan _span;
         private TimeSpan _delayLookup;
         private TimeSpan _delayUpdate;
-        private readonly LiveTradeManager _tradeManager;
+        private readonly PaperTradeManager _tradeManager;
 
         private Timer _timerLookup;
         private Timer _timerUpdate;
 
-        public TimedHostedService(ILogger logger, TimeSpan span, TimeSpan delayLookup, TimeSpan delayUpdate, LiveTradeManager tradeManager)
+        public TimedHostedService(ILogger logger, TimeSpan span, TimeSpan delayLookup, TimeSpan delayUpdate, PaperTradeManager tradeManager)
         {
             _logger = logger;
             _span = span;
