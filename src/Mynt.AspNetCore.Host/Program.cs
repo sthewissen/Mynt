@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
+﻿using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Hosting.WindowsServices;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Mynt.AspNetCore.WindowsService.Hosting;
+using Mynt.AspNetCore.Host.Hosting;
 
-namespace Mynt.AspNetCore.WindowsService
+namespace Mynt.AspNetCore.Host
 {
     public class Program
     {

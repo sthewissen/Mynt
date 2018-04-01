@@ -5,8 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Mynt.AspNetCore.WindowsService.Hosting;
+using Mynt.AspNetCore.Host.Hosting;
 using Mynt.Core.Enums;
 using Mynt.Core.Exchanges;
 using Mynt.Core.Interfaces;
@@ -15,7 +14,7 @@ using Mynt.Core.Strategies;
 using Mynt.Core.TradeManagers;
 using Mynt.Data.AzureTableStorage;
 
-namespace Mynt.AspNetCore.WindowsService
+namespace Mynt.AspNetCore.Host
 {
     public class Startup
     {
@@ -60,11 +59,11 @@ namespace Mynt.AspNetCore.WindowsService
 
                 .AddSingleton<IDataStore, AzureTableStorageDataStore>()
                     .AddSingleton<AzureTableStorageOptions>() // TODO
-                .AddSingleton<PaperTradeManager>()
+                .AddSingleton<ITradeManager, PaperTradeManager>()
                 .AddSingleton(i => new TradeOptions())
 
-                .AddSingleton<ILogger>(i => i.GetService<ILogger<PaperTradeManager>>())
-                .AddSingleton<IHostedService>(i => new TimedHostedService(i.GetService<ILogger<TimedHostedService>>(), TimeSpan.FromHours(1), TimeSpan.Zero, TimeSpan.FromMinutes(1), i.GetService<PaperTradeManager>()));
+                .AddSingleton<ILogger>(i => i.GetService<ILogger<ITradeManager>>())
+                .AddSingleton<IHostedService>(i => new MyntHostedService(i.GetService<ILogger<MyntHostedService>>(), TimeSpan.FromHours(1), TimeSpan.Zero, TimeSpan.FromMinutes(1), i.GetService<ITradeManager>()));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

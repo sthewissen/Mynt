@@ -2,7 +2,7 @@
 using System.ServiceProcess;
 using Microsoft.AspNetCore.Hosting;
 
-namespace Mynt.AspNetCore.WindowsService.Hosting
+namespace Mynt.AspNetCore.Host.Hosting
 {
     public static class WebHostExtensions
     {

@@ -1,26 +1,25 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using ExchangeSharp;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Mynt.Core.Interfaces;
 using Mynt.Core.TradeManagers;
 
-namespace Mynt.AspNetCore.WindowsService.Hosting
+namespace Mynt.AspNetCore.Host.Hosting
 {
-    internal class TimedHostedService : IHostedService, IDisposable
+    internal class MyntHostedService : IHostedService, IDisposable
     {
         private readonly ILogger _logger;
-        private TimeSpan _span;
-        private TimeSpan _delayLookup;
-        private TimeSpan _delayUpdate;
-        private readonly PaperTradeManager _tradeManager;
+        // TODO options
+        private readonly TimeSpan _span;
+        private readonly TimeSpan _delayLookup;
+        private readonly TimeSpan _delayUpdate;
+        private readonly ITradeManager _tradeManager;
 
         private Timer _timerLookup;
         private Timer _timerUpdate;
 
-        public TimedHostedService(ILogger logger, TimeSpan span, TimeSpan delayLookup, TimeSpan delayUpdate, PaperTradeManager tradeManager)
+        public MyntHostedService(ILogger logger, TimeSpan span, TimeSpan delayLookup, TimeSpan delayUpdate, ITradeManager tradeManager)
         {
             _logger = logger;
             _span = span;
@@ -31,7 +30,7 @@ namespace Mynt.AspNetCore.WindowsService.Hosting
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Timed Background Service is starting.");
+            _logger.LogInformation("Mynt service is starting.");
 
             _timerLookup = new Timer(OnLookup, null, _delayLookup, _span);
             _timerUpdate = new Timer(OnUpdate, null, _delayUpdate, _span);
@@ -41,19 +40,19 @@ namespace Mynt.AspNetCore.WindowsService.Hosting
 
         private async void OnLookup(object state)
         {
-            _logger.LogInformation("Timed Background Service is working.");
+            _logger.LogInformation("Mynt service is looking for new trades.");
             await _tradeManager.LookForNewTrades();
         }
 
         private async void OnUpdate(object state)
         {
-            _logger.LogInformation("Timed Background Service is working.");
+            _logger.LogInformation("Mynt service is updating trades.");
             await _tradeManager.UpdateExistingTrades();
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Timed Background Service is stopping.");
+            _logger.LogInformation("Mynt service is stopping.");
 
             _timerLookup?.Change(Timeout.Infinite, 0);
             _timerUpdate?.Change(Timeout.Infinite, 0);
