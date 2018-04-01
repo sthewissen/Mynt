@@ -4,13 +4,13 @@ namespace Mynt.Core.Notifications
 {
     public class TelegramNotificationOptions : BaseSettings
     {
-        public string TelegramChatId { get; set; }
-        public string TelegramBotToken { get; set; }
+        public string ChatId { get; set; }
+        public string BotToken { get; set; }
 
         public TelegramNotificationOptions()
         {
-            TrySetFromConfig(() => TelegramChatId = AppSettings.Get<string>(nameof(TelegramChatId)));
-            TrySetFromConfig(() => TelegramBotToken = AppSettings.Get<string>(nameof(TelegramBotToken)));
+            TrySetFromConfig(() => ChatId = AppSettings.Get<string>("TelegramChatId"));
+            TrySetFromConfig(() => BotToken = AppSettings.Get<string>("TelegramBotToken"));
         }
     }
 }

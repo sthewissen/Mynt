@@ -28,14 +28,16 @@ namespace Mynt.AspNetCore.Host
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services
+            // TODO do your own log4net provider that supports .net core 2.0 ILoggingBuilder
+            // As for now, logging is configured in the method below
+            /*services
                 .AddLogging(b =>
                 {
                     b
                         .AddDebug()
                         .AddConsole();
                 });
-
+                */
             services.AddMvc();
 
             // Set up exchange - TBD TODO more elegant solution
@@ -55,10 +57,10 @@ namespace Mynt.AspNetCore.Host
             // Major TODO, coming soon
                 services.AddSingleton<ITradingStrategy, TheScalper>()
                 .AddSingleton<INotificationManager, TelegramNotificationManager>()
-                    .AddSingleton<TelegramNotificationOptions>() // TODO
+                    .AddSingleton(i => Configuration.GetSection("Telegram").Get<TelegramNotificationOptions>()) // TODO
 
                 .AddSingleton<IDataStore, AzureTableStorageDataStore>()
-                    .AddSingleton<AzureTableStorageOptions>() // TODO
+                    .AddSingleton(i => Configuration.GetSection("AzureTableStorage").Get<AzureTableStorageOptions>()) // TODO
                 .AddSingleton<ITradeManager, PaperTradeManager>()
                 .AddSingleton(i => new TradeOptions())
 
@@ -67,12 +69,18 @@ namespace Mynt.AspNetCore.Host
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
+            // TODO see above method
+            loggerFactory.AddConsole()
+                .AddDebug()
+                .AddLog4Net();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
+
 
             app.UseMvc();
         }
