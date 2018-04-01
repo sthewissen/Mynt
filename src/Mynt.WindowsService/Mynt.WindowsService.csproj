@@ -234,9 +234,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="config\appSettingsOverwrites.config">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="config\appSettingsOverwrites.config.default" />
     <None Include="config\copy_default_config.bat" />
     <None Include="log4net.config">
