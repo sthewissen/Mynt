@@ -16,10 +16,10 @@ namespace Mynt.Core.TradeManagers
         private readonly string _buyMessage;
         private readonly string _sellMessage;
         private readonly ITradingStrategy _strategy;
-        private readonly ILogger _logger;
+        private readonly ILogger<NotifyOnlyTradeManager> _logger;
         private readonly TradeOptions _settings;
 
-        public NotifyOnlyTradeManager(IExchangeApi api, ITradingStrategy strategy, INotificationManager notificationManager, string buyMessage, string sellMessage, ILogger logger, TradeOptions settings)
+        public NotifyOnlyTradeManager(IExchangeApi api, ITradingStrategy strategy, INotificationManager notificationManager, string buyMessage, string sellMessage, ILogger<NotifyOnlyTradeManager> logger, TradeOptions settings)
         {
             _api = api;
             _strategy = strategy;

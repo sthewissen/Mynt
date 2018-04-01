@@ -80,8 +80,7 @@ namespace Mynt.AspNetCore.Host
                 .AddSingleton<ITradeManager, PaperTradeManager>()
                 .AddSingleton(i => new TradeOptions())
 
-                .AddSingleton<ILogger>(i => i.GetService<ILogger<ITradeManager>>())
-                .AddSingleton<IHostedService>(i => new MyntHostedService(i.GetService<ILogger<MyntHostedService>>(), TimeSpan.FromHours(1), TimeSpan.Zero, TimeSpan.FromMinutes(1), i.GetService<ITradeManager>()));
+                .AddSingleton<IHostedService>(i => ActivatorUtilities.CreateInstance<MyntHostedService>(i, TimeSpan.FromHours(1), TimeSpan.Zero, TimeSpan.FromMinutes(1)));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

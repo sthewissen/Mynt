@@ -9,7 +9,7 @@ namespace Mynt.AspNetCore.Host.Hosting
 {
     internal class MyntHostedService : IHostedService, IDisposable
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<MyntHostedService> _logger;
         // TODO options
         private readonly TimeSpan _span;
         private readonly TimeSpan _delayLookup;
@@ -19,7 +19,7 @@ namespace Mynt.AspNetCore.Host.Hosting
         private Timer _timerLookup;
         private Timer _timerUpdate;
 
-        public MyntHostedService(ILogger logger, TimeSpan span, TimeSpan delayLookup, TimeSpan delayUpdate, ITradeManager tradeManager)
+        public MyntHostedService(ILogger<MyntHostedService> logger, TimeSpan span, TimeSpan delayLookup, TimeSpan delayUpdate, ITradeManager tradeManager)
         {
             _logger = logger;
             _span = span;
