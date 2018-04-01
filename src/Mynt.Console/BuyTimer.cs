@@ -17,7 +17,7 @@ namespace Mynt.Console
         public virtual Task Execute(IJobExecutionContext context)
         {
             var loggerFactory = new LoggerFactory().AddConsole();
-            var logger = loggerFactory.CreateLogger<BuyTimer>();
+            var logger = loggerFactory.CreateLogger<PaperTradeManager>();
 
             logger.LogInformation("Checking buy side...");
 

@@ -14,13 +14,13 @@ namespace Mynt.Core.TradeManagers
         private readonly IExchangeApi _api;
         private readonly INotificationManager _notification;
         private readonly ITradingStrategy _strategy;
-        private readonly ILogger<LiveTradeManager> _logger;
+        private readonly ILogger _logger;
         private List<Trade> _activeTrades;
         private List<Trader> _currentTraders;
         private readonly IDataStore _dataStore;
         private readonly TradeOptions _settings;
 
-        public LiveTradeManager(IExchangeApi api, ITradingStrategy strategy, INotificationManager notificationManager, ILogger<LiveTradeManager> logger, TradeOptions settings, IDataStore dataStore)
+        public LiveTradeManager(IExchangeApi api, ITradingStrategy strategy, INotificationManager notificationManager, ILogger logger, TradeOptions settings, IDataStore dataStore)
         {
             _api = api;
             _strategy = strategy;
