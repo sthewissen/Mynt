@@ -3,48 +3,76 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Mynt.Core.TradeManagers;
 
 namespace Mynt.AspNetCore.Host.Hosting
 {
-    internal class MyntHostedService : IHostedService, IDisposable
+    public class MyntHostedService : IHostedService, IDisposable
     {
         private readonly ILogger<MyntHostedService> _logger;
-        // TODO options
-        private readonly TimeSpan _span;
-        private readonly TimeSpan _delayLookup;
-        private readonly TimeSpan _delayUpdate;
         private readonly ITradeManager _tradeManager;
+        private readonly IOptions<MyntHostedServiceOptions> _options;
 
-        private Timer _timerLookup;
-        private Timer _timerUpdate;
+        private CancellationTokenSource _cancellationTokenSource;
 
-        public MyntHostedService(ILogger<MyntHostedService> logger, TimeSpan span, TimeSpan delayLookup, TimeSpan delayUpdate, ITradeManager tradeManager)
+        public MyntHostedService(ITradeManager tradeManager, IOptions<MyntHostedServiceOptions> options, ILogger<MyntHostedService> logger)
         {
             _logger = logger;
-            _span = span;
-            _delayLookup = delayLookup;
-            _delayUpdate = delayUpdate;
             _tradeManager = tradeManager;
+            _options = options ?? throw new ArgumentNullException(nameof(options));
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation("Mynt service is starting.");
 
-            _timerLookup = new Timer(OnLookup, null, _delayLookup, _span);
-            _timerUpdate = new Timer(OnUpdate, null, _delayUpdate, _span);
+            _cancellationTokenSource = new CancellationTokenSource();
+            
+            Task.Run(() => SpinUpNewCronJob(_options.Value.BuyTimer, OnBuy), cancellationToken);
+            Task.Run(() => SpinUpNewCronJob(_options.Value.SellTimer, OnSell), cancellationToken);
 
             return Task.CompletedTask;
         }
 
-        private async void OnLookup(object state)
+        private async Task SpinUpNewCronJob(string cronTime, Action action)
+        {
+            try
+            {
+                var schedule = NCrontab.CrontabSchedule.Parse(cronTime);
+                while (!_cancellationTokenSource.IsCancellationRequested)
+                {
+                    try
+                    {
+                        var now = DateTime.Now;
+                        var span = schedule.GetNextOccurrence(now) - now;
+                        await Task.Delay(span, _cancellationTokenSource.Token);
+                        if (_cancellationTokenSource.IsCancellationRequested)
+                        {
+                            continue;
+                        }
+
+                        action();
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Error while processing a timed job.");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while starting a timed job.");
+            }
+        }
+
+        private async void OnBuy()
         {
             _logger.LogInformation("Mynt service is looking for new trades.");
             await _tradeManager.LookForNewTrades();
         }
 
-        private async void OnUpdate(object state)
+        private async void OnSell()
         {
             _logger.LogInformation("Mynt service is updating trades.");
             await _tradeManager.UpdateExistingTrades();
@@ -54,16 +82,14 @@ namespace Mynt.AspNetCore.Host.Hosting
         {
             _logger.LogInformation("Mynt service is stopping.");
 
-            _timerLookup?.Change(Timeout.Infinite, 0);
-            _timerUpdate?.Change(Timeout.Infinite, 0);
+            _cancellationTokenSource.Cancel();
 
             return Task.CompletedTask;
         }
 
         public void Dispose()
         {
-            _timerLookup?.Dispose();
-            _timerUpdate?.Dispose();
+            _cancellationTokenSource.Dispose();
         }
     }
 }

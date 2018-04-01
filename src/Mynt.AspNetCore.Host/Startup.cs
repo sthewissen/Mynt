@@ -72,14 +72,18 @@ namespace Mynt.AspNetCore.Host
             // Major TODO, coming soon
             services.AddSingleton<ITradingStrategy, TheScalper>()
                 .AddSingleton<INotificationManager, TelegramNotificationManager>()
-                    .AddSingleton(i => Configuration.GetSection("Telegram").Get<TelegramNotificationOptions>()) // TODO
+                .AddSingleton(i => Configuration.GetSection("Telegram").Get<TelegramNotificationOptions>()) // TODO
 
                 .AddSingleton<IDataStore, AzureTableStorageDataStore>()
-                    .AddSingleton(i => Configuration.GetSection("AzureTableStorage").Get<AzureTableStorageOptions>()) // TODO
+                .AddSingleton(i => Configuration.GetSection("AzureTableStorage").Get<AzureTableStorageOptions>()) // TODO
                 .AddSingleton<ITradeManager, PaperTradeManager>()
                 .AddSingleton(i => new TradeOptions())
+                .AddSingleton<ILogger>(i => i.GetRequiredService<ILoggerFactory>().CreateLogger<MyntHostedService>())
 
-                .AddSingleton<IHostedService>(i => ActivatorUtilities.CreateInstance<MyntHostedService>(i, TimeSpan.FromHours(1), TimeSpan.Zero, TimeSpan.FromMinutes(1)));
+                .AddSingleton<IHostedService, MyntHostedService>()
+                .Configure<MyntHostedServiceOptions>(Configuration.GetSection("Hosting"))
+
+                ;
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
