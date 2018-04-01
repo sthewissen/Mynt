@@ -16,7 +16,7 @@ This is an Azure Functions-based cryptocurrency trading bot. It uses the followi
 
 A lot of the logic is based on the [Freqtrade] bot and was converted to C#. The bot currently supports trading on the Bittrex exchange. This software was primarily created for educational purposes only. Don't risk money which you are afraid to lose. This bot was first mentioned in [one of my blogposts].
 
-![Build status](https://sthewissen.visualstudio.com/_apis/public/build/definitions/c865956c-413b-4c44-b678-45d3026ae0b0/11/badge)
+![Build status](https://sthewissen.visualstudio.com/_apis/public/build/definitions/c865956c-413b-4c44-b678-45d3026ae0b0/20/badge)
 
 ## Get in touch!
 
