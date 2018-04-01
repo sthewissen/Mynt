@@ -34,8 +34,7 @@ namespace Mynt.AspNetCore.Host
                 .AddLogging(b =>
                 {
                     b
-                        .AddDebug()
-                        .AddConsole();
+                        .AddLog4Net()
                 });
                 */
             services.AddMvc();
@@ -87,9 +86,9 @@ namespace Mynt.AspNetCore.Host
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             // TODO see above method
-            loggerFactory.AddConsole()
-                .AddDebug()
-                .AddLog4Net();
+            loggerFactory
+                .AddLog4Net()
+                ;
 
             if (env.IsDevelopment())
             {
