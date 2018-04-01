@@ -55,7 +55,7 @@ namespace Mynt.WindowsService
             // Use Telegram if settings set up in config
             INotificationManager notificationManager = null;
             var telegramOptions = new TelegramNotificationOptions();
-            if (!String.IsNullOrWhiteSpace(telegramOptions.TelegramChatId))
+            if (!String.IsNullOrWhiteSpace(telegramOptions.ChatId))
             {
                 notificationManager = new TelegramNotificationManager(telegramOptions);
             }
