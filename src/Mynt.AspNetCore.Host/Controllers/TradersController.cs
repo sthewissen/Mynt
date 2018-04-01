@@ -1,27 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
-using Mynt.Core.TradeManagers;
 
-namespace Mynt.AspNetCore.WindowsService.Controllers
+namespace Mynt.AspNetCore.Host.Controllers
 {
     [Route("api/[controller]")]
     public class TradersController : Controller
     {
-        private IDataStore _manager;
-        public TradersController(IDataStore manager)
+        private readonly IDataStore _dataStore;
+
+        public TradersController(IDataStore dataStore)
         {
-            _manager = manager;
+            _dataStore = dataStore;
         }
-        // GET api/values
+
         [HttpGet]
         public async Task<List<Trader>> Get()
         {
-            return await _manager.GetTradersAsync();
+            return await _dataStore.GetTradersAsync();
         }
     }
 }
