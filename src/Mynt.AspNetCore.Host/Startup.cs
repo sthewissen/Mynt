@@ -43,19 +43,35 @@ namespace Mynt.AspNetCore.Host
             // Set up exchange - TBD TODO more elegant solution
             var binance = Configuration.GetSection("Binance").Get<ExchangeOptions>();
             var bittrex = Configuration.GetSection("Bittrex").Get<ExchangeOptions>();
+            var bitfinex = Configuration.GetSection("Bitfinex").Get<ExchangeOptions>();
+            var poloniex = Configuration.GetSection("Poloniex").Get<ExchangeOptions>();
             if (!String.IsNullOrEmpty(bittrex?.ApiKey))
             {
                 bittrex.Exchange = Exchange.Bittrex;
                 services.AddSingleton<IExchangeApi>(i => new BaseExchange(bittrex));
             }
-            else
+            else if (!String.IsNullOrEmpty(binance?.ApiKey))
             {
                 binance.Exchange = Exchange.Binance;
                 services.AddSingleton<IExchangeApi>(i => new BaseExchange(binance));
             }
+            else if (!String.IsNullOrEmpty(bitfinex?.ApiKey))
+            {
+                bitfinex.Exchange = Exchange.Bitfinex;
+                services.AddSingleton<IExchangeApi>(i => new BaseExchange(bitfinex));
+            }
+            else if (!String.IsNullOrEmpty(poloniex?.ApiKey))
+            {
+                poloniex.Exchange = Exchange.Poloniex;
+                services.AddSingleton<IExchangeApi>(i => new BaseExchange(poloniex));
+            }
+            else
+            {
+                throw new Exception("Please configure exchange settings");
+            }
 
             // Major TODO, coming soon
-                services.AddSingleton<ITradingStrategy, TheScalper>()
+            services.AddSingleton<ITradingStrategy, TheScalper>()
                 .AddSingleton<INotificationManager, TelegramNotificationManager>()
                     .AddSingleton(i => Configuration.GetSection("Telegram").Get<TelegramNotificationOptions>()) // TODO
 
