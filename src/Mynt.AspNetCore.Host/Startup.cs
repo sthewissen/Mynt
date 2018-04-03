@@ -13,6 +13,8 @@ using Mynt.Core.Notifications;
 using Mynt.Core.Strategies;
 using Mynt.Core.TradeManagers;
 using Mynt.Data.AzureTableStorage;
+using Serilog;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Mynt.AspNetCore.Host
 {
@@ -28,15 +30,13 @@ namespace Mynt.AspNetCore.Host
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // TODO do your own log4net provider that supports .net core 2.0 ILoggingBuilder
-            // As for now, logging is configured in the method below
-            /*services
-                .AddLogging(b =>
-                {
-                    b
-                        .AddLog4Net()
-                });
-                */
+            // Configure serilog from appsettings.json
+            var serilogger = new LoggerConfiguration()
+                .ReadFrom.Configuration(Configuration)
+                .CreateLogger();
+
+            services.AddLogging(b => { b.AddSerilog(serilogger); });
+
             services.AddMvc();
 
             // Set up exchange - TBD TODO more elegant solution
@@ -88,18 +88,12 @@ namespace Mynt.AspNetCore.Host
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            // TODO see above method
-            loggerFactory
-                .AddLog4Net()
-                ;
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
-
 
             app.UseMvc();
         }
