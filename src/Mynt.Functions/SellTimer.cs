@@ -3,24 +3,27 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
-using Microsoft.Extensions.Logging;
 using Mynt.Core.Enums;
 using Mynt.Core.Exchanges;
 using Mynt.Core.Notifications;
 using Mynt.Core.Strategies;
 using Mynt.Core.TradeManagers;
 using Mynt.Data.AzureTableStorage;
+using Serilog;
+using Serilog.Sinks.AzureWebJobsTraceWriter;
 
 namespace Mynt.Functions
 {
     public static class SellTimer
     {
         [FunctionName("SellTimer")]
-        public static async Task Run([TimerTrigger("0 * * * * *")]TimerInfo sellTimer, ILogger log)
-        {
+        public static async Task Run([TimerTrigger("0 * * * * *")]TimerInfo sellTimer, TraceWriter log)
+        { 
+            var logger = new LoggerConfiguration().WriteTo.TraceWriter(log).CreateLogger();
+            
             try
             {
-                log.LogInformation("Starting processing...");
+                logger.Information("Starting processing...");
 
                 // Either use the default options as defined in TradeOptions or override them.
                 // You can override them using the property setters here or by providing keys in your configuration mechanism
@@ -37,7 +40,7 @@ namespace Mynt.Functions
                 var tradeManager = new PaperTradeManager(
                     api: new BaseExchange(new ExchangeOptions(Exchange.Binance)),
                     dataStore: new AzureTableStorageDataStore(new AzureTableStorageOptions()),
-                    logger: log,
+                    logger: null,
                     notificationManager: new TelegramNotificationManager(new TelegramNotificationOptions()),
                     settings: options,
                     strategy: new TheScalper());
@@ -45,12 +48,12 @@ namespace Mynt.Functions
                 // Start running this thing!
                 await tradeManager.UpdateExistingTrades();
 
-                log.LogInformation("Done...");
+                logger.Information("Done...");
             }
             catch (Exception ex)
             {
                 // If anything goes wrong log an error to Azure.
-                log.LogError(ex.Message + ex.StackTrace);
+                logger.Error(ex.Message + ex.StackTrace);
             }
         }
     }
