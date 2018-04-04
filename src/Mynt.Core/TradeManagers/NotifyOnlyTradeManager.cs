@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Mynt.Core.TradeManagers
 {
-    public class NotifyOnlyTradeManager
+    public class NotifyOnlyTradeManager : ITradeManager
     {
         private readonly IExchangeApi _api;
         private readonly INotificationManager _notification;
@@ -34,7 +34,7 @@ namespace Mynt.Core.TradeManagers
         /// Checks if new trades can be started.
         /// </summary>
         /// <returns></returns>
-        public async Task CheckStrategySignals()
+        public async Task LookForNewTrades()
         {
             var trades = await FindBuyOpportunities();
 
@@ -188,6 +188,11 @@ namespace Mynt.Core.TradeManagers
             {
                 await _notification.SendNotification(message);
             }
+        }
+
+        public Task UpdateExistingTrades()
+        {
+            return Task.CompletedTask;
         }
     }
 }

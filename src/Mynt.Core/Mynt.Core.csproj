@@ -17,7 +17,6 @@
     <Folder Include="Notifications\" />
     <Folder Include="Configuration\" />
     <Folder Include="Strategies\" />
-    <Folder Include="TradeManagers\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.0.1" />

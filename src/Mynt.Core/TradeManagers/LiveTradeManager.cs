@@ -9,7 +9,7 @@ using Mynt.Core.Models;
 
 namespace Mynt.Core.TradeManagers
 {
-    public class LiveTradeManager
+    public class LiveTradeManager : ITradeManager
     {
         private readonly IExchangeApi _api;
         private readonly INotificationManager _notification;

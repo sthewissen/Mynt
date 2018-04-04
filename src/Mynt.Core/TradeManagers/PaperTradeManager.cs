@@ -9,7 +9,7 @@ using Mynt.Core.Models;
 
 namespace Mynt.Core.TradeManagers
 {
-    public class PaperTradeManager
+    public class PaperTradeManager : ITradeManager
     {
         private readonly IExchangeApi _api;
         private readonly INotificationManager _notification;

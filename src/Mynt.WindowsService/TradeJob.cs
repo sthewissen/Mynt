@@ -46,15 +46,16 @@ namespace Mynt.WindowsService
                 api = new BaseExchange(bitfinexSettings);
             else if (!String.IsNullOrEmpty(poloniexSettings.ApiKey))
                 api = new BaseExchange(poloniexSettings);
+            else
+                return Task.CompletedTask; // log or throw exception?
 
-            
             // Default strategy
             var strategy = new TheScalper();
 
             // Use Telegram if settings set up in config
             INotificationManager notificationManager = null;
             var telegramOptions = new TelegramNotificationOptions();
-            if (!String.IsNullOrWhiteSpace(telegramOptions.TelegramChatId))
+            if (!String.IsNullOrWhiteSpace(telegramOptions.ChatId))
             {
                 notificationManager = new TelegramNotificationManager(telegramOptions);
             }
@@ -63,8 +64,15 @@ namespace Mynt.WindowsService
             // Call the Trade manager with the strategy of our choosing.
             var manager = new LiveTradeManager(api, strategy, notificationManager, logger, tradeSettings, new AzureTableStorageDataStore(new AzureTableStorageOptions()));
 
-            // Call the process method to start processing the current situation.
-            manager.LookForNewTrades().GetAwaiter().GetResult();
+            if (context.Trigger.Key.Name == "AnalysisJobTrigger")
+            {
+                // Call the process method to start processing the current situation.
+                manager.LookForNewTrades().GetAwaiter().GetResult();
+            }
+            else
+            {
+                manager.UpdateExistingTrades().GetAwaiter().GetResult();
+            }
 
             return Task.FromResult(true);
         }

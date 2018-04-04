@@ -11,6 +11,10 @@ namespace Mynt.Core.Exchanges
         public string ApiSecret { get; set; }
         public string PassPhrase { get; set; }
 
+        public ExchangeOptions()
+        {
+        }
+
         public ExchangeOptions(Exchange exchange)
         {
             Exchange = exchange;
