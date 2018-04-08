@@ -1,0 +1,15 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "",
+    "AzureWebJobsDashboard": "",
+
+    "BinanceApiKey": "KeyValue",
+    "BinanceApiSecret": "SecretValue"
+  },
+  "Binance": {
+    "ApiKey": "Key",
+    "ApiSecret": "Secret",
+    "PassPhrase": null
+  }
+}

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
+using Microsoft.Extensions.Configuration;
 using Mynt.Core.Enums;
 using Mynt.Core.Exchanges;
 using Mynt.Core.Notifications;
@@ -17,8 +18,17 @@ namespace Mynt.AzureFunctions
     public static class BuyTimer
     {
         [FunctionName("BuyTimer")]
-        public static async Task Run([TimerTrigger("10 1 * * * *")]TimerInfo buyTimer, TraceWriter log)
+        public static async Task Run([TimerTrigger("10 1 * * * *")]TimerInfo buyTimer, TraceWriter log, ExecutionContext context)
         {
+            var config = new ConfigurationBuilder()
+                .SetBasePath(context.FunctionAppDirectory)
+                .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
+                .AddEnvironmentVariables()
+                .Build();
+
+            var binance = config.GetSection("Binance").Get<ExchangeOptions>();
+            var binanceKey = config["BinanceApiKey"];
+
             var logger = new LoggerConfiguration().WriteTo.TraceWriter(log).CreateLogger();
             
             try
