@@ -290,3 +290,4 @@ __pycache__/
 functions/.DS_Store
 .DS_Store
 src/Mynt.Functions/local.settings.json
+src/Mynt.WindowsService/config/appSettingsOverwrites.config

@@ -8,7 +8,8 @@ namespace Mynt.Core.TradeManagers
 {
     public class TradeOptions : BaseSettings
     {
-        // Trader settings
+        // Trader settings & trading mode
+        public bool PaperTrading { get; set; } = true;
         public int MaxNumberOfConcurrentTrades { get; set; } = 2;
         public decimal AmountOfBtcToInvestPerTrader { get; set; } = 0.01m;
         public decimal TransactionFeePercentage { get; set; } = 0.0025m;
@@ -66,6 +67,7 @@ namespace Mynt.Core.TradeManagers
 
         public TradeOptions()
         {
+            TrySetFromConfig(() => PaperTrading = AppSettings.Get<bool>(nameof(PaperTrading)));
             TrySetFromConfig(() => MaxNumberOfConcurrentTrades = AppSettings.Get<int>(nameof(MaxNumberOfConcurrentTrades)));
             TrySetFromConfig(() => AmountOfBtcToInvestPerTrader = AppSettings.Get<decimal>(nameof(AmountOfBtcToInvestPerTrader)));
 

@@ -4,6 +4,7 @@ using Quartz;
 using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Mynt.Core.Configuration;
 using Mynt.Core.Enums;
 using Mynt.Core.Exchanges;
 using Mynt.Core.Interfaces;
@@ -35,7 +36,7 @@ namespace Mynt.WindowsService
             var bitfinexSettings = new ExchangeOptions(Exchange.Bitfinex);
             var poloniexSettings = new ExchangeOptions(Exchange.Poloniex);
 
-            IExchangeApi api;
+            IExchangeApi api = null;
 
             // Use an API key if provided (one of these should be set)
             if (!String.IsNullOrEmpty(bittrexSettings.ApiKey))
@@ -60,12 +61,25 @@ namespace Mynt.WindowsService
             }
 
             var tradeSettings = new TradeOptions();
-            // Call the Trade manager with the strategy of our choosing.
-            var manager = new LiveTradeManager(api, strategy, notificationManager, logger, tradeSettings, new AzureTableStorageDataStore(new AzureTableStorageOptions()));
 
-            // Call the process method to start processing the current situation.
-            manager.LookForNewTrades().GetAwaiter().GetResult();
+            if (!tradeSettings.PaperTrading)
+            {
+                // Call the Trade manager with the strategy of our choosing.
+                var manager = new LiveTradeManager(api, strategy, notificationManager, logger, tradeSettings, new AzureTableStorageDataStore(new AzureTableStorageOptions()));
 
+                // Call the process method to start processing the current situation.
+                manager.LookForNewTrades().GetAwaiter().GetResult();
+            }
+            else
+            {
+                // Initialize a Trade Manager instance that will run using the settings provided below.
+                // Once again, you can use the default values for the settings defined in te Options classes below.
+                // You can also override them here or using the configuration mechanism of your choosing.
+                var manager = new PaperTradeManager(api, strategy, notificationManager, logger, tradeSettings, new AzureTableStorageDataStore(new AzureTableStorageOptions()));
+
+                // Start running this thing!
+                manager.LookForNewTrades().GetAwaiter().GetResult();
+            }
             return Task.FromResult(true);
         }
     }

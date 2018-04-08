@@ -216,6 +216,9 @@
       <HintPath>..\packages\System.Xml.ReaderWriter.4.3.0\lib\net46\System.Xml.ReaderWriter.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="TA-Lib-Core, Version=1.0.4998.21369, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\TA-Lib.0.5.0.3\lib\TA-Lib-Core.dll</HintPath>
+    </Reference>
     <Reference Include="WebSocket4Net, Version=0.15.2.11, Culture=neutral, PublicKeyToken=eb4e154b696bf72a, processorArchitecture=MSIL">
       <HintPath>..\packages\WebSocket4Net.0.15.2\lib\net45\WebSocket4Net.dll</HintPath>
     </Reference>
@@ -251,14 +254,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Mynt.Core.Binance\Mynt.Core.Binance.csproj">
-      <Project>{F34D0F30-7063-48BE-80A9-B7974A7ECF76}</Project>
-      <Name>Mynt.Core.Binance</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Mynt.Core.Bittrex\Mynt.Core.Bittrex.csproj">
-      <Project>{626D9760-282C-4ADF-8C56-DBA91DE01E87}</Project>
-      <Name>Mynt.Core.Bittrex</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Mynt.Core\Mynt.Core.csproj">
       <Project>{0d33270e-d419-4839-9ccb-3dd2de277a67}</Project>
       <Name>Mynt.Core</Name>
@@ -266,10 +261,6 @@
     <ProjectReference Include="..\Mynt.Data.AzureTableStorage\Mynt.Data.AzureTableStorage.csproj">
       <Project>{e48797fd-0018-45fc-bd28-8c0f9bb1d27d}</Project>
       <Name>Mynt.Data.AzureTableStorage</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Mynt.Extensibility\Mynt.Extensibility.csproj">
-      <Project>{71abd5bd-e1cb-4820-8beb-f34763ed0083}</Project>
-      <Name>Mynt.Extensibility</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
