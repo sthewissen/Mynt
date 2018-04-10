@@ -40,7 +40,7 @@ namespace Mynt.AspNetCore.Host
             services.AddMvc();
 
             // Set up exchange - TBD TODO more elegant solution
-            var binance = Configuration.GetSection("Exchange").Get<ExchangeOptions>();
+            var binance = Configuration.GetSection("Binance").Get<ExchangeOptions>();
             var bittrex = Configuration.GetSection("Bittrex").Get<ExchangeOptions>();
             var bitfinex = Configuration.GetSection("Bitfinex").Get<ExchangeOptions>();
             var poloniex = Configuration.GetSection("Poloniex").Get<ExchangeOptions>();
