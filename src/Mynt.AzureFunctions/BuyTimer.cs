@@ -26,9 +26,6 @@ namespace Mynt.AzureFunctions
                 .AddEnvironmentVariables()
                 .Build();
 
-            var binance = config.GetSection("Binance").Get<ExchangeOptions>();
-            var binanceKey = config["BinanceApiKey"];
-
             var logger = new LoggerConfiguration().WriteTo.TraceWriter(log).CreateLogger();
             
             try
@@ -44,11 +41,12 @@ namespace Mynt.AzureFunctions
                     MarketBlackList = new List<string> { "TRX", "XVG" }
                  };
 
+                var exchangeOptions = config.Get<ExchangeOptions>();
                 // Initialize a Trade Manager instance that will run using the settings provided below.
                 // Once again, you can use the default values for the settings defined in te Options classes below.
                 // You can also override them here or using the configuration mechanism of your choosing.
                 var tradeManager = new PaperTradeManager(
-                    api: new BaseExchange(new ExchangeOptions(Exchange.Binance)),
+                    api: new BaseExchange(exchangeOptions),
                     dataStore: new AzureTableStorageDataStore(new AzureTableStorageOptions()),
                     logger: null,
                     notificationManager: new TelegramNotificationManager(new TelegramNotificationOptions()),

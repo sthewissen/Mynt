@@ -4,12 +4,8 @@
     "AzureWebJobsStorage": "",
     "AzureWebJobsDashboard": "",
 
-    "BinanceApiKey": "KeyValue",
-    "BinanceApiSecret": "SecretValue"
-  },
-  "Binance": {
-    "ApiKey": "Key",
-    "ApiSecret": "Secret",
-    "PassPhrase": null
+    "Exchange": 0, 
+    "ApiKey": "KeyValue",
+    "ApiSecret": "SecretValue"
   }
 }
