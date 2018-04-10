@@ -38,7 +38,7 @@ namespace Mynt.Functions
                 // Once again, you can use the default values for the settings defined in te Options classes below.
                 // You can also override them here or using the configuration mechanism of your choosing.
                 var tradeManager = new PaperTradeManager(
-                    api: new BaseExchange(new ExchangeOptions(Exchange.Binance)),
+                    api: new BaseExchange(new ExchangeOptions()),
                     dataStore: new AzureTableStorageDataStore(new AzureTableStorageOptions()),
                     logger: null,
                     notificationManager: new TelegramNotificationManager(new TelegramNotificationOptions()),

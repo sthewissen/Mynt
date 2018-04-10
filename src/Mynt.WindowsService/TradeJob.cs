@@ -30,10 +30,10 @@ namespace Mynt.WindowsService
 
             logger.LogInformation("Ready to shuffle your g0ldz!");
 
-            var binanceSettings = new ExchangeOptions(Exchange.Binance);
-            var bittrexSettings = new ExchangeOptions(Exchange.Bittrex);
-            var bitfinexSettings = new ExchangeOptions(Exchange.Bitfinex);
-            var poloniexSettings = new ExchangeOptions(Exchange.Poloniex);
+            var binanceSettings = new ExchangeOptions();
+            var bittrexSettings = new ExchangeOptions();
+            var bitfinexSettings = new ExchangeOptions();
+            var poloniexSettings = new ExchangeOptions();
 
             IExchangeApi api;
 

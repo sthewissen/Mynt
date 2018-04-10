@@ -4,7 +4,7 @@
     "AzureWebJobsStorage": "",
     "AzureWebJobsDashboard": "",
 
-    "Exchange": 0, 
+    "Exchange": "Binance", // or 0, look @ Exchange enum
     "ApiKey": "KeyValue",
     "ApiSecret": "SecretValue"
   }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
+using Microsoft.Extensions.Configuration;
 using Mynt.Core.Enums;
 using Mynt.Core.Exchanges;
 using Mynt.Core.Notifications;
@@ -17,10 +18,17 @@ namespace Mynt.AzureFunctions
     public static class SellTimer
     {
         [FunctionName("SellTimer")]
-        public static async Task Run([TimerTrigger("0 * * * * *")]TimerInfo sellTimer, TraceWriter log)
-        { 
+        public static async Task Run([TimerTrigger("0 * * * * *")]TimerInfo sellTimer, TraceWriter log, ExecutionContext context)
+        {
+            var config = new ConfigurationBuilder()
+                .SetBasePath(context.FunctionAppDirectory)
+                .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
+                .AddEnvironmentVariables()
+                .Build();
+
             var logger = new LoggerConfiguration().WriteTo.TraceWriter(log).CreateLogger();
-            
+
+
             try
             {
                 logger.Information("Starting processing...");
@@ -34,11 +42,13 @@ namespace Mynt.AzureFunctions
                     MarketBlackList = new List<string> { "TRX", "XVG" }
                  };
 
+                var exchangeOptions = config.Get<ExchangeOptions>();
+
                 // Initialize a Trade Manager instance that will run using the settings provided below.
                 // Once again, you can use the default values for the settings defined in te Options classes below.
                 // You can also override them here or using the configuration mechanism of your choosing.
                 var tradeManager = new PaperTradeManager(
-                    api: new BaseExchange(new ExchangeOptions(Exchange.Binance)),
+                    api: new BaseExchange(exchangeOptions),
                     dataStore: new AzureTableStorageDataStore(new AzureTableStorageOptions()),
                     logger: null,
                     notificationManager: new TelegramNotificationManager(new TelegramNotificationOptions()),

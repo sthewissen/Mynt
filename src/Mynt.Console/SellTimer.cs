@@ -22,7 +22,7 @@ namespace Mynt.Console
             logger.LogInformation("Checking sell side...");
 
             var tradeManager = new PaperTradeManager(
-                  api: new BaseExchange(new ExchangeOptions(Exchange.Binance)),
+                  api: new BaseExchange(new ExchangeOptions()),
                   dataStore: new AzureTableStorageDataStore(new AzureTableStorageOptions()),
                   logger: logger,
                   notificationManager: new TelegramNotificationManager(new TelegramNotificationOptions()),
