@@ -65,7 +65,9 @@ namespace Mynt.AzureFunctions
             {
                 // If anything goes wrong log an error to Azure.
                 logger.Error(ex.Message + ex.StackTrace);
-            }
+
+                if (ex.InnerException != null)
+                    logger.Error(ex.InnerException.Message + ex.InnerException.StackTrace);
         }
     }
 }
