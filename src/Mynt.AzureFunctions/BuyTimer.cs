@@ -18,7 +18,7 @@ namespace Mynt.AzureFunctions
     public static class BuyTimer
     {
         [FunctionName("BuyTimer")]
-        public static async Task Run([TimerTrigger("10 1 * * * *")]TimerInfo buyTimer, TraceWriter log, ExecutionContext context)
+        public static async Task Run([TimerTrigger("10 1 * * * *")] TimerInfo buyTimer, TraceWriter log, ExecutionContext context)
         {
             var config = new ConfigurationBuilder()
                 .SetBasePath(context.FunctionAppDirectory)
@@ -38,7 +38,7 @@ namespace Mynt.AzureFunctions
 
                 var options = new TradeOptions()
                 {
-                    MarketBlackList = new List<string> { "TRX", "XVG" }
+                    MarketBlackList = new List<string> {"TRX", "XVG"}
                 };
 
                 var exchangeOptions = config.Get<ExchangeOptions>();
@@ -68,6 +68,7 @@ namespace Mynt.AzureFunctions
 
                 if (ex.InnerException != null)
                     logger.Error(ex.InnerException.Message + ex.InnerException.StackTrace);
+            }
         }
     }
 }
