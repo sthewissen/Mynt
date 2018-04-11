@@ -26,11 +26,8 @@ namespace Mynt.AzureFunctions
                 .AddEnvironmentVariables()
                 .Build();
 
-            var binance = config.GetSection("Binance").Get<ExchangeOptions>();
-            var binanceKey = config["BinanceApiKey"];
-
             var logger = new LoggerConfiguration().WriteTo.TraceWriter(log).CreateLogger();
-            
+
             try
             {
                 logger.Information("Starting processing...");
@@ -39,26 +36,30 @@ namespace Mynt.AzureFunctions
                 // You can override them using the property setters here or by providing keys in your configuration mechanism
                 // matching the property names in this class.
 
-                 var options = new TradeOptions()
-                 {
+                var options = new TradeOptions()
+                {
                     MarketBlackList = new List<string> { "TRX", "XVG" }
-                 };
+                };
+
+                var exchangeOptions = config.Get<ExchangeOptions>();
+                var azureTableStorageOptions = config.Get<AzureTableStorageOptions>();
+                var telegramNotificationOptions = config.Get<TelegramNotificationOptions>();
 
                 // Initialize a Trade Manager instance that will run using the settings provided below.
                 // Once again, you can use the default values for the settings defined in te Options classes below.
                 // You can also override them here or using the configuration mechanism of your choosing.
                 var tradeManager = new PaperTradeManager(
-                    api: new BaseExchange(new ExchangeOptions(Exchange.Binance)),
-                    dataStore: new AzureTableStorageDataStore(new AzureTableStorageOptions()),
+                    api: new BaseExchange(exchangeOptions),
+                    dataStore: new AzureTableStorageDataStore(azureTableStorageOptions),
                     logger: null,
-                    notificationManager: new TelegramNotificationManager(new TelegramNotificationOptions()),
+                    notificationManager: new TelegramNotificationManager(telegramNotificationOptions),
                     settings: options,
                     strategy: new TheScalper());
 
                 // Start running this thing!
                 await tradeManager.LookForNewTrades();
 
-               logger.Information("Done...");
+                logger.Information("Done...");
             }
             catch (Exception ex)
             {

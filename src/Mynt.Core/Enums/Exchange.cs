@@ -3,9 +3,9 @@ namespace Mynt.Core.Enums
 {
     public enum Exchange
     {
-        Binance,
-        Bitfinex,
-        Bittrex,
-        Poloniex
+        Binance = 0,
+        Bitfinex = 1,
+        Bittrex = 2,
+        Poloniex = 3
     }
 }

@@ -14,7 +14,7 @@ namespace Mynt.Data.SqlServer
 
         public SqlServerDataStore(SqlServerOptions options)
         {
-            _context = new MyntDbContext(options.ConnectionString);
+            _context = new MyntDbContext(options.SqlServerConnectionString);
         }
 
         public async Task InitializeAsync()

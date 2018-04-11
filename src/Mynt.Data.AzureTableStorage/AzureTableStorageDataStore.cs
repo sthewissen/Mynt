@@ -21,8 +21,8 @@ namespace Mynt.Data.AzureTableStorage
         public async Task InitializeAsync()
         {
             // First initialize a few things
-            _orderTable = await GetTableConnection(_options.ConnectionString, "orders");
-            _traderTable = await GetTableConnection(_options.ConnectionString, "traders");
+            _orderTable = await GetTableConnection(_options.AzureTableStorageConnectionString, "orders");
+            _traderTable = await GetTableConnection(_options.AzureTableStorageConnectionString, "traders");
         }
 
         private static async Task<CloudTable> GetTableConnection(string connectionString, string tableName)
