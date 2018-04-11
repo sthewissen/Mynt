@@ -9,7 +9,6 @@
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="Serilog" Version="2.7.1-dev-00972" />
     <PackageReference Include="Serilog.Sinks.AzureWebJobsTraceWriter-preview" Version="2.0.3-alpha" />
-    <PackageReference Include="DigitalRuby.ExchangeSharp" Version="0.3.5" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mynt.Core\Mynt.Core.csproj" />
