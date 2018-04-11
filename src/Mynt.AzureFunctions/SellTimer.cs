@@ -43,9 +43,6 @@ namespace Mynt.AzureFunctions
                 var azureTableStorageOptions = config.Get<AzureTableStorageOptions>();
                 var telegramNotificationOptions = config.Get<TelegramNotificationOptions>();
 
-                // TODO: Remove when confirmed this is loaded...
-                logger.Information(telegramNotificationOptions.TelegramBotToken);
-
                 // Initialize a Trade Manager instance that will run using the settings provided below.
                 // Once again, you can use the default values for the settings defined in te Options classes below.
                 // You can also override them here or using the configuration mechanism of your choosing.
