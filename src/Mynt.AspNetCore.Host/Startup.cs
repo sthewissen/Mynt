@@ -39,36 +39,9 @@ namespace Mynt.AspNetCore.Host
 
             services.AddMvc();
 
-            // Set up exchange - TBD TODO more elegant solution
-            var binance = Configuration.GetSection("Binance").Get<ExchangeOptions>();
-            var bittrex = Configuration.GetSection("Bittrex").Get<ExchangeOptions>();
-            var bitfinex = Configuration.GetSection("Bitfinex").Get<ExchangeOptions>();
-            var poloniex = Configuration.GetSection("Poloniex").Get<ExchangeOptions>();
-
-            if (!String.IsNullOrEmpty(bittrex?.ApiKey))
-            {
-                bittrex.Exchange = Exchange.Bittrex;
-                services.AddSingleton<IExchangeApi>(i => new BaseExchange(bittrex));
-            }
-            else if (!String.IsNullOrEmpty(binance?.ApiKey))
-            {
-                binance.Exchange = Exchange.Binance;
-                services.AddSingleton<IExchangeApi>(i => new BaseExchange(binance));
-            }
-            else if (!String.IsNullOrEmpty(bitfinex?.ApiKey))
-            {
-                bitfinex.Exchange = Exchange.Bitfinex;
-                services.AddSingleton<IExchangeApi>(i => new BaseExchange(bitfinex));
-            }
-            else if (!String.IsNullOrEmpty(poloniex?.ApiKey))
-            {
-                poloniex.Exchange = Exchange.Poloniex;
-                services.AddSingleton<IExchangeApi>(i => new BaseExchange(poloniex));
-            }
-            else
-            {
-                throw new Exception("Please configure exchange settings");
-            }
+            // Set up exchange - TODO
+            var exchangeOptions = Configuration.Get<ExchangeOptions>();
+            services.AddSingleton<IExchangeApi>(i => new BaseExchange(exchangeOptions));
 
             // Major TODO, coming soon
             services.AddSingleton<ITradingStrategy, TheScalper>()
