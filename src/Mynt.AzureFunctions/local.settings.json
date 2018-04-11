@@ -6,6 +6,7 @@
 
     "Exchange": "Binance", // or 0, look @ Exchange enum
     "ApiKey": "KeyValue",
-    "ApiSecret": "SecretValue"
+    "ApiSecret": "SecretValue",
+    "PassPhrase": "PassPhrase"
   }
 }
