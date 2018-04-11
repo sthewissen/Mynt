@@ -33,9 +33,7 @@ namespace Mynt.AzureFunctions
                 logger.Information("Starting processing...");
 
                 // Either use the default options as defined in TradeOptions or override them.
-                // You can override them using the property setters here or by providing keys in your configuration mechanism
-                // matching the property names in this class.
-
+                // You can override them using the properties in the TradeOptions class below.
                  var options = new TradeOptions()
                  {
                     MarketBlackList = new List<string> { "TRX", "XVG" }
@@ -44,6 +42,9 @@ namespace Mynt.AzureFunctions
                 var exchangeOptions = config.Get<ExchangeOptions>();
                 var azureTableStorageOptions = config.Get<AzureTableStorageOptions>();
                 var telegramNotificationOptions = config.Get<TelegramNotificationOptions>();
+
+                // TODO: Remove when confirmed this is loaded...
+                logger.Information(telegramNotificationOptions.TelegramBotToken);
 
                 // Initialize a Trade Manager instance that will run using the settings provided below.
                 // Once again, you can use the default values for the settings defined in te Options classes below.
