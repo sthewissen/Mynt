@@ -17,6 +17,11 @@ namespace Mynt.AzureFunctions
 {
     public static class SellTimer
     {
+        static SellTimer()
+        {
+            ApplicationHelper.Startup();
+        }
+
         [FunctionName("SellTimer")]
         public static async Task Run([TimerTrigger("0 * * * * *")]TimerInfo sellTimer, TraceWriter log, ExecutionContext context)
         {
