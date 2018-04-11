@@ -14,7 +14,7 @@ namespace Mynt.Data.Sqlite
 
         public SqliteDataStore(SqliteOptions options)
         {
-            _context = new MyntDbContext(options.ConnectionString);
+            _context = new MyntDbContext(options.SqliteConnectionString);
         }
 
         public async Task InitializeAsync()

@@ -15,8 +15,8 @@ namespace Mynt.Core.Notifications
 
         public TelegramNotificationManager(TelegramNotificationOptions settings)
         {
-            _chatId = settings.ChatId;
-            _telegramWebhookUrl = $"https://api.telegram.org/bot{settings.BotToken}/sendMessage";
+            _chatId = settings.TelegramChatId;
+            _telegramWebhookUrl = $"https://api.telegram.org/bot{settings.TelegramBotToken}/sendMessage";
         }
 
         public async Task<bool> SendNotification(string message)

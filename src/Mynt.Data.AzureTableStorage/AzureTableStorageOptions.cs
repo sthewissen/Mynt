@@ -3,13 +3,8 @@ using Mynt.Core.Configuration;
 
 namespace Mynt.Data.AzureTableStorage
 {
-    public class AzureTableStorageOptions : BaseSettings
+    public class AzureTableStorageOptions
     {
-        public string ConnectionString { get; set; }
-
-        public AzureTableStorageOptions()
-        { 
-            TrySetFromConfig(() => ConnectionString = AppSettings.Get<string>("AzureTableStorage" + nameof(ConnectionString)));
-       }
+        public string AzureTableStorageConnectionString { get; set; }
     }
 }
