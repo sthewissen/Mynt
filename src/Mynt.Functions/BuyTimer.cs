@@ -18,6 +18,11 @@ namespace Mynt.Functions
 {
     public static class BuyTimer
     {
+        static BuyTimer()
+        {
+            ApplicationHelper.Startup();
+        }
+
         [FunctionName("BuyTimer")]
         public static async Task Run([TimerTrigger("10 1 * * * *")]TimerInfo buyTimer, TraceWriter log)
         {

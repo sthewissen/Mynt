@@ -286,7 +286,5 @@ __pycache__/
 *.btm.cs
 *.odx.cs
 *.xsd.cs
-/functions/Mynt.WindowsService/config/appSettingsOverwrites.config
-functions/.DS_Store
+
 .DS_Store
-src/Mynt.Functions/local.settings.json

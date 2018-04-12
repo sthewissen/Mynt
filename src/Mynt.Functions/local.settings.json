@@ -1,0 +1,18 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "",
+    "AzureWebJobsDashboard": "",
+
+    "BindingRedirects": "[ { \"ShortName\": \"Newtonsoft.Json\", \"RedirectToVersion\": \"11.0.0.0\", \"PublicKeyToken\": \"30ad4fe6b2a6aeed\" } ]",
+
+    "Exchange": "Binance", // or 0, look @ Exchange enum
+    "ApiKey": "KeyValue",
+    "ApiSecret": "SecretValue",
+    "PassPhrase": "PassPhrase",
+
+    "AzureTableStorageConnectionString": "",
+    "TelegramBotToken": "",
+    "TelegramChatId": ""
+  }
+}
