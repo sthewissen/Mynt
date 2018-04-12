@@ -10,6 +10,7 @@ using Mynt.Core.Notifications;
 using Mynt.Core.Strategies;
 using Mynt.Core.TradeManagers;
 using Mynt.Data.AzureTableStorage;
+using Newtonsoft.Json.Linq;
 using Serilog;
 using Serilog.Sinks.AzureWebJobsTraceWriter;
 
@@ -43,6 +44,9 @@ namespace Mynt.AzureFunctions
                  {
                     MarketBlackList = new List<string> { "TRX", "XVG" }
                  };
+
+                // Spin up something from Newtonsoft.Json...
+                var obj = new Newtonsoft.Json.Linq.JObject();
 
                 var exchangeOptions = config.Get<ExchangeOptions>();
                 var azureTableStorageOptions = config.Get<AzureTableStorageOptions>();
