@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
+using Mynt.Core.Configuration;
 // using Microsoft.Extensions.Configuration;
 using Mynt.Core.Enums;
 using Mynt.Core.Exchanges;
@@ -33,9 +34,9 @@ namespace Mynt.Functions
                     MarketBlackList = new List<string> { "TRX", "XVG" }
                  };
 
-                var exchangeOptions = new ExchangeOptions(); // config.Get<ExchangeOptions>();
-                var azureTableStorageOptions = new AzureTableStorageOptions(); // config.Get<AzureTableStorageOptions>();
-                var telegramNotificationOptions = new TelegramNotificationOptions(); // config.Get<TelegramNotificationOptions>();
+                var exchangeOptions = AppSettings.Get<ExchangeOptions>();
+                var azureTableStorageOptions = AppSettings.Get<AzureTableStorageOptions>();
+                var telegramNotificationOptions = AppSettings.Get<TelegramNotificationOptions>();
 
                 // Initialize a Trade Manager instance that will run using the settings provided below.
                 // Once again, you can use the default values for the settings defined in te Options classes below.
