@@ -19,7 +19,7 @@ namespace Mynt.Functions
     public static class BuyTimer
     {
         [FunctionName("BuyTimer")]
-        public static async Task Run([TimerTrigger("10 1 * * * *")]TimerInfo buyTimer, TraceWriter log, ExecutionContext context)
+        public static async Task Run([TimerTrigger("10 1 * * * *")]TimerInfo buyTimer, TraceWriter log)
         {
             var logger = new LoggerConfiguration().WriteTo.TraceWriter(log).CreateLogger();
 
