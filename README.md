@@ -1,4 +1,4 @@
-![Mynt](https://raw.githubusercontent.com/sthewissen/Mynt/master/img/myntlogo.png)
+<img src="https://raw.githubusercontent.com/sthewissen/Mynt/master/img/myntlogo.png" alt="Mynt" width="400" />
 
 Finding this useful? Consider a donation!
 

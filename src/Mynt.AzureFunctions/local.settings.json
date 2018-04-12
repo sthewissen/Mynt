@@ -1,7 +1,7 @@
 {
   "IsEncrypted": false,
   "Values": {
-    "AzureWebJobsStorage": "DefaultEndpointsProtocol=https;AccountName=myntbot;AccountKey=+B1E7PQpBa8dkko/ZidLvf3Cgsc1ay21qjiq7nBhW28KPsHNDcB1/3QiNnmbsIl75L5Q6gFLWxJJbgHPv4LlgA==;EndpointSuffix=core.windows.net",
+    "AzureWebJobsStorage": "",
     "AzureWebJobsDashboard": "",
 
     "BindingRedirects": "[ { \"ShortName\": \"Newtonsoft.Json\", \"RedirectToVersion\": \"11.0.2.21942\", \"PublicKeyToken\": \"30ad4fe6b2a6aeed\" } ]",
