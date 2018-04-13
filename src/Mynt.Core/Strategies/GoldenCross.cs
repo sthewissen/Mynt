@@ -26,12 +26,12 @@ namespace Mynt.Core.Strategies
                     // Since we look back 1 candle, the first candle can never be a signal.
                     if (i == 0)
                         result.Add(TradeAdvice.Hold);
-                    // When the fast SMA moves above the slow SMA, we have a positive cross-over
-                    else if (sma50[i] < sma200[i] && sma50[i - 1] > sma200[i])
-                        result.Add(TradeAdvice.Buy);
                     // When the slow SMA moves above the fast SMA, we have a negative cross-over
-                    else if (sma50[i] > sma200[i] && sma50[i - 1] < sma200[i])
+                    else if (sma50[i] < sma200[i] && sma50[i - 1] > sma200[i - 1])
                         result.Add(TradeAdvice.Sell);
+                    // When the fast SMA moves above the slow SMA, we have a positive cross-over
+                    else if (sma50[i] > sma200[i] && sma50[i - 1] < sma200[i - 1])
+                        result.Add(TradeAdvice.Buy);
                     else
                         result.Add(TradeAdvice.Hold);
                 }

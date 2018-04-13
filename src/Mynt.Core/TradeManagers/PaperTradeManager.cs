@@ -28,6 +28,12 @@ namespace Mynt.Core.TradeManagers
             _notification = notificationManager;
             _dataStore = dataStore;
             _settings = settings;
+
+            if (_api == null) throw new ArgumentException("Invalid exchange provided...");
+            if (_strategy == null) throw new ArgumentException("Invalid strategy provided...");
+            if (_dataStore == null) throw new ArgumentException("Invalid data store provided...");
+            if (_settings == null) throw new ArgumentException("Invalid settings provided...");
+            if (_logger == null) throw new ArgumentException("Invalid logger provided...");
         }
 
         #region SETUP
@@ -548,7 +554,13 @@ namespace Mynt.Core.TradeManagers
                 
                 _logger.Information($"Checking {trade.Market} sell conditions...");
 
-                if (sellType != SellType.None)
+                if (sellType == SellType.TrailingStopLossUpdated)
+                {
+                    // Update the stop loss for this trade, which was set in ShouldSell.
+                    _logger.Information("Updated the trailing stop loss for {Market} to {StopLoss}", trade.Market, trade.StopLossRate.Value.ToString("0.00000000"));
+                    await _dataStore.SaveTradeAsync(trade);
+                }
+                else if (sellType != SellType.None)
                 {
                     var orderId = GetOrderId();
 
@@ -563,12 +575,6 @@ namespace Mynt.Core.TradeManagers
                     await _dataStore.SaveTradeAsync(trade);
 
                     await SendNotification($"Going to sell {trade.Market} at {trade.CloseRate:0.00000000}.");
-                }
-                else if (sellType == SellType.TrailingStopLossUpdated)
-                {
-                    // Update the stop loss for this trade, which was set in ShouldSell.
-                    _logger.Information("Updated the trailing stop loss for {Market} to {StopLoss}", trade.Market, trade.StopLossRate.Value.ToString("0.00000000"));
-                    await _dataStore.SaveTradeAsync(trade);
                 }
             }
         }
@@ -618,9 +624,11 @@ namespace Mynt.Core.TradeManagers
                 // Only update the trailing stop when its above our starting percentage and higher than the previous one.
                 if (currentProfit > _settings.TrailingStopStartingPercentage && (trade.StopLossRate < newStopRate || !trade.StopLossRate.HasValue))
                 {
+                    _logger.Information($"Trailing stop loss updated for {trade.Market} from {trade.StopLossRate:0.00000000} to {newStopRate:0.00000000}");
+
                     // The current profit percentage is high enough to create the trailing stop value.
                     trade.StopLossRate = newStopRate;
-
+                    
                     return SellType.TrailingStopLossUpdated;
                 }
 
