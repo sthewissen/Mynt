@@ -20,15 +20,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "data", "data", "{F34057AE-A
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "running", "running", "{0A0E2DD3-2FBE-4B41-A8F3-3B3CA01830A2}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "backtester", "backtester", "{942741EB-D3F2-4E7E-AE6D-11DFCC345375}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mynt.AspNetCore.Host", "Mynt.AspNetCore.Host\Mynt.AspNetCore.Host.csproj", "{192ADA12-7C0D-4671-AE53-329E0643E74B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mynt.Functions", "Mynt.Functions\Mynt.Functions.csproj", "{6CF60DBF-1F5E-4179-B760-2F05EEFEE612}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.Tests", "Mynt.Tests\Mynt.Tests.csproj", "{3CA6A5DD-27D2-42BE-AC59-1C9B1B4FA577}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.BackTester", "Mynt.BackTester\Mynt.BackTester.csproj", "{5C144B66-484D-4B71-8E03-8860130DF5E1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -64,10 +60,6 @@ Global
 		{3CA6A5DD-27D2-42BE-AC59-1C9B1B4FA577}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3CA6A5DD-27D2-42BE-AC59-1C9B1B4FA577}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3CA6A5DD-27D2-42BE-AC59-1C9B1B4FA577}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5C144B66-484D-4B71-8E03-8860130DF5E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5C144B66-484D-4B71-8E03-8860130DF5E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5C144B66-484D-4B71-8E03-8860130DF5E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5C144B66-484D-4B71-8E03-8860130DF5E1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -78,7 +70,6 @@ Global
 		{F5934EEF-3636-4A9D-86FA-660B9E8F40B8} = {F34057AE-AC0B-4A0B-8B26-71FB4DC7F474}
 		{192ADA12-7C0D-4671-AE53-329E0643E74B} = {0A0E2DD3-2FBE-4B41-A8F3-3B3CA01830A2}
 		{6CF60DBF-1F5E-4179-B760-2F05EEFEE612} = {0A0E2DD3-2FBE-4B41-A8F3-3B3CA01830A2}
-		{5C144B66-484D-4B71-8E03-8860130DF5E1} = {942741EB-D3F2-4E7E-AE6D-11DFCC345375}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AFCCB5C5-80F3-4AE8-B21C-2007C408EBCD}

@@ -7,7 +7,7 @@ namespace Mynt.BackTester.Models
     internal class BackTestResult
     {
         public string Currency { get; set; }
-        public double Profit { get; set; }
-        public double Duration { get; set; }
+        public decimal Profit { get; set; }
+        public int Duration { get; set; }
     }
 }

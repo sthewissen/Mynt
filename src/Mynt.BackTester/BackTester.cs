@@ -49,9 +49,6 @@ namespace Mynt.BackTester
                 PrintResults(results.Where(x => x.Currency == pair).ToList());
             }
 
-            Console.WriteLine();
-            Console.Write("\tTOTAL:".PadRight(15, ' '));
-            PrintResults(results);
             WriteSeparator();
         }
 
@@ -86,54 +83,38 @@ namespace Mynt.BackTester
             // Go through our coinpairs and backtest them.
             foreach (var pair in _coinsToBuy)
             {
-                //    var candleProvider = new JsonCandleProvider("Data");
+                var candleProvider = new JsonCandleProvider("Data");
 
-                //    // This creates a list of buy signals.
-                //    var candles = candleProvider.GetCandles(pair);
-                //    var trend = strategy.Prepare(candles);
+                // This creates a list of buy signals.
+                var candles = candleProvider.GetCandles(pair);
+                var trend = strategy.Prepare(candles);
 
-                //    for (int i = 0; i < trend.Count; i++)
-                //    {
-                //        if (trend[i].TradeAdvice == TradeAdvice.Buy)
-                //        {
-                //            // This is a buy signal
-                //            var trade = new Trade() { OpenRate = candles[i].Close, OpenDate = candles[i].Timestamp, Quantity = 1 };
+                for (int i = 0; i < trend.Count; i++)
+                {
+                    if (trend[i] == TradeAdvice.Buy)
+                    {
+                        // This is a buy signal
+                        var trade = new Trade() { OpenRate = candles[i].Close, OpenDate = candles[i].Timestamp, Quantity = 1 };
 
-                //            var buyStep = i;
+                        var buyStep = i;
 
-                //            // Calculate win/lose forwards from buy point
-                //            for (; i < trend.Count; i++)
-                //            {
-                //                // There are 2 ways we can sell, either through the strategy telling us to do so (-1)
-                //                // or because other conditions such as the ROI or stoploss tell us to.
-                //                if (trend[i].TradeAdvice == TradeAdvice.Sell || i == trend.Count - 1
-                //                    || ShouldSell(trade, candles[i].Close, candles[i].Timestamp) != SellType.None)
-                //                {
-                //                    // Bittrex charges 0.25% transaction fee
-                //                    // Binance charges 0.1% transaction fee, 0.05% if paid in BNB
-                //                    var currentProfit = (candles[i].Close - trade.OpenRate) / trade.OpenRate - 0.001;
-                //                    results.Add(new BackTestResult { Currency = pair, Profit = currentProfit, Duration = i - buyStep });
-                //                    break;
-                //                }
-                //            }
-                //        }
-                //    }
+                        // Calculate win/lose forwards from buy point
+                        for (; i < trend.Count; i++)
+                        {
+                            // There are 2 ways we can sell, either through the strategy telling us to do so (-1)
+                            // or because other conditions such as the ROI or stoploss tell us to.
+                            if (trend[i] == TradeAdvice.Sell || i == trend.Count - 1)
+                            {
+                                var currentProfit = (candles[i].Close - trade.OpenRate) / trade.OpenRate;
+                                results.Add(new BackTestResult { Currency = pair, Profit = currentProfit, Duration = i - buyStep });
+                                break;
+                            }
+                        }
+                    }
+                }
             }
 
             return results;
-        }
-
-        private SellType ShouldSell(Trade trade, decimal currentRateBid, DateTime utcNow)
-        {
-            var currentProfit = (currentRateBid - trade.OpenRate) / trade.OpenRate;
-
-            // Let's not do a stoploss for now...
-            if (currentProfit < _options.StopLossPercentage)
-            {
-                return SellType.StopLoss;
-            }
-
-            return SellType.None;
         }
 
         #endregion
@@ -158,15 +139,11 @@ namespace Mynt.BackTester
 
             if (results.Count > 0)
             {
-                var cumulativeProfits = results.GroupBy(_ => _.Currency).
-                    Select(_ => (_.Select(x => (1 + x.Profit)).Aggregate((a, x) => a * x) - 1) * 100);
-                var cumulativeProfit = cumulativeProfits.Average();
                 var resultString = $"{(Convert.ToDouble(results.Count(x => x.Profit > 0)) / Convert.ToDouble(results.Count) * 100.0):0.00}%  |  " +
                     $"Made {results.Count} buys ({results.Count(x => x.Profit > 0)}/{results.Count(x => x.Profit < 0)}). " +
                     $"Average profit {(results.Select(x => x.Profit).Average() * 100):0.00}%. " +
                     $"Total profit was {(results.Select(x => x.Profit).Sum()):0.000}. " +
-                    $"Profit when reinvesting was {cumulativeProfit:0.00}%. " +
-                    $"Average duration {(results.Select(x => x.Duration).Average() * 5):0.0} mins.";
+                    $"Average duration {(results.Select(x => x.Duration).Average() * 60):0.0} mins.";
                 WriteColoredLine(resultString, color);
             }
             else

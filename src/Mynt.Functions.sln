@@ -20,8 +20,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "data", "data", "{F34057AE-A
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "running", "running", "{0A0E2DD3-2FBE-4B41-A8F3-3B3CA01830A2}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "backtester", "backtester", "{942741EB-D3F2-4E7E-AE6D-11DFCC345375}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mynt.Functions", "Mynt.Functions\Mynt.Functions.csproj", "{E430FA76-8463-4D8B-BFA3-A904F725F3DD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.Tests", "Mynt.Tests\Mynt.Tests.csproj", "{3CA6A5DD-27D2-42BE-AC59-1C9B1B4FA577}"
