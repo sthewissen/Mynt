@@ -11,7 +11,7 @@ namespace Mynt.Core.Strategies
     {
         public override string Name => "Golden Cross";
         public override int MinimumAmountOfCandles => 202;
-        public override Period IdealPeriod => Period.Day;
+        public override Period IdealPeriod => Period.Hour;
 
         public override List<TradeAdvice> Prepare(List<Candle> candles)
         {
