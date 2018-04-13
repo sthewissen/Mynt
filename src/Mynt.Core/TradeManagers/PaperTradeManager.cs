@@ -497,7 +497,7 @@ namespace Mynt.Core.TradeManagers
                 var candles = await _api.GetTickerHistory(order.Market, Period.Minute, order.OpenDate);
                 var candlesContainingSell = candles.Where(x => order.CloseRate >= x.Low && order.CloseRate <= x.High).ToList();
 
-                _logger.Information($"Checking {order.Market} SELL order...");
+                _logger.Information($"Checking {order.Market} SELL order @ {order.CloseRate:0.00000000}...");
 
                 // This means the order probably would've gotten filled...
                 // We have no other way to check this, because no actual orders are being placed.
@@ -508,7 +508,7 @@ namespace Mynt.Core.TradeManagers
                     order.IsSelling = false;
                     order.CloseDate = DateTime.UtcNow;
 
-                    _logger.Information($"{order.Market} SELL order filled...");
+                    _logger.Information($"{order.Market} SELL order filled @ {order.CloseRate:0.00000000}...");
 
                     order.CloseProfit = (order.CloseRate * order.Quantity) - order.StakeAmount;
                     order.CloseProfitPercentage = ((order.CloseRate * order.Quantity) - order.StakeAmount) / order.StakeAmount * 100;

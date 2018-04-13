@@ -49,7 +49,7 @@ namespace Mynt.Functions
                 var tradeManager = new PaperTradeManager(
                     api: new BaseExchange(exchangeOptions),
                     dataStore: new AzureTableStorageDataStore(azureTableStorageOptions),
-                    logger: null,
+                    logger: logger,
                     notificationManager: new TelegramNotificationManager(telegramNotificationOptions),
                     settings: options,
                     strategy: new TheScalper());
