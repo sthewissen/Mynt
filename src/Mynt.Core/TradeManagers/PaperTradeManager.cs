@@ -254,8 +254,6 @@ namespace Mynt.Core.TradeManagers
         {
             try
             {
-                _logger.Information("Checking market {Market}...", market);
-
                 var minimumDate = _strategy.GetMinimumDateTime();
                 var candleDate = _strategy.GetCurrentCandleDateTime();
                 var candles = await _api.GetTickerHistory(market, _strategy.IdealPeriod, minimumDate);
