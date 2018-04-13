@@ -448,7 +448,7 @@ namespace Mynt.Core.TradeManagers
             foreach (var trade in _activeTrades.Where(x => x.OpenOrderId != null && x.SellOrderId == null))
             {
                 var candles = await _api.GetTickerHistory(trade.Market, Period.Minute, trade.OpenDate);
-                var candlesContainingBuy = candles.Where(x => trade.OpenRate >= x.Low && trade.OpenRate <= x.High).ToList();
+                var candlesContainingBuy = candles.Where(x => trade.OpenRate >= x.High ||(trade.OpenRate >= x.Low && trade.OpenRate <= x.High)).ToList();
 
                 _logger.Information($"Checking {trade.Market} BUY order...");
 
@@ -495,7 +495,7 @@ namespace Mynt.Core.TradeManagers
             foreach (var order in _activeTrades.Where(x => x.OpenOrderId != null && x.SellOrderId != null))
             {
                 var candles = await _api.GetTickerHistory(order.Market, Period.Minute, order.OpenDate);
-                var candlesContainingSell = candles.Where(x => order.CloseRate >= x.Low && order.CloseRate <= x.High).ToList();
+                var candlesContainingSell = candles.Where(x =>order.CloseRate <= x.Low || (order.CloseRate >= x.Low && order.CloseRate <= x.High)).ToList();
 
                 _logger.Information($"Checking {order.Market} SELL order @ {order.CloseRate:0.00000000}...");
 
