@@ -557,7 +557,6 @@ namespace Mynt.Core.TradeManagers
                 if (sellType == SellType.TrailingStopLossUpdated)
                 {
                     // Update the stop loss for this trade, which was set in ShouldSell.
-                    _logger.Information("Updated the trailing stop loss for {Market} to {StopLoss}", trade.Market, trade.StopLossRate.Value.ToString("0.00000000"));
                     await _dataStore.SaveTradeAsync(trade);
                 }
                 else if (sellType != SellType.None)

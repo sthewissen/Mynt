@@ -506,8 +506,13 @@ namespace Mynt.Core.TradeManagers
                 // These are trades that are not being bought or sold at the moment so these need to be checked for sell conditions.
                 var ticker = await _api.GetTicker(trade.Market);
                 var sellType = ShouldSell(trade, ticker.Bid, DateTime.UtcNow);
-
-                if (sellType != SellType.None)
+                
+                if (sellType == SellType.TrailingStopLossUpdated)
+                {
+                    // Update the stop loss for this trade, which was set in ShouldSell.
+                    await _dataStore.SaveTradeAsync(trade);
+                }
+                else if (sellType != SellType.None)
                 {
                     if (trade.SellType == SellType.Immediate)
                     {
@@ -526,12 +531,6 @@ namespace Mynt.Core.TradeManagers
                     await _dataStore.SaveTradeAsync(trade);
 
                     await SendNotification($"Going to sell {trade.Market} at {trade.CloseRate:0.00000000}.");
-                }
-                else if (sellType == SellType.TrailingStopLossUpdated)
-                {
-                    // Update the stop loss for this trade, which was set in ShouldSell.
-                    _logger.Information("Updated the trailing stop loss for {Market} to {StopLoss}", trade.Market, trade.StopLossRate.Value.ToString("0.00000000"));
-                    await _dataStore.SaveTradeAsync(trade);
                 }
             }
         }
@@ -581,6 +580,8 @@ namespace Mynt.Core.TradeManagers
                 // Only update the trailing stop when its above our starting percentage and higher than the previous one.
                 if (currentProfit > _settings.TrailingStopStartingPercentage && (trade.StopLossRate < newStopRate || !trade.StopLossRate.HasValue))
                 {
+                    _logger.Information($"Trailing stop loss updated for {trade.Market} from {trade.StopLossRate:0.00000000} to {newStopRate:0.00000000}");
+
                     // The current profit percentage is high enough to create the trailing stop value.
                     trade.StopLossRate = newStopRate;
 
