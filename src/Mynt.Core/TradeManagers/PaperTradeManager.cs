@@ -448,7 +448,7 @@ namespace Mynt.Core.TradeManagers
                 var candles = await _api.GetTickerHistory(trade.Market, Period.Minute, trade.OpenDate);
                 var candlesContainingBuy = candles.Where(x => trade.OpenRate >= x.High ||(trade.OpenRate >= x.Low && trade.OpenRate <= x.High)).ToList();
 
-                _logger.Information($"Checking {trade.Market} BUY order...");
+                _logger.Information($"Checking {trade.Market} BUY order @ {trade.OpenRate:0.00000000}...");
 
                 // This means the order probably would've gotten filled...
                 // We have no other way to check this, because no actual orders are being placed.
@@ -457,7 +457,7 @@ namespace Mynt.Core.TradeManagers
                     trade.OpenOrderId = null;
                     trade.IsBuying = false;
                     
-                    _logger.Information($"{trade.Market} BUY order filled...");
+                    _logger.Information($"{trade.Market} BUY order filled @ {trade.OpenRate:0.00000000}...");
 
                     // If this is enabled we place a sell order as soon as our buy order got filled.
                     if (_settings.ImmediatelyPlaceSellOrder)
