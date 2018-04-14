@@ -81,6 +81,8 @@ namespace Mynt.Data.SqlServer.Migrations
 
                     b.Property<bool>("IsBusy");
 
+                    b.Property<bool>("IsArchived");
+
                     b.Property<DateTime>("LastUpdated");
 
                     b.Property<double>("StakeAmount");

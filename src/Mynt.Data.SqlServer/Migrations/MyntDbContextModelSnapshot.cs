@@ -78,7 +78,9 @@ namespace Mynt.Data.SqlServer.Migrations
 
                     b.Property<string>("Identifier");
 
-                    b.Property<bool>("IsBusy");
+                    b.Property<bool>("IsBusy"); 
+
+                    b.Property<bool>("IsArchived"); 
 
                     b.Property<DateTime>("LastUpdated");
 

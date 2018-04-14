@@ -49,6 +49,7 @@ namespace Mynt.Data.SqlServer.Migrations
                     CurrentBalance = table.Column<double>(nullable: false),
                     Identifier = table.Column<string>(nullable: true),
                     IsBusy = table.Column<bool>(nullable: false),
+                    IsArchived = table.Column<bool>(nullable: false),
                     LastUpdated = table.Column<DateTime>(nullable: false),
                     StakeAmount = table.Column<double>(nullable: false)
                 },
