@@ -4,6 +4,8 @@ using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Mynt.AspNetCore.Host.Hosting;
+using Serilog;
+using Serilog.Events;
 
 namespace Mynt.AspNetCore.Host
 {
@@ -31,6 +33,7 @@ namespace Mynt.AspNetCore.Host
                 .ConfigureAppConfiguration(i => 
                     i.AddJsonFile("appsettings.overrides.json", true))
                 .UseStartup<Startup>()
+                .UseSerilog()
                 //.UseUrls("http://*:5000")
                 .Build();
     }
