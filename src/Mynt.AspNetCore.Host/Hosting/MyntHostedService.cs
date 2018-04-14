@@ -21,6 +21,7 @@ namespace Mynt.AspNetCore.Host.Hosting
             _logger = logger;
             _tradeManager = tradeManager;
             _options = options ?? throw new ArgumentNullException(nameof(options));
+            
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -66,16 +67,35 @@ namespace Mynt.AspNetCore.Host.Hosting
             }
         }
 
+        // Thread safety
+        private static readonly SemaphoreSlim SemaphoreSlim = new SemaphoreSlim(1,1);
+
         private async void OnBuy()
         {
-            _logger.LogInformation("Mynt service is looking for new trades.");
-            await _tradeManager.LookForNewTrades();
+            await SemaphoreSlim.WaitAsync();
+            try
+            {
+                _logger.LogInformation("Mynt service is looking for new trades.");
+                await _tradeManager.LookForNewTrades();
+            }
+            finally
+            {
+                SemaphoreSlim.Release();
+            }
         }
 
         private async void OnSell()
         {
-            _logger.LogInformation("Mynt service is updating trades.");
-            await _tradeManager.UpdateExistingTrades();
+            await SemaphoreSlim.WaitAsync();
+            try
+            {
+                _logger.LogInformation("Mynt service is updating trades.");
+                await _tradeManager.UpdateExistingTrades();
+            }
+            finally
+            {
+                SemaphoreSlim.Release();
+            }
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
