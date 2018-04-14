@@ -30,23 +30,26 @@ namespace Mynt.Core.TradeManagers
             _settings = settings;
         }
 
-        private async Task Initialize()
+        private async Task Initialize(bool initTraders=false)
         {
             // First initialize a few things
             await _dataStore.InitializeAsync();
 
-            _currentTraders = await _dataStore.GetTradersAsync();
-
-            _logger.Information($"Currently have {_currentTraders.Count} traders out of {_settings.MaxNumberOfConcurrentTrades}...");
-
-            // Create our trader records if they're wrong.
-            if (_currentTraders.Count < _settings.MaxNumberOfConcurrentTrades)
+            if (initTraders)
             {
-                await CreateTraders(_currentTraders.Count);
-            }
-            else if (_currentTraders.Count > _settings.MaxNumberOfConcurrentTrades)
-            {
-                await ArchiveTraders(_currentTraders);
+                var currentTraders = await _dataStore.GetTradersAsync();
+
+                _logger.Information($"Currently have {currentTraders.Count} traders out of {_settings.MaxNumberOfConcurrentTrades}...");
+
+                // Create our trader records if they're wrong.
+                if (currentTraders.Count < _settings.MaxNumberOfConcurrentTrades)
+                {
+                    await CreateTraders(currentTraders.Count);
+                }
+                else if (currentTraders.Count > _settings.MaxNumberOfConcurrentTrades)
+                {
+                    await ArchiveTraders(currentTraders);
+                }
             }
 
             // Get a list of our busy traders
@@ -107,7 +110,7 @@ namespace Mynt.Core.TradeManagers
         public async Task LookForNewTrades()
         {
             // Initialize the things we'll be using throughout the process.
-            await Initialize();
+            await Initialize(true);
 
             // This means an order to buy has been open for an entire buy cycle.
             if (_settings.CancelUnboughtOrdersEachCycle)
