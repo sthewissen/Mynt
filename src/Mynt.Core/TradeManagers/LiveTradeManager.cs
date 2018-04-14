@@ -87,7 +87,7 @@ namespace Mynt.Core.TradeManagers
             {
                 var newTrader = new Trader()
                 {
-                    Identifier = $"trader{Guid.NewGuid().ToString().Split('-').FirstOrDefault()}",
+                    Identifier = $"{Guid.NewGuid().ToString().Split('-').FirstOrDefault()}",
                     CurrentBalance = _settings.AmountOfBtcToInvestPerTrader,
                     IsBusy = false,
                     LastUpdated = DateTime.UtcNow,
