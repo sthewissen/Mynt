@@ -43,28 +43,56 @@ namespace Mynt.Core.TradeManagers
             // First initialize a few things
             await _dataStore.InitializeAsync();
 
-            _activeTrades = await _dataStore.GetActiveTradesAsync();
-            _currentTraders = await _dataStore.GetBusyTradersAsync();
+            _currentTraders = await _dataStore.GetTradersAsync();
 
-            // Create our trader records if no traders exist yet.
-            if (_currentTraders.Count == 0)
+            _logger.Information($"Currently have {_currentTraders.Count} traders out of {_settings.MaxNumberOfConcurrentTrades}...");
+
+            // Create our trader records if they're wrong.
+            if (_currentTraders.Count < _settings.MaxNumberOfConcurrentTrades)
             {
-                await CreateTradersIfNoneExist();
+                await CreateTraders(_currentTraders.Count);
+            }
+            else if (_currentTraders.Count > _settings.MaxNumberOfConcurrentTrades)
+            {
+                await ArchiveTraders(_currentTraders);
             }
 
             // Get a list of our busy traders
+            _activeTrades = await _dataStore.GetActiveTradesAsync();
             _currentTraders = await _dataStore.GetBusyTradersAsync();
         }
 
-        private async Task CreateTradersIfNoneExist()
+        private async Task ArchiveTraders(List<Trader> currentTraders)
+        {
+            var amountToArchive = currentTraders.Count - _settings.MaxNumberOfConcurrentTrades;
+            var closedTraders = 0;
+
+            foreach (var item in currentTraders)
+            {
+                // If we've archived what we need, we can stop.
+                if (closedTraders == amountToArchive)
+                    break;
+
+                // This trader is not busy, it can be closed.
+                if (!item.IsBusy && !item.IsArchived)
+                {
+                    item.IsArchived = true;
+                    closedTraders += 1;
+                }
+            }
+
+            await _dataStore.SaveTradersAsync(currentTraders);
+        }
+
+        private async Task CreateTraders(int currentAmount)
         {
             var traders = new List<Trader>();
 
-            for (var i = 0; i < _settings.MaxNumberOfConcurrentTrades; i++)
+            for (var i = 0 + currentAmount; i < _settings.MaxNumberOfConcurrentTrades; i++)
             {
                 var newTrader = new Trader()
                 {
-                    Identifier = $"Trader{i}",
+                    Identifier = $"Trader_{Guid.NewGuid().ToString().Split('-').FirstOrDefault()}",
                     CurrentBalance = _settings.AmountOfBtcToInvestPerTrader,
                     IsBusy = false,
                     LastUpdated = DateTime.UtcNow,
@@ -452,7 +480,7 @@ namespace Mynt.Core.TradeManagers
             foreach (var trade in _activeTrades.Where(x => x.OpenOrderId != null && x.SellOrderId == null))
             {
                 var candles = await _api.GetTickerHistory(trade.Market, Period.Minute, trade.OpenDate);
-                var candlesContainingBuy = candles.Where(x => trade.OpenRate >= x.High ||(trade.OpenRate >= x.Low && trade.OpenRate <= x.High)).ToList();
+                var candlesContainingBuy = candles.Where(x => trade.OpenRate >= x.High || (trade.OpenRate >= x.Low && trade.OpenRate <= x.High)).ToList();
 
                 _logger.Information($"Checking {trade.Market} BUY order @ {trade.OpenRate:0.00000000}...");
 
@@ -462,7 +490,7 @@ namespace Mynt.Core.TradeManagers
                 {
                     trade.OpenOrderId = null;
                     trade.IsBuying = false;
-                    
+
                     _logger.Information($"{trade.Market} BUY order filled @ {trade.OpenRate:0.00000000}...");
 
                     // If this is enabled we place a sell order as soon as our buy order got filled.
@@ -476,7 +504,7 @@ namespace Mynt.Core.TradeManagers
                         trade.SellOrderId = orderId;
                         trade.IsSelling = true;
                         trade.SellType = SellType.Immediate;
-                        
+
                         _logger.Information($"{trade.Market} order placed @ {trade.CloseRate:0.00000000}...");
                     }
 
@@ -499,7 +527,7 @@ namespace Mynt.Core.TradeManagers
             foreach (var order in _activeTrades.Where(x => x.OpenOrderId != null && x.SellOrderId != null))
             {
                 var candles = await _api.GetTickerHistory(order.Market, Period.Minute, order.OpenDate);
-                var candlesContainingSell = candles.Where(x =>order.CloseRate <= x.Low || (order.CloseRate >= x.Low && order.CloseRate <= x.High)).ToList();
+                var candlesContainingSell = candles.Where(x => order.CloseRate <= x.Low || (order.CloseRate >= x.Low && order.CloseRate <= x.High)).ToList();
 
                 _logger.Information($"Checking {order.Market} SELL order @ {order.CloseRate:0.00000000}...");
 
@@ -535,7 +563,7 @@ namespace Mynt.Core.TradeManagers
                 }
             }
         }
-                                    
+
         /// <summary>
         /// Checks the current active trades if they need to be sold.
         /// </summary>
@@ -551,7 +579,7 @@ namespace Mynt.Core.TradeManagers
                 // These are trades that are not being bought or sold at the moment so these need to be checked for sell conditions.
                 var ticker = await _api.GetTicker(trade.Market);
                 var sellType = ShouldSell(trade, ticker.Bid, DateTime.UtcNow);
-                
+
                 _logger.Information($"Checking {trade.Market} sell conditions...");
 
                 if (sellType == SellType.TrailingStopLossUpdated)
@@ -568,7 +596,7 @@ namespace Mynt.Core.TradeManagers
                     trade.SellOrderId = orderId;
                     trade.SellType = sellType;
                     trade.IsSelling = true;
-                    
+
                     _logger.Information($"Selling {trade.Market} ({sellType.ToString()})...");
 
                     await _dataStore.SaveTradeAsync(trade);
@@ -627,7 +655,7 @@ namespace Mynt.Core.TradeManagers
 
                     // The current profit percentage is high enough to create the trailing stop value.
                     trade.StopLossRate = newStopRate;
-                    
+
                     return SellType.TrailingStopLossUpdated;
                 }
 

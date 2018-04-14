@@ -35,17 +35,69 @@ namespace Mynt.Core.TradeManagers
             // First initialize a few things
             await _dataStore.InitializeAsync();
 
-            _activeTrades = await _dataStore.GetActiveTradesAsync();
-            _currentTraders = await _dataStore.GetBusyTradersAsync();
+            _currentTraders = await _dataStore.GetTradersAsync();
 
-            // Create our trader records if no traders exist yet.
-            if (_currentTraders.Count == 0)
+            _logger.Information($"Currently have {_currentTraders.Count} traders out of {_settings.MaxNumberOfConcurrentTrades}...");
+
+            // Create our trader records if they're wrong.
+            if (_currentTraders.Count < _settings.MaxNumberOfConcurrentTrades)
             {
-                await CreateTradersIfNoneExist();
+                await CreateTraders(_currentTraders.Count);
+            }
+            else if (_currentTraders.Count > _settings.MaxNumberOfConcurrentTrades)
+            {
+                await ArchiveTraders(_currentTraders);
             }
 
             // Get a list of our busy traders
+            _activeTrades = await _dataStore.GetActiveTradesAsync();
             _currentTraders = await _dataStore.GetBusyTradersAsync();
+        }
+
+        private async Task ArchiveTraders(List<Trader> currentTraders)
+        {
+            var amountToArchive = currentTraders.Count - _settings.MaxNumberOfConcurrentTrades;
+            var closedTraders = 0;
+
+            foreach (var item in currentTraders)
+            {
+                // If we've archived what we need, we can stop.
+                if (closedTraders == amountToArchive)
+                    break;
+
+                // This trader is not busy, it can be closed.
+                if (!item.IsBusy && !item.IsArchived)
+                {
+                    item.IsArchived = true;
+                    closedTraders += 1;
+                }
+            }
+
+            await _dataStore.SaveTradersAsync(currentTraders);
+        }
+
+        private async Task CreateTraders(int currentAmount)
+        {
+            var traders = new List<Trader>();
+
+            for (var i = 0 + currentAmount; i < _settings.MaxNumberOfConcurrentTrades; i++)
+            {
+                var newTrader = new Trader()
+                {
+                    Identifier = $"Trader_{Guid.NewGuid().ToString().Split('-').FirstOrDefault()}",
+                    CurrentBalance = _settings.AmountOfBtcToInvestPerTrader,
+                    IsBusy = false,
+                    LastUpdated = DateTime.UtcNow,
+                    StakeAmount = _settings.AmountOfBtcToInvestPerTrader,
+                };
+
+                traders.Add(newTrader);
+            }
+
+            if (traders.Count > 0)
+            {
+                await _dataStore.SaveTradersAsync(traders);
+            }
         }
 
         /// <summary>
@@ -91,39 +143,7 @@ namespace Mynt.Core.TradeManagers
                 }
             }
         }
-
-        #region SETUP
-
-        /// <summary>
-        /// Creates trader objects that run in their own little bubble.
-        /// </summary>
-        /// <returns></returns>
-        private async Task CreateTradersIfNoneExist()
-        {
-            var traders = new List<Trader>();
-
-            for (var i = 0; i < _settings.MaxNumberOfConcurrentTrades; i++)
-            {
-                var newTrader = new Trader()
-                {
-                    Identifier = $"Trader{i}",
-                    CurrentBalance = _settings.AmountOfBtcToInvestPerTrader,
-                    IsBusy = false,
-                    LastUpdated = DateTime.UtcNow,
-                    StakeAmount = _settings.AmountOfBtcToInvestPerTrader,
-                };
-
-                traders.Add(newTrader);
-            }
-
-            if (traders.Count > 0)
-            {
-                await _dataStore.SaveTradersAsync(traders);
-            }
-        }
-
-        #endregion
-
+        
         #region STRATEGY RELATED
 
         /// <summary>

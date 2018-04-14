@@ -13,5 +13,6 @@ namespace Mynt.Data.Sqlite
         public double CurrentBalance { get; set; }
         public DateTime LastUpdated { get; set; }
         public bool IsBusy { get; set; }
+        public bool IsArchived { get; set; }
     }
 }

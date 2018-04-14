@@ -9,7 +9,7 @@ namespace Mynt.Core.TradeManagers
     public class TradeOptions : BaseSettings
     {
         // Trader settings
-        public int MaxNumberOfConcurrentTrades { get; set; } = 2;
+        public int MaxNumberOfConcurrentTrades { get; set; } = 20;
         public decimal AmountOfBtcToInvestPerTrader { get; set; } = 0.01m;
         public decimal TransactionFeePercentage { get; set; } = 0.0025m;
 

@@ -33,7 +33,7 @@ namespace Mynt.Data.SqlServer
 
         public async Task<List<Trader>> GetAvailableTradersAsync()
         {
-            var traders = await _context.Traders.Where(x => !x.IsBusy).ToListAsync();
+            var traders = await _context.Traders.Where(x => !x.IsBusy && !x.IsArchived).ToListAsync();
             var items = Mapping.Mapper.Map<List<Trader>>(traders);
 
             return items;
@@ -41,7 +41,7 @@ namespace Mynt.Data.SqlServer
 
         public async Task<List<Trader>> GetBusyTradersAsync()
         {
-            var traders = await _context.Traders.Where(x => x.IsBusy).ToListAsync();
+            var traders = await _context.Traders.Where(x => x.IsBusy && !x.IsArchived).ToListAsync();
             var items = Mapping.Mapper.Map<List<Trader>>(traders);
 
             return items;

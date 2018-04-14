@@ -37,7 +37,8 @@ namespace Mynt.Data.AzureTableStorage
 
         public async Task<List<Trader>> GetTradersAsync()
         {
-            var query = new TableQuery<TraderAdapter>();
+            var query = new TableQuery<TraderAdapter>().Where(TableQuery.GenerateFilterConditionForBool("IsArchived", QueryComparisons.Equal, false));
+
             TableContinuationToken token = null;
             var items = new List<TraderAdapter>();
             do
@@ -69,7 +70,11 @@ namespace Mynt.Data.AzureTableStorage
 
         public async Task<List<Trader>> GetAvailableTradersAsync()
         {
-            var query = new TableQuery<TraderAdapter>().Where(TableQuery.GenerateFilterConditionForBool("IsBusy", QueryComparisons.Equal, false));
+            var filter1 = TableQuery.GenerateFilterConditionForBool("IsBusy", QueryComparisons.Equal, false);
+            var filter2 = TableQuery.GenerateFilterConditionForBool("IsArchived", QueryComparisons.Equal, false);
+            var filter = TableQuery.CombineFilters(filter1, TableOperators.And, filter2);
+
+            var query = new TableQuery<TraderAdapter>().Where(filter);
             TableContinuationToken token = null;
             var items = new List<TraderAdapter>();
             do
@@ -85,7 +90,11 @@ namespace Mynt.Data.AzureTableStorage
 
         public async Task<List<Trader>> GetBusyTradersAsync()
         {
-            var query = new TableQuery<TraderAdapter>().Where(TableQuery.GenerateFilterConditionForBool("IsBusy", QueryComparisons.Equal, true));
+            var filter1 = TableQuery.GenerateFilterConditionForBool("IsBusy", QueryComparisons.Equal, true);
+            var filter2 = TableQuery.GenerateFilterConditionForBool("IsArchived", QueryComparisons.Equal, false);
+            var filter = TableQuery.CombineFilters(filter1, TableOperators.And, filter2);
+
+            var query = new TableQuery<TraderAdapter>().Where(filter);
             TableContinuationToken token = null;
             var items = new List<TraderAdapter>();
             do

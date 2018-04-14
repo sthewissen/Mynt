@@ -9,5 +9,6 @@ namespace Mynt.Core.Models
         public decimal CurrentBalance { get; set; }
         public DateTime LastUpdated { get; set; }
         public bool IsBusy { get; set; }
+        public bool IsArchived { get; set; }
     }
 }
