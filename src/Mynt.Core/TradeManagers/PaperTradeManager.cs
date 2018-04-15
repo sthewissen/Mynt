@@ -604,7 +604,7 @@ namespace Mynt.Core.TradeManagers
                     trade.IsSelling = true;
 
                     _logger.Information($"Selling {trade.Market} ({sellType.ToString()})...");
-                   
+
                     await _dataStore.SaveTradeAsync(trade);
                     await SendNotification($"Going to sell {trade.Market} at {trade.CloseRate:0.00000000}.");
                 }
@@ -659,7 +659,12 @@ namespace Mynt.Core.TradeManagers
                     _logger.Information($"Trailing stop loss updated for {trade.Market} from {trade.StopLossRate:0.00000000} to {newStopRate:0.00000000}");
 
                     // The current profit percentage is high enough to create the trailing stop value.
-                    trade.StopLossRate = Math.Round(newStopRate, 8);
+                    // If we are getting our first stop loss raise, we set it to break even. From there the stop
+                    // gets increased every given TrailingStopPercentage...
+                    if (!trade.StopLossRate.HasValue)
+                        trade.StopLossRate = trade.OpenRate;
+                    else
+                        trade.StopLossRate = Math.Round(newStopRate, 8);
 
                     return SellType.TrailingStopLossUpdated;
                 }
