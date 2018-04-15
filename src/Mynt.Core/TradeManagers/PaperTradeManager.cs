@@ -482,14 +482,14 @@ namespace Mynt.Core.TradeManagers
             // that means its a buy trade that is waiting to get bought. See if we can update that first.
             foreach (var trade in _activeTrades.Where(x => x.OpenOrderId != null && x.SellOrderId == null))
             {
-                var candles = await _api.GetTickerHistory(trade.Market, Period.Minute, trade.OpenDate);
-                var candlesContainingBuy = candles.Where(x => trade.OpenRate >= x.High || (trade.OpenRate >= x.Low && trade.OpenRate <= x.High)).ToList();
+                var candles = await _api.GetTickerHistory(trade.Market, Period.Minute, 1);
+                var candle = candles.FirstOrDefault();
 
                 _logger.Information($"Checking {trade.Market} BUY order @ {trade.OpenRate:0.00000000}...");
 
                 // This means the order probably would've gotten filled...
                 // We have no other way to check this, because no actual orders are being placed.
-                if (candlesContainingBuy.Any())
+                if (candle != null && (trade.OpenRate >= candle.High || (trade.OpenRate >= candle.Low && trade.OpenRate <= candle.High)))
                 {
                     trade.OpenOrderId = null;
                     trade.IsBuying = false;
@@ -529,14 +529,14 @@ namespace Mynt.Core.TradeManagers
 
             foreach (var order in _activeTrades.Where(x => x.OpenOrderId != null && x.SellOrderId != null))
             {
-                var candles = await _api.GetTickerHistory(order.Market, Period.Minute, order.OpenDate);
-                var candlesContainingSell = candles.Where(x => order.CloseRate <= x.Low || (order.CloseRate >= x.Low && order.CloseRate <= x.High)).ToList();
+                var candles = await _api.GetTickerHistory(order.Market, Period.Minute, 10);
+                var candle = candles.FirstOrDefault();
 
                 _logger.Information($"Checking {order.Market} SELL order @ {order.CloseRate:0.00000000}...");
 
                 // This means the order probably would've gotten filled...
                 // We have no other way to check this, because no actual orders are being placed.
-                if (candlesContainingSell.Any())
+                if (candle != null && (order.CloseRate <= candle.Low || (order.CloseRate >= candle.Low && order.CloseRate <= candle.High)))
                 {
                     order.OpenOrderId = null;
                     order.IsOpen = false;
