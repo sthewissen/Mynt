@@ -12,6 +12,7 @@ using Mynt.Data.AzureTableStorage;
 
 namespace Mynt.TelegramBot
 {
+    [Serializable]
     public class EchoDialog : IDialog<object>
     {
         protected int count = 1;
@@ -38,7 +39,7 @@ namespace Mynt.TelegramBot
         {
             var message = await argument;
 
-            switch(message.Text.Split(' ').FirstOrDefault())
+            switch (message.Text.Split(' ').FirstOrDefault())
             {
                 case "/trades":
                     var returnMessage = await CreateTradeString();
@@ -55,8 +56,7 @@ namespace Mynt.TelegramBot
 
         private async Task<string> CreateProfitString()
         {
-            // throw new NotImplementedException();
-            return "";
+            return "I SHIT ON YOU!";
         }
 
         private async Task<string> CreateTradeString()
@@ -65,6 +65,8 @@ namespace Mynt.TelegramBot
             var azureTableStorageOptions = AppSettings.Get<AzureTableStorageOptions>();
 
             var dataStore = new AzureTableStorageDataStore(azureTableStorageOptions);
+            await dataStore.InitializeAsync();
+
             var trades = await dataStore.GetActiveTradesAsync();
             var exchange = new BaseExchange(exchangeOptions);
             var stringResult = new StringBuilder();
@@ -73,8 +75,11 @@ namespace Mynt.TelegramBot
             {
                 var ticker = await exchange.GetTicker(item.Market);
                 var currentProfit = (ticker.Bid - item.OpenRate) / item.OpenRate;
-                stringResult.AppendLine($"{item.Market} - {currentProfit:0.00}% - {item.OpenDate.Humanize()}");
+                stringResult.AppendLine($"**{item.Market}:** {currentProfit:0.00}% opened {item.OpenDate.Humanize()}");
             }
+
+            if (trades.Count == 0)
+                stringResult.Append("No current active trades...");
 
             return stringResult.ToString();
         }

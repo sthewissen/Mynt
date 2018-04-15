@@ -24,7 +24,7 @@ namespace Mynt.Core.TradeManagers
         // Use a trailing stop to lock in your profits.
         // WARNING: This can't be used in combination with ImmediatelyPlaceSellOrder.
         public bool EnableTrailingStop { get; set; } = true;
-        public decimal TrailingStopStartingPercentage { get; set; } = 0.02m;
+        public decimal TrailingStopStartingPercentage { get; set; } = 0.05m;
         public decimal TrailingStopPercentage { get; set; } = 0.05m;
 
         // If set to true, orders that have not been bought for an entire cycle of the BuyTimer
