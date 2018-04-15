@@ -470,6 +470,9 @@ namespace Mynt.Core.TradeManagers
 
             // Third, our current trades need to be checked if one of these has hit its sell targets...
             await CheckForSellConditions();
+
+            // Save the changes
+            await _dataStore.SaveTradesAsync(_activeTrades);
         }
 
         /// <summary>
@@ -511,8 +514,6 @@ namespace Mynt.Core.TradeManagers
                         _logger.Information($"{trade.Market} order placed @ {trade.CloseRate:0.00000000}...");
                     }
 
-                    await _dataStore.SaveTradeAsync(trade);
-
                     await SendNotification($"Buy order filled for {trade.Market} at {trade.OpenRate:0.00000000}.");
                 }
             }
@@ -529,7 +530,7 @@ namespace Mynt.Core.TradeManagers
 
             foreach (var order in _activeTrades.Where(x => x.OpenOrderId != null && x.SellOrderId != null))
             {
-                var candles = await _api.GetTickerHistory(order.Market, Period.Minute, 10);
+                var candles = await _api.GetTickerHistory(order.Market, Period.Minute, 1);
                 var candle = candles.FirstOrDefault();
 
                 _logger.Information($"Checking {order.Market} SELL order @ {order.CloseRate:0.00000000}...");
@@ -560,7 +561,6 @@ namespace Mynt.Core.TradeManagers
                     }
 
                     await _dataStore.SaveTraderAsync(trader);
-                    await _dataStore.SaveTradeAsync(order);
 
                     await SendNotification($"Sold {order.Market} at {order.CloseRate:0.00000000} for {order.CloseProfit:0.00000000} profit ({order.CloseProfitPercentage:0.00}%).");
                 }
@@ -601,8 +601,6 @@ namespace Mynt.Core.TradeManagers
                     trade.IsSelling = true;
 
                     _logger.Information($"Selling {trade.Market} ({sellType.ToString()})...");
-
-                    await _dataStore.SaveTradeAsync(trade);
 
                     await SendNotification($"Going to sell {trade.Market} at {trade.CloseRate:0.00000000}.");
                 }
