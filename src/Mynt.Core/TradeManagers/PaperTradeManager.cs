@@ -472,7 +472,7 @@ namespace Mynt.Core.TradeManagers
             await CheckForSellConditions();
 
             // Save the changes
-            await _dataStore.SaveTradesAsync(_activeTrades);
+            // await _dataStore.SaveTradesAsync(_activeTrades);
         }
 
         /// <summary>
@@ -510,6 +510,8 @@ namespace Mynt.Core.TradeManagers
                         trade.SellOrderId = orderId;
                         trade.IsSelling = true;
                         trade.SellType = SellType.Immediate;
+
+                        await _dataStore.SaveTradeAsync(trade);
 
                         _logger.Information($"{trade.Market} order placed @ {trade.CloseRate:0.00000000}...");
                     }
@@ -560,6 +562,7 @@ namespace Mynt.Core.TradeManagers
                         trader.LastUpdated = DateTime.UtcNow;
                     }
 
+                    await _dataStore.SaveTradeAsync(order);
                     await _dataStore.SaveTraderAsync(trader);
 
                     await SendNotification($"Sold {order.Market} at {order.CloseRate:0.00000000} for {order.CloseProfit:0.00000000} profit ({order.CloseProfitPercentage:0.00}%).");
@@ -601,7 +604,8 @@ namespace Mynt.Core.TradeManagers
                     trade.IsSelling = true;
 
                     _logger.Information($"Selling {trade.Market} ({sellType.ToString()})...");
-
+                   
+                    await _dataStore.SaveTradeAsync(trade);
                     await SendNotification($"Going to sell {trade.Market} at {trade.CloseRate:0.00000000}.");
                 }
             }
