@@ -606,7 +606,7 @@ namespace Mynt.Core.TradeManagers
                     _logger.Information($"Trailing stop loss updated for {trade.Market} from {trade.StopLossRate:0.00000000} to {newStopRate:0.00000000}");
 
                     // The current profit percentage is high enough to create the trailing stop value.
-                    trade.StopLossRate = newStopRate;
+                    trade.StopLossRate = Math.Round(newStopRate, 8);
 
                     return SellType.TrailingStopLossUpdated;
                 }
