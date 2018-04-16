@@ -1,11 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace Mynt.Core.Configuration
 {
@@ -19,7 +17,7 @@ namespace Mynt.Core.Configuration
 
             var converter = TypeDescriptor.GetConverter(typeof(T));
 
-            return (T)(converter.ConvertFromInvariantString(appSetting));
+            return (T)converter.ConvertFromInvariantString(appSetting);
         }
 
         public static T Get<T>()
@@ -31,26 +29,23 @@ namespace Mynt.Core.Configuration
             {
                 var name = property.Name;
                 var valueString = ConfigurationManager.AppSettings[name];
-                var converter = TypeDescriptor.GetConverter(property.PropertyType);
-                var value = converter.ConvertFromInvariantString(valueString);
-                property.SetValue(instance, value);
+                if (property.PropertyType.GetInterface(nameof(IList)) != null)
+                {
+                    if (!String.IsNullOrEmpty(valueString))
+                    {
+                        var value = JsonConvert.DeserializeObject(valueString, property.PropertyType);
+                        property.SetValue(instance, value);
+                    }
+                }
+                else
+                {
+                    var converter = TypeDescriptor.GetConverter(property.PropertyType);
+                    var value = converter.ConvertFromInvariantString(valueString);
+                    property.SetValue(instance, value);
+                }
             }
 
             return instance;
-        }
-    }
-
-    public abstract class BaseSettings
-    {
-        protected static void TrySetFromConfig(Action action)
-        {
-            try
-            {
-                action();
-            }
-            catch
-            {
-            }
         }
     }
 }

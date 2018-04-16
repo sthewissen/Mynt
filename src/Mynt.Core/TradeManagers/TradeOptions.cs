@@ -3,10 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using Mynt.Core.Configuration;
 using Mynt.Core.Enums;
+using Newtonsoft.Json.Linq;
 
 namespace Mynt.Core.TradeManagers
 {
-    public class TradeOptions : BaseSettings
+    public class Roi
+    {
+        public int Duration { get; set; }
+        public decimal Profit { get; set; }
+    }
+
+    public class TradeOptions
     {
         // Trader settings
         public int MaxNumberOfConcurrentTrades { get; set; } = 10;
@@ -51,7 +58,7 @@ namespace Mynt.Core.TradeManagers
         // decimal containing a percentage. This list is used to define constraints such as
         // "Sell when 5 minutes have passed and profit is at 3%".
         // WARNING: This can't be used in combination with ImmediatelyPlaceSellOrder.
-        public List<(int Duration, decimal Profit)> ReturnOnInvestment { get; set; } = new List<ValueTuple<int, decimal>> {};
+        public List<Roi> ReturnOnInvestment { get; set; } = new List<Roi> {};
 
         // These are the markets we don't want to trade on
         public List<string> QuoteCurrencies { get; set; } = new List<string> { "BTC" };
@@ -63,32 +70,10 @@ namespace Mynt.Core.TradeManagers
         public List<string> OnlyTradeList { get; set; } = new List<string> {};
 
         // These are the markets we want to trade on regardless of volume
-        public List<string> AlwaysTradeList { get; set; } = new List<string> {};
+        public List<string> AlwaysTradeList { get; set; }
 
-        public TradeOptions()
+/*        public TradeOptions()
         {
-            TrySetFromConfig(() => MaxNumberOfConcurrentTrades = AppSettings.Get<int>(nameof(MaxNumberOfConcurrentTrades)));
-            TrySetFromConfig(() => AmountOfBtcToInvestPerTrader = AppSettings.Get<decimal>(nameof(AmountOfBtcToInvestPerTrader)));
-
-            TrySetFromConfig(() => StopLossPercentage = AppSettings.Get<decimal>(nameof(StopLossPercentage)));
-
-            TrySetFromConfig(() => ImmediatelyPlaceSellOrder = AppSettings.Get<bool>(nameof(ImmediatelyPlaceSellOrder)));
-            TrySetFromConfig(() => ImmediatelyPlaceSellOrderAtProfit = AppSettings.Get<decimal>(nameof(ImmediatelyPlaceSellOrderAtProfit)));
-
-            TrySetFromConfig(() => EnableTrailingStop = AppSettings.Get<bool>(nameof(EnableTrailingStop)));
-            TrySetFromConfig(() => TrailingStopStartingPercentage = AppSettings.Get<decimal>(nameof(TrailingStopStartingPercentage)));
-            TrySetFromConfig(() => TrailingStopPercentage = AppSettings.Get<decimal>(nameof(TrailingStopPercentage)));
-
-            TrySetFromConfig(() => CancelUnboughtOrdersEachCycle = AppSettings.Get<bool>(nameof(CancelUnboughtOrdersEachCycle)));
-
-            TrySetFromConfig(() => PlaceFirstStopAtSignalCandleLow = AppSettings.Get<bool>(nameof(PlaceFirstStopAtSignalCandleLow)));
-
-            TrySetFromConfig(() => MinimumAmountOfVolume = AppSettings.Get<int>(nameof(MinimumAmountOfVolume)));
-
-            TrySetFromConfig(() => BuyInPriceStrategy = (BuyInPriceStrategy)AppSettings.Get<int>(nameof(BuyInPriceStrategy)));
-            TrySetFromConfig(() => AskLastBalance = AppSettings.Get<decimal>(nameof(AskLastBalance)));
-            TrySetFromConfig(() => BuyInPricePercentage = AppSettings.Get<decimal>(nameof(BuyInPricePercentage)));
-
             TrySetFromConfig(() => {
                 var list = AppSettings.Get<string>(nameof(ReturnOnInvestment));
 
@@ -127,5 +112,6 @@ namespace Mynt.Core.TradeManagers
                     AlwaysTradeList = list.Split(',').ToList();
             });
         }
+        */
     }
 }

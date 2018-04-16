@@ -13,6 +13,30 @@
 
     "AzureTableStorageConnectionString": "",
     "TelegramBotToken": "",
-    "TelegramChatId": ""
+    "TelegramChatId": "",
+
+    // TradeOptions
+    "MaxNumberOfConcurrentTrades": 2,
+    "AmountOfBtcToInvestPerTrader": 0.01,
+    "TransactionFeePercentage": 0.0025,
+    "StopLossPercentage": -0.07,
+    "ImmediatelyPlaceSellOrder": false,
+    "ImmediatelyPlaceSellOrderAtProfit": 0.02,
+    "EnableTrailingStop": true,
+    "TrailingStopStartingPercentage": 0.02,
+    "TrailingStopPercentage": 0.05,
+    "CancelUnboughtOrdersEachCycle": true,
+    "PlaceFirstStopAtSignalCandleLow": false,
+    "MinimumAmountOfVolume": 300,
+    "BuyInPriceStrategy": "SignalCandleClose",
+    "AskLastBalance": 0.2,
+    "BuyInPricePercentage": 0.005,
+    "ProfitStrategy":"Reinvest",
+    // lists todo
+    "ReturnOnInvestment": "[{\"Duration\":1,\"Profit\":1.1},{\"Duration\":2,\"Profit\":2.2}]",
+    "QuoteCurrencies": "[\"BTC\"]",
+    "MarketBlackList": "[\"TRX\", \"XVG\"]",
+    "OnlyTradeList": "[\"ETH\", \"LTC\"]",
+    "AlwaysTradeList": "[\"ETH\", \"LTC\"]"
   }
 }
