@@ -74,7 +74,10 @@ namespace Mynt.TelegramBot
                 stake += item.StakeAmount;
             }
 
-            return $"Current profit is {(balance-stake):0.00000000} BTC ({(((balance-stake)/stake) * 100):0.00)}%)";
+            if(balance - stake == 0)
+                return "No profits yet, patience...";
+            
+            return $"Current profit is {(balance-stake):0.00000000} BTC ({(((balance-stake)/stake) * 100):0.00}%)";
         }
 
         private async Task<string> CreateTradeString()
@@ -93,7 +96,7 @@ namespace Mynt.TelegramBot
             {
                 var ticker = await exchange.GetTicker(item.Market);
                 var currentProfit = ((ticker.Bid - item.OpenRate) / item.OpenRate) * 100;
-                stringResult.AppendLine($"**{item.Market}:** {currentProfit:0.00}% opened {item.OpenDate.Humanize()}\n");
+                stringResult.AppendLine($"**{item.Market}:** {currentProfit:0.00}% opened {item.OpenDate.Humanize()} at {item.OpenRate:0.00000000} BTC\n");
             }
 
             if (trades.Count == 0)
