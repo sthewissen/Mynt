@@ -324,9 +324,12 @@ namespace Mynt.Core.TradeManagers
         private async Task<Trade> CreateBuyOrder(Trader freeTrader, string pair, Candle signalCandle)
         {
             // Take the amount to invest per trader OR the current balance for this trader.
-            var btcToSpend = freeTrader.CurrentBalance > _settings.AmountOfBtcToInvestPerTrader
-                ? _settings.AmountOfBtcToInvestPerTrader
-                : freeTrader.CurrentBalance;
+            var btcToSpend = 0.0m;
+
+            if (freeTrader.CurrentBalance < _settings.AmountOfBtcToInvestPerTrader || _settings.ProfitStrategy == ProfitType.Reinvest)
+                btcToSpend = freeTrader.CurrentBalance;
+            else
+                btcToSpend = _settings.AmountOfBtcToInvestPerTrader;
 
             // The amount here is an indication and will probably not be precisely what you get.
             var ticker = await _api.GetTicker(pair);
@@ -606,7 +609,12 @@ namespace Mynt.Core.TradeManagers
                     _logger.Information($"Trailing stop loss updated for {trade.Market} from {trade.StopLossRate:0.00000000} to {newStopRate:0.00000000}");
 
                     // The current profit percentage is high enough to create the trailing stop value.
-                    trade.StopLossRate = Math.Round(newStopRate, 8);
+                    // If we are getting our first stop loss raise, we set it to break even. From there the stop
+                    // gets increased every given TrailingStopPercentage...
+                    if (!trade.StopLossRate.HasValue)
+                        trade.StopLossRate = trade.OpenRate;
+                    else
+                        trade.StopLossRate = Math.Round(newStopRate, 8);
 
                     return SellType.TrailingStopLossUpdated;
                 }

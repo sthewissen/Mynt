@@ -408,9 +408,12 @@ namespace Mynt.Core.TradeManagers
         private async Task<Trade> CreateBuyOrder(Trader freeTrader, string pair, Candle signalCandle)
         {
             // Take the amount to invest per trader OR the current balance for this trader.
-            var btcToSpend = freeTrader.CurrentBalance > _settings.AmountOfBtcToInvestPerTrader
-                ? _settings.AmountOfBtcToInvestPerTrader
-                : freeTrader.CurrentBalance;
+            var btcToSpend = 0.0m;
+
+            if (freeTrader.CurrentBalance < _settings.AmountOfBtcToInvestPerTrader || _settings.ProfitStrategy == ProfitType.Reinvest)
+                btcToSpend = freeTrader.CurrentBalance;
+            else
+                btcToSpend = _settings.AmountOfBtcToInvestPerTrader;
 
             // The amount here is an indication and will probably not be precisely what you get.
             var ticker = await _api.GetTicker(pair);
