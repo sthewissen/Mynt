@@ -70,7 +70,7 @@ namespace Mynt.Core.TradeManagers
         public List<string> OnlyTradeList { get; set; } = new List<string> {};
 
         // These are the markets we want to trade on regardless of volume
-        public List<string> AlwaysTradeList { get; set; }
+        public List<string> AlwaysTradeList { get; set; } = new List<string> { };
 
 /*        public TradeOptions()
         {

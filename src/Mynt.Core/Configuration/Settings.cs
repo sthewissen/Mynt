@@ -29,7 +29,8 @@ namespace Mynt.Core.Configuration
             {
                 var name = property.Name;
                 var valueString = ConfigurationManager.AppSettings[name];
-                if (property.PropertyType.GetInterface(nameof(IList)) != null)
+
+                if (typeof(IList).IsAssignableFrom(property.PropertyType))
                 {
                     if (!String.IsNullOrEmpty(valueString))
                     {
