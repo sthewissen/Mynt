@@ -56,7 +56,25 @@ namespace Mynt.TelegramBot
 
         private async Task<string> CreateProfitString()
         {
-            return "I SHIT ON YOU!";
+            var azureTableStorageOptions = AppSettings.Get<AzureTableStorageOptions>();
+            var dataStore = new AzureTableStorageDataStore(azureTableStorageOptions);
+            await dataStore.InitializeAsync();
+
+            var traders = await dataStore.GetTradersAsync();
+
+            if (traders.Count == 0) 
+                return "No profits yet, patience...";
+
+            var balance = 0.0m;
+            var stake = 0.0m;
+
+            foreach (var item in traders)
+            {
+                balance += item.CurrentBalance;
+                stake += item.StakeAmount;
+            }
+
+            return $"Current profit is {(balance-stake):0.00000000} BTC ({(((balance-stake)/stake) * 100):0.00)}%)";
         }
 
         private async Task<string> CreateTradeString()
@@ -74,8 +92,8 @@ namespace Mynt.TelegramBot
             foreach (var item in trades)
             {
                 var ticker = await exchange.GetTicker(item.Market);
-                var currentProfit = (ticker.Bid - item.OpenRate) / item.OpenRate;
-                stringResult.AppendLine($"**{item.Market}:** {currentProfit:0.00}% opened {item.OpenDate.Humanize()}");
+                var currentProfit = ((ticker.Bid - item.OpenRate) / item.OpenRate) * 100;
+                stringResult.AppendLine($"**{item.Market}:** {currentProfit:0.00}% opened {item.OpenDate.Humanize()}\n");
             }
 
             if (trades.Count == 0)
