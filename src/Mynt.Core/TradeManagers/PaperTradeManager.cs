@@ -225,8 +225,6 @@ namespace Mynt.Core.TradeManagers
                     trade.IsSelling = true;
 
                     await _dataStore.SaveTradeAsync(trade);
-
-                    await SendNotification($"Sell order placed for {trade.Market} at {trade.CloseRate:0.00000000} (Strategy sell).");
                 }
             }
         }
@@ -423,10 +421,7 @@ namespace Mynt.Core.TradeManagers
             // up on our trade. We update the data below later when the final data is present.
             var orderId = GetOrderId();
 
-            await SendNotification($"Buying {pair} at ±{openRate:0.00000000} which was spotted at bid: {ticker.Bid:0.00000000}, " +
-                               $"ask: {ticker.Ask:0.00000000}, " +
-                               $"last: {ticker.Last:0.00000000}, " +
-                               $"({amount:0.0000} units).");
+            await SendNotification($"Buying #{pair} with limit {openRate:0.00000000} BTC ({amount:0.0000} units).");
 
             var trade = new Trade()
             {
@@ -515,8 +510,6 @@ namespace Mynt.Core.TradeManagers
                     }
 
                     await _dataStore.SaveTradeAsync(trade);
-
-                    await SendNotification($"Buy order filled for {trade.Market} at {trade.OpenRate:0.00000000}.");
                 }
             }
         }
@@ -565,7 +558,7 @@ namespace Mynt.Core.TradeManagers
                     await _dataStore.SaveTradeAsync(order);
                     await _dataStore.SaveTraderAsync(trader);
 
-                    await SendNotification($"Sold {order.Market} at {order.CloseRate:0.00000000} for {order.CloseProfit:0.00000000} profit ({order.CloseProfitPercentage:0.00}%).");
+                    await SendNotification($"Selling #{order.Market} with limit {order.CloseRate:0.00000000} BTC (profit: ± {order.CloseProfitPercentage:0.00}%, {order.CloseProfit:0.00000000} BTC).");
                 }
             }
         }
@@ -606,7 +599,6 @@ namespace Mynt.Core.TradeManagers
                     _logger.Information($"Selling {trade.Market} ({sellType.ToString()})...");
 
                     await _dataStore.SaveTradeAsync(trade);
-                    await SendNotification($"Going to sell {trade.Market} at {trade.CloseRate:0.00000000}.");
                 }
             }
         }
