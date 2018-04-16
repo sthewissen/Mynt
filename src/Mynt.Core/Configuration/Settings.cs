@@ -29,19 +29,22 @@ namespace Mynt.Core.Configuration
             {
                 var name = property.Name;
                 var valueString = ConfigurationManager.AppSettings[name];
-                if (!String.IsNullOrEmpty(valueString))
+                if (String.IsNullOrEmpty(valueString))
                 {
-                    if (typeof(IList).IsAssignableFrom(property.PropertyType))
-                    {
-                        var value = JsonConvert.DeserializeObject(valueString, property.PropertyType, new JsonSerializerSettings {FloatParseHandling = FloatParseHandling.Decimal});
-                        property.SetValue(instance, value);
-                    }
-                    else
-                    {
-                        var converter = TypeDescriptor.GetConverter(property.PropertyType);
-                        var value = converter.ConvertFromInvariantString(valueString);
-                        property.SetValue(instance, value);
-                    }
+                    // Ignore if value is not set, leave defaults.
+                    continue;
+                }
+
+                if (typeof(IList).IsAssignableFrom(property.PropertyType))
+                {
+                    var value = JsonConvert.DeserializeObject(valueString, property.PropertyType, new JsonSerializerSettings {FloatParseHandling = FloatParseHandling.Decimal});
+                    property.SetValue(instance, value);
+                }
+                else
+                {
+                    var converter = TypeDescriptor.GetConverter(property.PropertyType);
+                    var value = converter.ConvertFromInvariantString(valueString);
+                    property.SetValue(instance, value);
                 }
             }
 
