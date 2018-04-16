@@ -581,15 +581,21 @@ namespace Mynt.Core.TradeManagers
                 return SellType.StopLoss;
             }
 
-            // Check if time matches and current rate is above threshold
-            foreach (var item in _settings.ReturnOnInvestment)
+            // Only use ROI when no stoploss is set, because the stop loss
+            // will be the anchor that sells when the trade falls below it.
+            // This gives the trade room to rise further instead of selling directly.
+            if (!trade.StopLossRate.HasValue)
             {
-                var timeDiff = (utcNow - trade.OpenDate).TotalSeconds / 60;
-
-                if (timeDiff > item.Duration && currentProfit > item.Profit)
+                // Check if time matches and current rate is above threshold
+                foreach (var item in _settings.ReturnOnInvestment)
                 {
-                    _logger.Information("Timer hit: {TimeDifference} mins, profit {Profit}%", timeDiff, item.Profit.ToString("0.00"));
-                    return SellType.Timed;
+                    var timeDiff = (utcNow - trade.OpenDate).TotalSeconds / 60;
+
+                    if (timeDiff > item.Duration && currentProfit > item.Profit)
+                    {
+                        _logger.Information("Timer hit: {TimeDifference} mins, profit {Profit}%", timeDiff, item.Profit.ToString("0.00"));
+                        return SellType.Timed;
+                    }
                 }
             }
 
