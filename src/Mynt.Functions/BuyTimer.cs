@@ -53,7 +53,7 @@ namespace Mynt.Functions
                     logger: logger,
                     notificationManager: new TelegramNotificationManager(telegramNotificationOptions),
                     settings: tradeOptions,
-                    strategy: new TheScalper());
+                    strategy: ApplicationHelper.TryCreateTradingStrategy(tradeOptions.DefaultStrategy) ?? new TheScalper());
 
                 // Start running this thing!
                 await tradeManager.LookForNewTrades();

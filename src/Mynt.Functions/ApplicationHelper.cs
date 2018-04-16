@@ -1,4 +1,6 @@
 ﻿using System;
+using Mynt.Core.Interfaces;
+
 namespace Mynt.Functions
 {
     public static class ApplicationHelper
@@ -21,6 +23,20 @@ namespace Mynt.Functions
                         IsStarted = true;
                     }
                 }
+            }
+        }
+
+        public static ITradingStrategy TryCreateTradingStrategy(string name)
+        {
+            try
+            {
+            var type = Type.GetType($"Mynt.Core.Strategies.{name}, Mynt.Core", true, true);
+            return Activator.CreateInstance(type) as ITradingStrategy;
+
+            }
+            catch
+            {
+                return null;
             }
         }
     }

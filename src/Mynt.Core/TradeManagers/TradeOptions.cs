@@ -44,6 +44,8 @@ namespace Mynt.Core.TradeManagers
         // trading a volume above this value and analyze those for buy signals.
         public int MinimumAmountOfVolume { get; set; } = 300;
 
+        // Default strategy to use with trade managers.
+        public string DefaultStrategy { get; set; } = nameof(TheScalper);
 
         // Sets the bidding price. A value of 0.0 will use the ask price, 1.0 will use the last price and values between 
         // those interpolate between ask and last price. Using the ask price will guarantee quick success in bid, but
