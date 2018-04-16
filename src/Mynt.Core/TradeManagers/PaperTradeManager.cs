@@ -511,10 +511,10 @@ namespace Mynt.Core.TradeManagers
                         trade.IsSelling = true;
                         trade.SellType = SellType.Immediate;
 
-                        await _dataStore.SaveTradeAsync(trade);
-
                         _logger.Information($"{trade.Market} order placed @ {trade.CloseRate:0.00000000}...");
                     }
+
+                    await _dataStore.SaveTradeAsync(trade);
 
                     await SendNotification($"Buy order filled for {trade.Market} at {trade.OpenRate:0.00000000}.");
                 }
