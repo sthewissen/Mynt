@@ -29,14 +29,16 @@ namespace Mynt.Core.Configuration
             {
                 var name = property.Name;
                 var valueString = ConfigurationManager.AppSettings[name];
+                if (String.IsNullOrEmpty(valueString))
+                {
+                    // Ignore if value is not set, leave defaults.
+                    continue;
+                }
 
                 if (typeof(IList).IsAssignableFrom(property.PropertyType))
                 {
-                    if (!String.IsNullOrEmpty(valueString))
-                    {
-                        var value = JsonConvert.DeserializeObject(valueString, property.PropertyType);
-                        property.SetValue(instance, value);
-                    }
+                    var value = JsonConvert.DeserializeObject(valueString, property.PropertyType, new JsonSerializerSettings {FloatParseHandling = FloatParseHandling.Decimal});
+                    property.SetValue(instance, value);
                 }
                 else
                 {
