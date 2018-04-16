@@ -87,7 +87,7 @@ namespace Mynt.Functions
                 {
                     var ticker = await exchange.GetTicker(item.Market);
                     var currentProfit = ((ticker.Bid - item.OpenRate) / item.OpenRate) * 100;
-                    stringResult.AppendLine($"#{item.Market}: {currentProfit:0.00}% opened {item.OpenDate.Humanize()} at {item.OpenRate:0.00000000} BTC");
+                    stringResult.AppendLine($"#{item.Market}: *{currentProfit:0.00}%* opened {item.OpenDate.Humanize()} at {item.OpenRate:0.00000000} BTC");
                 }
 
                 await telegram.SendNotification(stringResult.ToString());
