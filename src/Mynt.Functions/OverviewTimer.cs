@@ -23,7 +23,7 @@ namespace Mynt.Functions
         }
 
         [FunctionName("OverviewTimer")]
-        public static async Task Run([TimerTrigger("0 */5 * * * *")]TimerInfo buyTimer, TraceWriter log)
+        public static async Task Run([TimerTrigger("0 0 */4 * * *")]TimerInfo buyTimer, TraceWriter log)
         {
             var logger = new LoggerConfiguration().WriteTo.TraceWriter(log).CreateLogger();
 
