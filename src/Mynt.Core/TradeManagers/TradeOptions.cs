@@ -19,6 +19,7 @@ namespace Mynt.Core.TradeManagers
         public int MaxNumberOfConcurrentTrades { get; set; } = 10;
         public decimal AmountOfBtcToInvestPerTrader { get; set; } = 0.01m;
         public decimal TransactionFeePercentage { get; set; } = 0.0025m;
+        public ProfitType ProfitStrategy { get; set; } = ProfitType.Reinvest;
 
         // If we go below this profit percentage, we sell immediately.
         public decimal StopLossPercentage { get; set; } = -0.07m;

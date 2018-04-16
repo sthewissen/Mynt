@@ -31,6 +31,7 @@
     "BuyInPriceStrategy": "SignalCandleClose",
     "AskLastBalance": 0.2,
     "BuyInPricePercentage": 0.005,
+    "ProfitStrategy":"Reinvest",
     // lists todo
     "ReturnOnInvestment": "[{\"Duration\":1,\"Profit\":1.1},{\"Duration\":2,\"Profit\":2.2}]",
     "QuoteCurrencies": "[\"BTC\"]",
