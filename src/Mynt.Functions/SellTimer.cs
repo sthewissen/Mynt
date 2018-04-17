@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
+using Microsoft.Extensions.Logging;
 using Mynt.Core.Configuration;
 // using Microsoft.Extensions.Configuration;
 using Mynt.Core.Enums;
@@ -26,11 +27,12 @@ namespace Mynt.Functions
         [FunctionName("SellTimer")]
         public static async Task Run([TimerTrigger("0 * * * * *")]TimerInfo sellTimer, TraceWriter log)
         {
-            var logger = new LoggerConfiguration().WriteTo.TraceWriter(log).CreateLogger();
+            var serilogger = new LoggerConfiguration().WriteTo.TraceWriter(log).CreateLogger();
+            var logger = new LoggerFactory().AddSerilog(serilogger).CreateLogger(nameof(SellTimer));
 
             try
             {
-                logger.Information("Starting processing...");
+                logger.LogInformation("Starting processing...");
 
                 // Either use the default options as defined in TradeOptions or override them.
                 // You can override them using the property setters here or by providing keys in your configuration mechanism
@@ -52,20 +54,21 @@ namespace Mynt.Functions
                     logger: logger,
                     notificationManager: new TelegramNotificationManager(telegramNotificationOptions),
                     settings: tradeOptions,
-                    strategy: new TheScalper());
+                    strategy: ApplicationHelper.TryCreateTradingStrategy(tradeOptions.DefaultStrategy) ?? new TheScalper());
 
                 // Start running this thing!
                 await tradeManager.UpdateExistingTrades();
 
-                logger.Information("Done...");
+                logger.LogInformation("Done...");
             }
             catch (Exception ex)
             {
                 // If anything goes wrong log an error to Azure.
-                logger.Error(ex.Message + ex.StackTrace);
+                logger.LogError(ex, "Error on BuyTimer");
 
-                if(ex.InnerException!=null)
-                    logger.Error(ex.InnerException.Message + ex.InnerException.StackTrace);
+                // TODO necessary?
+                //                if (ex.InnerException != null)
+                //                    logger.Error(ex.InnerException.Message + ex.InnerException.StackTrace);
             }
         }
     }

@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Mynt.Core.Configuration;
+﻿using System.Collections.Generic;
 using Mynt.Core.Enums;
-using Newtonsoft.Json.Linq;
+using Mynt.Core.Strategies;
 
 namespace Mynt.Core.TradeManagers
 {
@@ -47,6 +44,9 @@ namespace Mynt.Core.TradeManagers
         // trading a volume above this value and analyze those for buy signals.
         public int MinimumAmountOfVolume { get; set; } = 300;
 
+        // Default strategy to use with trade managers.
+        public string DefaultStrategy { get; set; } = nameof(TheScalper);
+
         // Sets the bidding price. A value of 0.0 will use the ask price, 1.0 will use the last price and values between 
         // those interpolate between ask and last price. Using the ask price will guarantee quick success in bid, but
         // the bot will also end up paying more then would probably have been necessary.
@@ -72,46 +72,5 @@ namespace Mynt.Core.TradeManagers
         // These are the markets we want to trade on regardless of volume
         public List<string> AlwaysTradeList { get; set; } = new List<string> { };
 
-/*        public TradeOptions()
-        {
-            TrySetFromConfig(() => {
-                var list = AppSettings.Get<string>(nameof(ReturnOnInvestment));
-
-                if (list != null)
-                {
-                    var separatedList = list.Split('|').ToList();
-                    ReturnOnInvestment = separatedList.Select(x => new ValueTuple<int, decimal>(Convert.ToInt32(x.Split(':')[0]), Convert.ToDecimal(x.Split(':')[1]))).ToList();
-                }
-            });
-
-            TrySetFromConfig(() => {
-                var list = AppSettings.Get<string>(nameof(QuoteCurrencies));
-
-                if (list != null)
-                    QuoteCurrencies = list.Split(',').ToList();
-            });
-
-            TrySetFromConfig(() => {
-                var list = AppSettings.Get<string>(nameof(MarketBlackList));
-
-                if(list!=null)
-                    MarketBlackList = list.Split(',').ToList();
-            });
-
-            TrySetFromConfig(() => {
-                var list = AppSettings.Get<string>(nameof(OnlyTradeList));
-
-                if (list != null)
-                    OnlyTradeList = list.Split(',').ToList();
-            });
-
-            TrySetFromConfig(() => {
-                var list = AppSettings.Get<string>(nameof(AlwaysTradeList));
-
-                if (list != null)
-                    AlwaysTradeList = list.Split(',').ToList();
-            });
-        }
-        */
     }
 }

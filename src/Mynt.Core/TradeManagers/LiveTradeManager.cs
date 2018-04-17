@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Mynt.Core.Enums;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
-using Serilog.Core;
 
 namespace Mynt.Core.TradeManagers
 {
@@ -14,13 +14,13 @@ namespace Mynt.Core.TradeManagers
         private readonly IExchangeApi _api;
         private readonly INotificationManager _notification;
         private readonly ITradingStrategy _strategy;
-        private readonly Logger _logger;
+        private readonly ILogger _logger;
         private List<Trade> _activeTrades;
         private List<Trader> _currentTraders;
         private readonly IDataStore _dataStore;
         private readonly TradeOptions _settings;
 
-        public LiveTradeManager(IExchangeApi api, ITradingStrategy strategy, INotificationManager notificationManager, Logger logger, TradeOptions settings, IDataStore dataStore)
+        public LiveTradeManager(IExchangeApi api, ITradingStrategy strategy, INotificationManager notificationManager, ILogger logger, TradeOptions settings, IDataStore dataStore)
         {
             _api = api;
             _strategy = strategy;
@@ -47,7 +47,7 @@ namespace Mynt.Core.TradeManagers
             {
                 var currentTraders = await _dataStore.GetTradersAsync();
 
-                _logger.Information($"Currently have {currentTraders.Count} traders out of {_settings.MaxNumberOfConcurrentTrades}...");
+                _logger.LogInformation("Currently have {CurrentTraders} traders out of {AllTraders}...", currentTraders.Count, _settings.MaxNumberOfConcurrentTrades);
 
                 // Create our trader records if they're wrong.
                 if (currentTraders.Count < _settings.MaxNumberOfConcurrentTrades)
@@ -154,7 +154,7 @@ namespace Mynt.Core.TradeManagers
                 }
                 else
                 {
-                    _logger.Information("No trade opportunities found...");
+                    _logger.LogInformation("No trade opportunities found...");
                 }
             }
         }
@@ -214,7 +214,7 @@ namespace Mynt.Core.TradeManagers
             // Do we even have enough funds to invest?
             if (currentBtcBalance.Available < freeTrader.CurrentBalance)
             {
-                _logger.Warning("Insufficient funds ({Available}) to perform a {MarketName} trade. Skipping this trade.", currentBtcBalance.Available, signal.MarketName);
+                _logger.LogWarning("Insufficient funds ({Available}) to perform a {MarketName} trade. Skipping this trade.", currentBtcBalance.Available, signal.MarketName);
                 return;
             }
 
@@ -227,7 +227,7 @@ namespace Mynt.Core.TradeManagers
                 await _dataStore.SaveTradeAsync(order);
 
                 // Send a notification that we found something suitable
-                _logger.Information("New trade signal {market}...", order.Market);
+                _logger.LogInformation("New trade signal {Market}...", order.Market);
 
                 // Update the trader to busy
                 freeTrader.LastUpdated = DateTime.UtcNow;
@@ -370,7 +370,7 @@ namespace Mynt.Core.TradeManagers
             if (_settings.PlaceFirstStopAtSignalCandleLow)
             {
                 trade.StopLossRate = signalCandle.Low;
-                _logger.Information("Automatic stop set at signal candle low {Low}", signalCandle.Low.ToString("0.00000000"));
+                _logger.LogInformation("Automatic stop set at signal candle low {Low}", signalCandle.Low.ToString("0.00000000"));
             }
 
             return trade;
@@ -385,6 +385,8 @@ namespace Mynt.Core.TradeManagers
         {
             try
             {
+                _logger.LogInformation("Checking market {Market}...", market);
+
                 var minimumDate = _strategy.GetMinimumDateTime();
                 var candleDate = _strategy.GetCurrentCandleDateTime();
                 var candles = await _api.GetTickerHistory(market, _strategy.IdealPeriod, minimumDate);
@@ -395,7 +397,7 @@ namespace Mynt.Core.TradeManagers
                 // Not enough candles to perform what we need to do.
                 if (candles.Count < _strategy.MinimumAmountOfCandles)
                 {
-                    _logger.Warning("Not enough candle data for {Market}...", market);
+                    _logger.LogWarning("Not enough candle data for {Market}...", market);
                     return new TradeSignal
                     {
                         TradeAdvice = TradeAdvice.Hold,
@@ -409,7 +411,7 @@ namespace Mynt.Core.TradeManagers
                 // This is an outdated candle...
                 if (signalDate < _strategy.GetSignalDate())
                 {
-                    _logger.Information("Outdated candle for {Market}...", market);
+                    _logger.LogInformation("Outdated candle for {Market}...", market);
                     return null;
                 }
 
@@ -426,7 +428,7 @@ namespace Mynt.Core.TradeManagers
             catch (Exception ex)
             {
                 // Couldn't get a buy signal for this market, no problem. Let's skip it.
-                _logger.Error(ex, "Couldn't get buy signal for {Market}...", market);
+                _logger.LogError(ex, "Couldn't get buy signal for {Market}...", market);
                 return null;
             }
         }
@@ -500,7 +502,7 @@ namespace Mynt.Core.TradeManagers
                     trade.OpenDate = exchangeOrder.OrderDate;
                     trade.IsBuying = false;
 
-                    _logger.Information($"{trade.Market} BUY order filled @ {trade.OpenRate:0.00000000}...");
+                    _logger.LogInformation("{Market} BUY order filled @ {OpenRate}...", trade.Market, trade.OpenRate.ToString("0.00000000"));
 
                     // If this is enabled we place a sell order as soon as our buy order got filled.
                     if (_settings.ImmediatelyPlaceSellOrder)
@@ -514,7 +516,7 @@ namespace Mynt.Core.TradeManagers
                         trade.IsSelling = true;
                         trade.SellType = SellType.Immediate;
 
-                        _logger.Information($"{trade.Market} order placed @ {trade.CloseRate:0.00000000}...");
+                        _logger.LogInformation("{Market} order placed @ {CloseRate}...", trade.Market, trade.CloseRate?.ToString("0.00000000"));
                     }
 
                     await _dataStore.SaveTradeAsync(trade);
@@ -542,7 +544,7 @@ namespace Mynt.Core.TradeManagers
                 var ticker = await _api.GetTicker(trade.Market);
                 var sellType = ShouldSell(trade, ticker.Bid, DateTime.UtcNow);
 
-                _logger.Information($"Checking {trade.Market} sell conditions...");
+                _logger.LogInformation("Checking {Market} sell conditions...", trade.Market);
 
                 if (sellType == SellType.TrailingStopLossUpdated)
                 {
@@ -559,7 +561,7 @@ namespace Mynt.Core.TradeManagers
                     trade.SellType = sellType;
                     trade.IsSelling = true;
 
-                    _logger.Information($"Selling {trade.Market} ({sellType.ToString()})...");
+                    _logger.LogInformation("Selling {Market} ({SellType})...", trade.Market, sellType);
 
                     await _dataStore.SaveTradeAsync(trade);
                 }
@@ -577,12 +579,12 @@ namespace Mynt.Core.TradeManagers
         {
             var currentProfit = (currentRateBid - trade.OpenRate) / trade.OpenRate;
 
-            _logger.Information("Should sell {Market}? Profit: {Profit}%...", trade.Market, (currentProfit * 100).ToString("0.00"));
+            _logger.LogInformation("Should sell {Market}? Profit: {Profit}%...", trade.Market, (currentProfit * 100).ToString("0.00"));
 
             // Let's not do a stoploss for now...
             if (currentProfit < _settings.StopLossPercentage)
             {
-                _logger.Information("Stop loss hit: {StopLoss}%", _settings.StopLossPercentage);
+                _logger.LogInformation("Stop loss hit: {StopLoss}%", _settings.StopLossPercentage);
                 return SellType.StopLoss;
             }
 
@@ -598,7 +600,7 @@ namespace Mynt.Core.TradeManagers
 
                     if (timeDiff > item.Duration && currentProfit > item.Profit)
                     {
-                        _logger.Information("Timer hit: {TimeDifference} mins, profit {Profit}%", timeDiff, item.Profit.ToString("0.00"));
+                        _logger.LogInformation("Timer hit: {TimeDifference} mins, profit {Profit}%", timeDiff, item.Profit.ToString("0.00"));
                         return SellType.Timed;
                     }
                 }
@@ -617,7 +619,7 @@ namespace Mynt.Core.TradeManagers
                 // Only update the trailing stop when its above our starting percentage and higher than the previous one.
                 if (currentProfit > _settings.TrailingStopStartingPercentage && (trade.StopLossRate < newStopRate || !trade.StopLossRate.HasValue))
                 {
-                    _logger.Information($"Trailing stop loss updated for {trade.Market} from {trade.StopLossRate:0.00000000} to {newStopRate:0.00000000}");
+                    _logger.LogInformation("Trailing stop loss updated for {Market} from {StopLossRate} to {NewStopRate}", trade.Market, trade.StopLossRate?.ToString("0.00000000"), newStopRate.ToString("0.00000000"));
 
                     // The current profit percentage is high enough to create the trailing stop value.
                     // If we are getting our first stop loss raise, we set it to break even. From there the stop
@@ -649,7 +651,7 @@ namespace Mynt.Core.TradeManagers
             {
                 var exchangeOrder = await _api.GetOrder(order.SellOrderId, order.Market);
 
-                _logger.Information($"Checking {order.Market} SELL order @ {order.CloseRate:0.00000000}...");
+                _logger.LogInformation("Checking {Market} SELL order @ {CloseRate}...", order.Market, order.CloseRate?.ToString("0.00000000"));
 
                 // if this order is filled, we can update our database.
                 if (exchangeOrder?.Status == OrderStatus.Filled)
@@ -660,7 +662,7 @@ namespace Mynt.Core.TradeManagers
                     order.CloseDate = exchangeOrder.OrderDate;
                     order.CloseRate = exchangeOrder.Price;
 
-                    _logger.Information($"{order.Market} SELL order filled @ {order.CloseRate:0.00000000}...");
+                    _logger.LogInformation("{Market} SELL order filled @ {CloseRate}...", order.Market, order.CloseRate?.ToString("0.00000000"));
 
                     order.CloseProfit = (exchangeOrder.Price * exchangeOrder.OriginalQuantity) - order.StakeAmount;
                     order.CloseProfitPercentage = ((exchangeOrder.Price * exchangeOrder.OriginalQuantity) - order.StakeAmount) / order.StakeAmount * 100;
