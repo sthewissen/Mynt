@@ -28,7 +28,15 @@ namespace Mynt.Core.TradeManagers
             _notification = notificationManager;
             _dataStore = dataStore;
             _settings = settings;
+
+            if (_api == null) throw new ArgumentException("Invalid exchange provided...");
+            if (_strategy == null) throw new ArgumentException("Invalid strategy provided...");
+            if (_dataStore == null) throw new ArgumentException("Invalid data store provided...");
+            if (_settings == null) throw new ArgumentException("Invalid settings provided...");
+            if (_logger == null) throw new ArgumentException("Invalid logger provided...");
         }
+
+        #region SETUP
 
         private async Task Initialize(bool initTraders=false)
         {
@@ -103,6 +111,10 @@ namespace Mynt.Core.TradeManagers
             }
         }
 
+        #endregion
+
+        #region BUY SIDE
+
         /// <summary>
         /// Checks if new trades can be started.
         /// </summary>
@@ -146,8 +158,6 @@ namespace Mynt.Core.TradeManagers
                 }
             }
         }
-        
-        #region STRATEGY RELATED
 
         /// <summary>
         /// Cancels any orders that have been buying for an entire cycle.
@@ -187,7 +197,7 @@ namespace Mynt.Core.TradeManagers
                         await _dataStore.SaveTraderAsync(currentTrader);
                     }
 
-                    await SendNotification($"Cancelled {trade.Market} buy order.");
+                    await SendNotification($"Cancelled {trade.Market} buy order because it wasn't filled in time.");
                 }
             }
         }
@@ -243,11 +253,9 @@ namespace Mynt.Core.TradeManagers
                 // If the strategy is telling us to sell we need to do so.
                 if (signal != null && signal.TradeAdvice == TradeAdvice.Sell)
                 {
+                    // If the trade is an immediate order, we leave it alone.
                     if ((trade.IsSelling && trade.SellType == SellType.Immediate))
-                    {
-                        // If an immediate order is placed it needs to be cancelled first.
-                        await _api.CancelOrder(trade.OpenOrderId, trade.Market);
-                    }
+                        return;
 
                     // Create a sell order for our strategy.
                     var ticker = await _api.GetTicker(trade.Market);
@@ -260,8 +268,6 @@ namespace Mynt.Core.TradeManagers
                     trade.IsSelling = true;
 
                     await _dataStore.SaveTradeAsync(trade);
-
-                    await SendNotification($"Sell order placed for {trade.Market} at {trade.CloseRate:0.00000000} (Strategy sell).");
                 }
             }
         }
@@ -306,6 +312,8 @@ namespace Mynt.Core.TradeManagers
                     pairs.Add(new TradeSignal
                     {
                         MarketName = market.MarketName,
+                        QuoteCurrency = market.CurrencyPair.QuoteCurrency,
+                        BaseCurrency = market.CurrencyPair.BaseCurrency,
                         TradeAdvice = signal.TradeAdvice,
                         SignalCandle = signal.SignalCandle
                     });
@@ -341,10 +349,7 @@ namespace Mynt.Core.TradeManagers
             // up on our trade. We update the data below later when the final data is present.
             var orderId = await _api.Buy(pair, amount, openRate);
 
-            await SendNotification($"Buying {pair} at ±{openRate:0.00000000} which was spotted at bid: {ticker.Bid:0.00000000}, " +
-                                   $"ask: {ticker.Ask:0.00000000}, " +
-                                   $"last: {ticker.Last:0.00000000}, " +
-                                   $"({amountYouGet:0.0000} units).");
+            await SendNotification($"Buying #{pair} with limit {openRate:0.00000000} BTC ({amount:0.0000} units).");
 
             var trade = new Trade()
             {
@@ -458,7 +463,7 @@ namespace Mynt.Core.TradeManagers
 
         #endregion
 
-        #region UPDATE TRADES
+        #region SELL
 
         public async Task UpdateExistingTrades()
         {
@@ -497,6 +502,8 @@ namespace Mynt.Core.TradeManagers
                     trade.OpenDate = exchangeOrder.OrderDate;
                     trade.IsBuying = false;
 
+                    _logger.Information($"{trade.Market} BUY order filled @ {trade.OpenRate:0.00000000}...");
+
                     // If this is enabled we place a sell order as soon as our buy order got filled.
                     if (_settings.ImmediatelyPlaceSellOrder)
                     {
@@ -508,11 +515,11 @@ namespace Mynt.Core.TradeManagers
                         trade.SellOrderId = orderId;
                         trade.IsSelling = true;
                         trade.SellType = SellType.Immediate;
+
+                        _logger.Information($"{trade.Market} order placed @ {trade.CloseRate:0.00000000}...");
                     }
 
                     await _dataStore.SaveTradeAsync(trade);
-
-                    await SendNotification($"Buy order filled for {trade.Market} at {trade.OpenRate:0.00000000}.");
                 }
             }
         }
@@ -529,10 +536,16 @@ namespace Mynt.Core.TradeManagers
             // An open order currently not selling or being an immediate sell are checked for SL  etc.
             foreach (var trade in _activeTrades.Where(x => (x.OpenOrderId == null || x.SellType == SellType.Immediate) && x.IsOpen))
             {
+                // If the trade is immediate we don't check sell conditions. An order was placed and we stick to it.
+                if (trade.SellType == SellType.Immediate)
+                    continue;
+                
                 // These are trades that are not being bought or sold at the moment so these need to be checked for sell conditions.
                 var ticker = await _api.GetTicker(trade.Market);
                 var sellType = ShouldSell(trade, ticker.Bid, DateTime.UtcNow);
-                
+
+                _logger.Information($"Checking {trade.Market} sell conditions...");
+
                 if (sellType == SellType.TrailingStopLossUpdated)
                 {
                     // Update the stop loss for this trade, which was set in ShouldSell.
@@ -540,12 +553,6 @@ namespace Mynt.Core.TradeManagers
                 }
                 else if (sellType != SellType.None)
                 {
-                    if (trade.SellType == SellType.Immediate)
-                    {
-                        // Immediates need to be cancelled first.
-                        await _api.CancelOrder(trade.SellOrderId, trade.Market);
-                    }
-
                     var orderId = await _api.Sell(trade.Market, trade.Quantity, ticker.Bid);
 
                     trade.CloseRate = ticker.Bid;
@@ -554,9 +561,9 @@ namespace Mynt.Core.TradeManagers
                     trade.SellType = sellType;
                     trade.IsSelling = true;
 
-                    await _dataStore.SaveTradeAsync(trade);
+                    _logger.Information($"Selling {trade.Market} ({sellType.ToString()})...");
 
-                    await SendNotification($"Going to sell {trade.Market} at {trade.CloseRate:0.00000000}.");
+                    await _dataStore.SaveTradeAsync(trade);
                 }
             }
         }
@@ -644,6 +651,8 @@ namespace Mynt.Core.TradeManagers
             {
                 var exchangeOrder = await _api.GetOrder(order.SellOrderId, order.Market);
 
+                _logger.Information($"Checking {order.Market} SELL order @ {order.CloseRate:0.00000000}...");
+
                 // if this order is filled, we can update our database.
                 if (exchangeOrder?.Status == OrderStatus.Filled)
                 {
@@ -652,6 +661,8 @@ namespace Mynt.Core.TradeManagers
                     order.IsSelling = false;
                     order.CloseDate = exchangeOrder.OrderDate;
                     order.CloseRate = exchangeOrder.Price;
+
+                    _logger.Information($"{order.Market} SELL order filled @ {order.CloseRate:0.00000000}...");
 
                     order.CloseProfit = (exchangeOrder.Price * exchangeOrder.OriginalQuantity) - order.StakeAmount;
                     order.CloseProfitPercentage = ((exchangeOrder.Price * exchangeOrder.OriginalQuantity) - order.StakeAmount) / order.StakeAmount * 100;
@@ -670,7 +681,7 @@ namespace Mynt.Core.TradeManagers
                     await _dataStore.SaveTraderAsync(trader);
                     await _dataStore.SaveTradeAsync(order);
 
-                    await SendNotification($"Sold {order.Market} at {order.CloseRate:0.00000000} for {order.CloseProfit:0.00000000} profit ({order.CloseProfitPercentage:0.00}%).");
+                    await SendNotification($"Selling #{order.Market} with limit {order.CloseRate:0.00000000} BTC (profit: ± {order.CloseProfitPercentage:0.00}%, {order.CloseProfit:0.00000000} BTC).");
                 }
             }
         }

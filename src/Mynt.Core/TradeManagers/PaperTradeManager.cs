@@ -194,7 +194,7 @@ namespace Mynt.Core.TradeManagers
                         await _dataStore.SaveTraderAsync(currentTrader);
                     }
 
-                    await SendNotification($"Cancelled {trade.Market} buy order.");
+                    await SendNotification($"Cancelled {trade.Market} buy order because it wasn't filled in time.");
                 }
             }
         }
