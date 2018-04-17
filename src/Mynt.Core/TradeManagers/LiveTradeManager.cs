@@ -502,7 +502,7 @@ namespace Mynt.Core.TradeManagers
                     trade.OpenDate = exchangeOrder.OrderDate;
                     trade.IsBuying = false;
 
-                    _logger.Information($"{trade.Market} BUY order filled @ {trade.OpenRate:0.00000000}...");
+                    _logger.LogInformation("{Market} BUY order filled @ {OpenRate}...", trade.Market, trade.OpenRate.ToString("0.00000000"));
 
                     // If this is enabled we place a sell order as soon as our buy order got filled.
                     if (_settings.ImmediatelyPlaceSellOrder)
@@ -516,7 +516,7 @@ namespace Mynt.Core.TradeManagers
                         trade.IsSelling = true;
                         trade.SellType = SellType.Immediate;
 
-                        _logger.Information($"{trade.Market} order placed @ {trade.CloseRate:0.00000000}...");
+                        _logger.LogInformation("{Market} order placed @ {CloseRate}...", trade.Market, trade.CloseRate?.ToString("0.00000000"));
                     }
 
                     await _dataStore.SaveTradeAsync(trade);
@@ -544,7 +544,7 @@ namespace Mynt.Core.TradeManagers
                 var ticker = await _api.GetTicker(trade.Market);
                 var sellType = ShouldSell(trade, ticker.Bid, DateTime.UtcNow);
 
-                _logger.Information($"Checking {trade.Market} sell conditions...");
+                _logger.LogInformation("Checking {Market} sell conditions...", trade.Market);
 
                 if (sellType == SellType.TrailingStopLossUpdated)
                 {
@@ -561,7 +561,7 @@ namespace Mynt.Core.TradeManagers
                     trade.SellType = sellType;
                     trade.IsSelling = true;
 
-                    _logger.Information($"Selling {trade.Market} ({sellType.ToString()})...");
+                    _logger.LogInformation("Selling {Market} ({SellType})...", trade.Market, sellType);
 
                     await _dataStore.SaveTradeAsync(trade);
                 }
@@ -651,7 +651,7 @@ namespace Mynt.Core.TradeManagers
             {
                 var exchangeOrder = await _api.GetOrder(order.SellOrderId, order.Market);
 
-                _logger.Information($"Checking {order.Market} SELL order @ {order.CloseRate:0.00000000}...");
+                _logger.LogInformation("Checking {Market} SELL order @ {CloseRate}...", order.Market, order.CloseRate?.ToString("0.00000000"));
 
                 // if this order is filled, we can update our database.
                 if (exchangeOrder?.Status == OrderStatus.Filled)
@@ -662,7 +662,7 @@ namespace Mynt.Core.TradeManagers
                     order.CloseDate = exchangeOrder.OrderDate;
                     order.CloseRate = exchangeOrder.Price;
 
-                    _logger.Information($"{order.Market} SELL order filled @ {order.CloseRate:0.00000000}...");
+                    _logger.LogInformation("{Market} SELL order filled @ {CloseRate}...", order.Market, order.CloseRate?.ToString("0.00000000"));
 
                     order.CloseProfit = (exchangeOrder.Price * exchangeOrder.OriginalQuantity) - order.StakeAmount;
                     order.CloseProfitPercentage = ((exchangeOrder.Price * exchangeOrder.OriginalQuantity) - order.StakeAmount) / order.StakeAmount * 100;
