@@ -599,7 +599,7 @@ namespace Mynt.Core.TradeManagers
                     trade.SellType = sellType;
                     trade.IsSelling = true;
 
-                    _logger.LogInformation($"Selling {trade.Market} ({sellType.ToString()})...");
+                    _logger.LogInformation("Selling {Market} ({SellType})...", trade.Market, sellType);
 
                     await _dataStore.SaveTradeAsync(trade);
                 }
