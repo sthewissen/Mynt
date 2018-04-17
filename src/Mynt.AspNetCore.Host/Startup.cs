@@ -43,15 +43,20 @@ namespace Mynt.AspNetCore.Host
             var exchangeOptions = Configuration.Get<ExchangeOptions>();
             services.AddSingleton<IExchangeApi>(i => new BaseExchange(exchangeOptions));
 
+            var tradeOptions = Configuration.GetSection("TradeOptions").Get<TradeOptions>();
+
+            var type = Type.GetType($"Mynt.Core.Strategies.{tradeOptions.DefaultStrategy}, Mynt.Core", true, true);
+
             // Major TODO, coming soon
-            services.AddSingleton<ITradingStrategy, TheScalper>()
+            services.AddSingleton(s => Activator.CreateInstance(type) as ITradingStrategy ?? new TheScalper())
                 .AddSingleton<INotificationManager, TelegramNotificationManager>()
                 .AddSingleton(i => Configuration.GetSection("Telegram").Get<TelegramNotificationOptions>()) // TODO
 
                 .AddSingleton<IDataStore, AzureTableStorageDataStore>()
-                .AddSingleton(i => Configuration.GetSection("AzureTableStorage").Get<AzureTableStorageOptions>()) // TODO
+                .AddSingleton(i => Configuration.GetSection("AzureTableStorageOptions").Get<AzureTableStorageOptions>()) // TODO
                 .AddSingleton<ITradeManager, PaperTradeManager>()
-                .AddSingleton(i => new TradeOptions())
+                .AddSingleton(i => tradeOptions)
+
                 .AddSingleton<ILogger>(i => i.GetRequiredService<ILoggerFactory>().CreateLogger<MyntHostedService>())
 
                 .AddSingleton<IHostedService, MyntHostedService>()

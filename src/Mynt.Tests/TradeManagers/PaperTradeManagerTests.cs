@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace Mynt.Tests.TradeManagers
 {
@@ -18,7 +20,8 @@ namespace Mynt.Tests.TradeManagers
         [TestInitialize]
         public void Init()
         {
-            var logger = new Serilog.LoggerConfiguration().CreateLogger();
+            var serilogger = new Serilog.LoggerConfiguration().CreateLogger();
+            var logger = new LoggerFactory().AddSerilog(serilogger).CreateLogger<PaperTradeManagerTests>();
             _tradeManager = new PaperTradeManager(new BaseExchange(new ExchangeOptions()), new TheScalper(), null, logger, new TradeOptions(), new InMemoryDataStore());
         }
 
