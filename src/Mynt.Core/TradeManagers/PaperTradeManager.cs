@@ -194,7 +194,7 @@ namespace Mynt.Core.TradeManagers
                         await _dataStore.SaveTraderAsync(currentTrader);
                     }
 
-                    await SendNotification($"Cancelled {trade.Market} buy order.");
+                    await SendNotification($"Cancelled {trade.Market} buy order because it wasn't filled in time.");
                 }
             }
         }
@@ -485,8 +485,6 @@ namespace Mynt.Core.TradeManagers
             {
                 var candles = await _api.GetTickerHistory(trade.Market, Period.Minute, 1);
                 var candle = candles.FirstOrDefault();
-
-                _logger.Information($"Checking {trade.Market} BUY order @ {trade.OpenRate:0.00000000}...");
 
                 // This means the order probably would've gotten filled...
                 // We have no other way to check this, because no actual orders are being placed.

@@ -29,6 +29,7 @@ namespace Mynt.Core.Configuration
             {
                 var name = property.Name;
                 var valueString = ConfigurationManager.AppSettings[name];
+
                 if (String.IsNullOrEmpty(valueString))
                 {
                     // Ignore if value is not set, leave defaults.

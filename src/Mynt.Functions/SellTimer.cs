@@ -41,7 +41,7 @@ namespace Mynt.Functions
                 var azureTableStorageOptions = AppSettings.Get<AzureTableStorageOptions>();
                 var telegramNotificationOptions = AppSettings.Get<TelegramNotificationOptions>();
 
-                logger.Information("Using trade options {@Options}", tradeOptions);
+                // logger.Information("Using trade options {@Options}", tradeOptions);
 
                 // Initialize a Trade Manager instance that will run using the settings provided below.
                 // Once again, you can use the default values for the settings defined in te Options classes below.
