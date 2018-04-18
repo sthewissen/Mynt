@@ -23,7 +23,7 @@ namespace Mynt.Functions
         }
 
         [FunctionName("OverviewTimer")]
-        public static async Task Run([TimerTrigger("0 0 */2 * * *")]TimerInfo buyTimer, TraceWriter log)
+        public static async Task Run([TimerTrigger("0 0 * * * *")]TimerInfo overviewTimer, TraceWriter log)
         {
             var logger = new LoggerConfiguration().WriteTo.TraceWriter(log).CreateLogger();
 
@@ -57,7 +57,7 @@ namespace Mynt.Functions
             }
         }
 
-        private static async Task SendProfitText(INotificationManager telegram, IDataStore dataStore)
+        private static async Task SendProfitText(INotificationManager notificationManager, IDataStore dataStore)
         {
             var traders = await dataStore.GetTradersAsync();
 
@@ -69,11 +69,11 @@ namespace Mynt.Functions
                 if (balance - stake == 0)
                     return;
 
-                await telegram.SendNotification($"Current profit is {(balance - stake):0.00000000} BTC ({(((balance - stake) / stake) * 100):0.00}%)");
+                await notificationManager.SendNotification($"Current profit is {(balance - stake):0.00000000} BTC ({(((balance - stake) / stake) * 100):0.00}%)");
             }
         }
 
-        private static async Task SendTradeOverviewMessage(INotificationManager telegram, IDataStore dataStore)
+        private static async Task SendTradeOverviewMessage(INotificationManager notificationManager, IDataStore dataStore)
         {
             var trades = await dataStore.GetActiveTradesAsync();
 
@@ -90,7 +90,7 @@ namespace Mynt.Functions
                     stringResult.AppendLine($"#{item.Market}: *{currentProfit:0.00}%* opened {item.OpenDate.Humanize()} at {item.OpenRate:0.00000000} BTC");
                 }
 
-                await telegram.SendNotification(stringResult.ToString());
+                await notificationManager.SendNotification(stringResult.ToString());
             }
         }
     }
