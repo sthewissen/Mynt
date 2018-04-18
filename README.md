@@ -43,8 +43,6 @@ Welcome to the Mynt cryptocurrency trade bot! This bot enables you to trade cryp
    
 A lot of the logic is based on the [Freqtrade] bot and was converted to C#. This software was initially created for educational purposes only. Don't risk money which you are afraid to lose. The bot runs at a pre-defined interval of 1 hour, since that matches the candle data it retrieves from the exchange. This bot was first mentioned in [one of my blogposts].
 
----
-
 ### Documentation
 
 * [Installation (Azure)](https://github.com/sthewissen/Mynt/wiki/Installation-(Azure))
@@ -54,8 +52,6 @@ A lot of the logic is based on the [Freqtrade] bot and was converted to C#. This
 * [Strategies](https://github.com/sthewissen/Mynt/wiki/Strategies)
 * [Notifications](https://github.com/sthewissen/Mynt/wiki/Notifications)
 * [Backtesting](https://github.com/sthewissen/Mynt/wiki/Backtesting)
-
----
 
 ### Additional tools used
 
