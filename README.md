@@ -34,7 +34,7 @@ Welcome to the Mynt cryptocurrency trade bot! This bot enables you to trade cryp
    - Bitfinex
    - Bittrex
    - Poloniex
-- Notifies you about your trades in
+- Notifies you about your trades
    - Slack
    - Telegram
    - Discord
