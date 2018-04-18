@@ -12,6 +12,8 @@ namespace Mynt.Core.TradeManagers
 
     public class TradeOptions
     {
+        decimal stopLossPercentage = -0.07m;
+
         // Trader settings
         public int MaxNumberOfConcurrentTrades { get; set; } = 10;
         public decimal AmountOfBtcToInvestPerTrader { get; set; } = 0.01m;
@@ -19,7 +21,18 @@ namespace Mynt.Core.TradeManagers
         public ProfitType ProfitStrategy { get; set; } = ProfitType.Reinvest;
 
         // If we go below this profit percentage, we sell immediately.
-        public decimal StopLossPercentage { get; set; } = -0.07m;
+        public decimal StopLossPercentage
+        {
+            get { return stopLossPercentage; }
+            set
+            {
+                // Ensure it's a negative number.
+                if (value > 0)
+                    value = value * -1;
+
+                stopLossPercentage = value;
+            }
+        }
 
         // Use this to create a sell order as soon as the buy order is hit.
         // WARNING: This can't be used in combination with EnableTrailingStop.
