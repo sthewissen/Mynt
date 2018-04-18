@@ -15,7 +15,7 @@ namespace Mynt.Backtester.Models
         public decimal TotalProfit => Results.Count > 0 ? Results.Sum(x => x.TotalProfit) : 0;
         public decimal SuccessRate => AmountOfTrades > 0 ? ((decimal)AmountOfProfitableTrades / (decimal)AmountOfTrades) * 100.0m : 0.0m;
 
-        public decimal DataPeriod => Results.Count > 0 ? Results.Average(x => x.DataPeriod) : 0;
+        public decimal DataPeriod => Results.Count > 0 ? Results.Max(x => x.DataPeriod) : 0;
 
         public List<BackTestResult> Results { get; set; }
 

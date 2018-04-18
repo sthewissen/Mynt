@@ -49,7 +49,11 @@ namespace Mynt.Backtester
             {
                 // The strategies we want to backtest.
                 new GoldenCross(),
-                new TheScalper()
+                new TheScalper(),
+                new BigThree(),
+                new BollingerAwe(),
+                new SmaCrossover(),
+                new Wvf()
             };
         }
 
@@ -108,7 +112,7 @@ namespace Mynt.Backtester
             // Prints the results for each coin for this strategy.
             if (results.Count > 0)
             {
-                Console.WriteLine(results.ToStringTable<BackTestStrategyResult>(new string[] { "Strategy", "# Trades", "# Profitable", "Success Rate", "BTC Profit", "Profit %", "Avg. Duration", "Avg. Period" },
+                Console.WriteLine(results.ToStringTable<BackTestStrategyResult>(new string[] { "Strategy", "# Trades", "# Profitable", "Success Rate", "BTC Profit", "Profit %", "Avg. Duration", "Max. Period" },
                                                                        (x) => x.Strategy,
                                                                        (x) => x.AmountOfTrades,
                                                                        (x) => x.AmountOfProfitableTrades,
