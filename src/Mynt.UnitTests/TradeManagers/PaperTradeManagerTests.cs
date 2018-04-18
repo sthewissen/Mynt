@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Serilog;
 
-namespace Mynt.Tests.TradeManagers
+namespace Mynt.UnitTests.TradeManagers
 {
     [TestClass]
     public class PaperTradeManagerTests

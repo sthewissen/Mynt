@@ -6,7 +6,7 @@ using Mynt.Core.Enums;
 using Mynt.Core.Models;
 using Mynt.Core.Strategies;
 
-namespace Mynt.Tests
+namespace Mynt.UnitTests
 {
     [TestClass]
     public class GoldenCrossTests

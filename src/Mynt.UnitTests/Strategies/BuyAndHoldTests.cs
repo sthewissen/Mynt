@@ -5,10 +5,8 @@ using Mynt.Core.Strategies;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Mynt.Tests.Strategies
+namespace Mynt.UnitTests.Strategies
 {
     [TestClass]
     public class BuyAndHoldTests

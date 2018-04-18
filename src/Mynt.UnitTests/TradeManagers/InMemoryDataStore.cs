@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
 
-namespace Mynt.Tests.TradeManagers
+namespace Mynt.UnitTests.TradeManagers
 {
     public class InMemoryDataStore : IDataStore
     {
