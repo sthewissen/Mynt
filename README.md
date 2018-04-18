@@ -8,9 +8,7 @@ Finding this useful? Consider a donation!
 
 ![Build status](https://sthewissen.visualstudio.com/_apis/public/build/definitions/c865956c-413b-4c44-b678-45d3026ae0b0/23/badge)
 
----
-
-Want to have a chat? [Come find us on Slack!]
+[Come find us on Slack!]
 
 <a href="https://join.slack.com/t/mynt-bot/signup"><img src="https://upload.wikimedia.org/wikipedia/commons/b/b9/Slack_Technologies_Logo.svg" alt="Join us on Slack!" width="100" /></a>
 
