@@ -30,6 +30,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "core", "core", "{5527361A-B
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "testing", "testing", "{605E0963-7988-4131-9D8C-E824F339AA91}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.Backtester", "Mynt.Backtester\Mynt.Backtester.csproj", "{022A5DC4-1CFC-42DC-9027-47C78A981DEA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -64,6 +66,10 @@ Global
 		{ADF7D7B5-B761-4CCD-9E9E-E29059D6686B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ADF7D7B5-B761-4CCD-9E9E-E29059D6686B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ADF7D7B5-B761-4CCD-9E9E-E29059D6686B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{022A5DC4-1CFC-42DC-9027-47C78A981DEA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{022A5DC4-1CFC-42DC-9027-47C78A981DEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{022A5DC4-1CFC-42DC-9027-47C78A981DEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{022A5DC4-1CFC-42DC-9027-47C78A981DEA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -76,6 +82,7 @@ Global
 		{6CF60DBF-1F5E-4179-B760-2F05EEFEE612} = {0A0E2DD3-2FBE-4B41-A8F3-3B3CA01830A2}
 		{0D33270E-D419-4839-9CCB-3DD2DE277A67} = {5527361A-B2E1-440A-8153-8F929F382E80}
 		{ADF7D7B5-B761-4CCD-9E9E-E29059D6686B} = {605E0963-7988-4131-9D8C-E824F339AA91}
+		{022A5DC4-1CFC-42DC-9027-47C78A981DEA} = {605E0963-7988-4131-9D8C-E824F339AA91}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AFCCB5C5-80F3-4AE8-B21C-2007C408EBCD}

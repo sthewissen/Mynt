@@ -27,13 +27,19 @@ namespace Mynt.Core.Strategies
                     result.Add(TradeAdvice.Hold);
                 else
                 {
-                    if (sma200[i] < closes[i] && // Candles above the SMA
-                        stoch.K[i - 1] <= stoch.D[i - 1] && // K below 20, oversold
+                    if (sma200[i] < closes[i] && 
+                        stoch.K[i - 1] <= stoch.D[i - 1] &&
                         stoch.K[i] > stoch.D[i] &&
                         stoch.D[i - 1] < 20 &&
-                        stoch.K[i - 1] < 20 // && // K below 20, oversold
-                        )
+                        stoch.K[i - 1] < 20)
                         result.Add(TradeAdvice.Buy);
+                    
+                    else if (stoch.K[i - 1] <= stoch.D[i - 1] &&
+                        stoch.K[i] > stoch.D[i] &&
+                        stoch.D[i - 1] > 80 &&
+                        stoch.K[i - 1] > 80)
+                        result.Add(TradeAdvice.Sell);
+                    
                     else
                         result.Add(TradeAdvice.Hold);
                 }
