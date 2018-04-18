@@ -34,6 +34,6 @@ namespace Mynt.Data.AzureTableStorage
 
         public string StrategyUsed { get; set; }
         public double? StopLossRate { get; set; }
-        public SellType SellType { get; set; }
+        public int SellType { get; set; }
     }
 }
