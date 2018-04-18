@@ -277,6 +277,7 @@ namespace Mynt.Core.Binance
                     High = (double)_.High,
                     Low = (double)_.Low,
                     Open = (double)_.Open,
+                    Volume = (double)_.Volume,
                     Timestamp = _.OpenTime
                 }
             ).ToList();
