@@ -1,11 +1,10 @@
-![Mynt](https://raw.githubusercontent.com/sthewissen/Mynt/master/img/myntlogo.png)
+<img src="https://raw.githubusercontent.com/sthewissen/Mynt/master/img/myntlogo.png" alt="Mynt" width="400" />
 
 Finding this useful? Consider a donation!
 
-| Coin | Address |
-| ------- | ------ |
-| BTC | 13myncc3ie6iGjSmJHCdzahwaKizX7NBB1 |
-| ETH | 0x4398c958468bEDB41DdEF4C297eB543c6d26f440 |
+[![Donate with Bitcoin](https://en.cryptobadges.io/badge/small/13myncc3ie6iGjSmJHCdzahwaKizX7NBB1)](https://en.cryptobadges.io/donate/13myncc3ie6iGjSmJHCdzahwaKizX7NBB1)
+
+[![Donate with Ethereum](https://en.cryptobadges.io/badge/small/0x4398c958468bEDB41DdEF4C297eB543c6d26f440)](https://en.cryptobadges.io/donate/0x4398c958468bEDB41DdEF4C297eB543c6d26f440)
 
 ---
 
@@ -41,8 +40,7 @@ This bot was first mentioned in [one of my blogposts].
 
 ### Additional tools used
 
-- Binance API wrapper - https://github.com/JKorf/Binance.Net
-- Bittrex API wrapper - https://github.com/Coinio/Bittrex.Api.Client
+- ExchangeSharp - https://github.com/jjxtra/ExchangeSharp
 - TA-Lib wrapper - https://www.nuget.org/packages/TA-Lib/
 
 ### Contributing
