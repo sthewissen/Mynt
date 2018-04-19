@@ -1,4 +1,4 @@
-{
+﻿{
   "IsEncrypted": false,
   "Values": {
     "AzureWebJobsStorage": "",
@@ -17,7 +17,7 @@
 
     // TradeOptions
     "MaxNumberOfConcurrentTrades": 2,
-    "AmountOfBtcToInvestPerTrader": 0.01,
+    "AmountToInvestPerTrader": 0.01,
     "StopLossPercentage": -0.07,
     "ImmediatelyPlaceSellOrder": false,
     "ImmediatelyPlaceSellOrderAtProfit": 0.02,
@@ -33,7 +33,7 @@
     "ProfitStrategy":"Reinvest",
     // lists todo
     "ReturnOnInvestment": "[{\"Duration\":1,\"Profit\":1.1},{\"Duration\":2,\"Profit\":2.2}]",
-    "QuoteCurrencies": "[\"BTC\"]",
+    "QuoteCurrency": "BTC",
     "MarketBlackList": "[\"TRX\", \"XVG\"]",
     "OnlyTradeList": "[\"ETH\", \"LTC\"]",
     "AlwaysTradeList": "[\"ETH\", \"LTC\"]"

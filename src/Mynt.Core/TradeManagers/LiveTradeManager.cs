@@ -96,10 +96,10 @@ namespace Mynt.Core.TradeManagers
                 var newTrader = new Trader()
                 {
                     Identifier = $"{Guid.NewGuid().ToString().Split('-').FirstOrDefault()}",
-                    CurrentBalance = _settings.AmountOfBtcToInvestPerTrader,
+                    CurrentBalance = _settings.AmountToInvestPerTrader,
                     IsBusy = false,
                     LastUpdated = DateTime.UtcNow,
-                    StakeAmount = _settings.AmountOfBtcToInvestPerTrader,
+                    StakeAmount = _settings.AmountToInvestPerTrader,
                 };
 
                 traders.Add(newTrader);
@@ -293,7 +293,7 @@ namespace Mynt.Core.TradeManagers
             markets = markets.Where(x =>
                 (x.Volume > _settings.MinimumAmountOfVolume ||
                  _settings.AlwaysTradeList.Contains(x.CurrencyPair.BaseCurrency)) &&
-                 _settings.QuoteCurrencies.Contains(x.CurrencyPair.QuoteCurrency.ToUpper())).ToList();
+                 _settings.QuoteCurrency.ToUpper() == x.CurrencyPair.QuoteCurrency.ToUpper()).ToList();
 
             // If there are items on the only trade list remove the rest
             foreach (var item in _settings.OnlyTradeList)
@@ -340,10 +340,10 @@ namespace Mynt.Core.TradeManagers
             // Take the amount to invest per trader OR the current balance for this trader.
             var btcToSpend = 0.0m;
 
-            if (freeTrader.CurrentBalance < _settings.AmountOfBtcToInvestPerTrader || _settings.ProfitStrategy == ProfitType.Reinvest)
+            if (freeTrader.CurrentBalance < _settings.AmountToInvestPerTrader || _settings.ProfitStrategy == ProfitType.Reinvest)
                 btcToSpend = freeTrader.CurrentBalance;
             else
-                btcToSpend = _settings.AmountOfBtcToInvestPerTrader;
+                btcToSpend = _settings.AmountToInvestPerTrader;
 
             // The amount here is an indication and will probably not be precisely what you get.
             var ticker = await _api.GetTicker(pair);

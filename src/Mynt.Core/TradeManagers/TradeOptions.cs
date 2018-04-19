@@ -16,7 +16,7 @@ namespace Mynt.Core.TradeManagers
 
         // Trader settings
         public int MaxNumberOfConcurrentTrades { get; set; } = 10;
-        public decimal AmountOfBtcToInvestPerTrader { get; set; } = 0.01m;
+        public decimal AmountToInvestPerTrader { get; set; } = 0.01m;
         public ProfitType ProfitStrategy { get; set; } = ProfitType.Reinvest;
 
         // If we go below this profit percentage, we sell immediately.
@@ -73,7 +73,7 @@ namespace Mynt.Core.TradeManagers
         public List<Roi> ReturnOnInvestment { get; set; } = new List<Roi> {};
 
         // These are the markets we don't want to trade on
-        public List<string> QuoteCurrencies { get; set; } = new List<string> { "BTC" };
+        public string QuoteCurrency { get; set; } = "BTC";
 
         // These are the markets we don't want to trade on
         public List<string> MarketBlackList { get; set; } = new List<string> {};

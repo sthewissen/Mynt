@@ -79,7 +79,7 @@ namespace Mynt.Core.TradeManagers
             markets = markets.Where(x =>
                 (x.Volume > _settings.MinimumAmountOfVolume ||
                  _settings.AlwaysTradeList.Contains(x.CurrencyPair.BaseCurrency)) &&
-                 _settings.QuoteCurrencies.Contains(x.CurrencyPair.QuoteCurrency.ToUpper())).ToList();
+                 _settings.QuoteCurrency.Contains(x.CurrencyPair.QuoteCurrency.ToUpper())).ToList();
 
             // Remove items that are on our blacklist.
             foreach (var market in _settings.MarketBlackList)
