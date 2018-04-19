@@ -349,7 +349,6 @@ namespace Mynt.Core.TradeManagers
             var ticker = await _api.GetTicker(pair);
             var openRate = GetTargetBid(ticker, signalCandle);
             var amount = btcToSpend / openRate;
-            var amountYouGet = (btcToSpend * (1 - _settings.TransactionFeePercentage)) / openRate;
 
             // Get the order ID, this is the most important because we need this to check
             // up on our trade. We update the data below later when the final data is present.
@@ -364,7 +363,7 @@ namespace Mynt.Core.TradeManagers
                 StakeAmount = btcToSpend,
                 OpenRate = openRate,
                 OpenDate = DateTime.UtcNow,
-                Quantity = amountYouGet,
+                Quantity = amount,
                 OpenOrderId = orderId,
                 BuyOrderId = orderId,
                 IsOpen = true,
