@@ -172,6 +172,12 @@ namespace Mynt.Core.TradeManagers
                 foreach (var trade in _activeTrades.Where(x => x.IsBuying))
                 {
                     // Cancel our open buy order on the exchange.
+                    var exchangeOrder = await _api.GetOrder(trade.BuyOrderId, trade.Market);
+
+                    // If this order is PartiallyFilled, don't cancel
+                    if (exchangeOrder?.Status == OrderStatus.PartiallyFilled)
+                        continue;  // not yet completed so wait
+
                     await _api.CancelOrder(trade.BuyOrderId, trade.Market);
 
                     // Update the buy order in our data storage.
