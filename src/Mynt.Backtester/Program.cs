@@ -66,28 +66,19 @@ namespace Mynt.Backtester
 
         private static List<ITradingStrategy> GetTradingStrategies()
         {
-            // TODO: Perhaps we can optimize this with reflection getting all the BaseStrategy implementations.
-            return new List<ITradingStrategy>()
+            // Use reflection to get all the instances of our strategies.
+            var strategyTypes = Assembly.GetAssembly(typeof(BaseStrategy)).GetTypes()
+                                     .Where(type => type.IsSubclassOf(typeof(BaseStrategy)))
+                                     .ToList();
+
+            var strategies = new List<ITradingStrategy>();
+
+            foreach(var item in strategyTypes)
             {
-                // The strategies we want to backtest.
-                new GoldenCross(),
-                new TheScalper(),
-                new BigThree(),
-                new BollingerAwe(),
-                new SmaCrossover(),
-                new Wvf(),
-                new WvfExtended(),
-                new AdxMomentum(),
-                new AdxSmas(),
-                new AwesomeSma(),
-                new AwesomeMacd(),
-                new Base150(),
-                new BbandRsi(),
-                new BreakoutMa(),
-                new CciEma(),
-                new CciRsi(),
-                new CciScalper()
-            };
+                strategies.Add((ITradingStrategy)Activator.CreateInstance(item));
+            }
+
+            return strategies;
         }
 
         #region backtesting
