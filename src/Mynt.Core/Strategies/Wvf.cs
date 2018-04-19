@@ -18,11 +18,12 @@ namespace Mynt.Core.Strategies
         {
             var result = new List<TradeAdvice>();
 
-            var ao = candles.AwesomeOscillator();
             var close = candles.Select(x => x.Close).ToList();
             var high = candles.Select(x => x.High).ToList();
             var low = candles.Select(x => x.Low).ToList();
             var open = candles.Select(x => x.Open).ToList();
+            var rsi = candles.Rsi(20);
+            var ema = rsi.Ema(10);
 
             var stochRsi = candles.StochRsi(14);
 
@@ -82,9 +83,9 @@ namespace Mynt.Core.Strategies
 
             for (int i = 0; i < candles.Count; i++)
             {
-                if (wvfs[i] >= upperRanges[i] || wvfs[i] >= rangeHighs[i] && ao[i] > 0 && ao[i - 1] < 0)
+                if (wvfs[i] >= upperRanges[i] || wvfs[i] >= rangeHighs[i] && rsi[i] > ema[i] && rsi[i-1] < ema[i-1])
                     result.Add(TradeAdvice.Buy);
-                else if (stochRsi.K[i] > 80 && stochRsi.K[i] > stochRsi.D[i] && stochRsi.K[i - 1] < stochRsi.D[i - 1] && ao[i] < 0 && ao[i - 1] > 0)
+                else if (stochRsi.K[i] > 80 && stochRsi.K[i] > stochRsi.D[i] && stochRsi.K[i - 1] < stochRsi.D[i - 1])
                     result.Add(TradeAdvice.Sell);
                 else
                     result.Add(TradeAdvice.Hold);

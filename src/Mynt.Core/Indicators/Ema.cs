@@ -57,5 +57,23 @@ namespace Mynt.Core.Indicators
 
             throw new Exception("Could not calculate EMA!");
         }
+
+        public static List<decimal?> Ema(this List<decimal?> source, int period = 30)
+        {
+            int outBegIdx, outNbElement;
+            double[] emaValues = new double[source.Count];
+            List<double?> outValues = new List<double?>();
+
+            var sourceFix = source.Select(x => x.HasValue ? Convert.ToDouble(x) : 0).ToArray();
+
+            var sma = TicTacTec.TA.Library.Core.Ema(0, source.Count - 1, sourceFix, period, out outBegIdx, out outNbElement, emaValues);
+
+            if (sma == TicTacTec.TA.Library.Core.RetCode.Success)
+            {
+                return FixIndicatorOrdering(emaValues.ToList(), outBegIdx, outNbElement);
+            }
+
+            throw new Exception("Could not calculate EMA!");
+        }
     }
 }

@@ -22,7 +22,7 @@ namespace Mynt.Backtester
             try
             {
                 _backTester = new BackTestRunner();
-                _dataRefresher = new DataRefresher(new ExchangeOptions{Exchange = Exchange.Binance});
+                _dataRefresher = new DataRefresher(new ExchangeOptions { Exchange = Exchange.Binance });
 
                 WriteIntro();
                 Console.WriteLine();
@@ -53,7 +53,12 @@ namespace Mynt.Backtester
                 new BigThree(),
                 new BollingerAwe(),
                 new SmaCrossover(),
-                new Wvf()
+                new Wvf(),
+                new WvfExtended(),
+                new AdxMomentum(),
+                new AdxSmas(),
+                new AwesomeSma(),
+                new AwesomeMacd()
             };
         }
 
@@ -72,15 +77,18 @@ namespace Mynt.Backtester
             // Prints the results for each coin for this strategy.
             if (results.Count > 0)
             {
-                Console.WriteLine(results.ToStringTable<BackTestResult>(new string[] { "Market", "# Trades", "# Profitable", "Success Rate", "BTC Profit", "Profit %", "Avg. Duration", "Period" },
-                                                                       (x) => x.Market,
-                                                                       (x) => x.AmountOfTrades,
-                                                                       (x) => x.AmountOfProfitableTrades,
-                                                                       (x) => $"{x.SuccessRate:0.00}%",
-                                                                       (x) => $"{x.TotalProfit:0.00000000}",
-                                                                       (x) => $"{x.TotalProfitPercentage:0.00}%",
-                                                                       (x) => $"{(x.AverageDuration):0.00} hours",
-                                                                        (x) => $"{x.DataPeriod} days"));
+                Console.WriteLine(results
+                                  .OrderByDescending(x => x.SuccessRate)
+                                  .ToList()
+                                  .ToStringTable<BackTestResult>(new string[] { "Market", "# Trades", "# Profitable", "Success Rate", "BTC Profit", "Profit %", "Avg. Duration", "Period" },
+                                                                 (x) => x.Market,
+                                                                 (x) => x.AmountOfTrades,
+                                                                 (x) => x.AmountOfProfitableTrades,
+                                                                 (x) => $"{x.SuccessRate:0.00}%",
+                                                                 (x) => $"{x.TotalProfit:0.00000000}",
+                                                                 (x) => $"{x.TotalProfitPercentage:0.00}%",
+                                                                 (x) => $"{(x.AverageDuration):0.00} hours",
+                                                                 (x) => $"{x.DataPeriod} days"));
             }
             else
             {
@@ -102,7 +110,7 @@ namespace Mynt.Backtester
 
             var results = new List<BackTestStrategyResult>();
 
-            foreach(var item in GetTradingStrategies())
+            foreach (var item in GetTradingStrategies())
             {
                 var stratResult = new BackTestStrategyResult() { Strategy = item.Name };
                 stratResult.Results.AddRange(runner.RunSingleStrategy(item, CoinsToBacktest, _stakeAmount));
@@ -112,7 +120,10 @@ namespace Mynt.Backtester
             // Prints the results for each coin for this strategy.
             if (results.Count > 0)
             {
-                Console.WriteLine(results.ToStringTable<BackTestStrategyResult>(new string[] { "Strategy", "# Trades", "# Profitable", "Success Rate", "BTC Profit", "Profit %", "Avg. Duration", "Max. Period" },
+                Console.WriteLine(results
+                                  .OrderByDescending(x => x.SuccessRate)
+                                  .ToList()
+                                  .ToStringTable<BackTestStrategyResult>(new string[] { "Strategy", "# Trades", "# Profitable", "Success Rate", "BTC Profit", "Profit %", "Avg. Duration", "Max. Period" },
                                                                        (x) => x.Strategy,
                                                                        (x) => x.AmountOfTrades,
                                                                        (x) => x.AmountOfProfitableTrades,
@@ -179,7 +190,7 @@ namespace Mynt.Backtester
                         continue;
                     case "3":
                         Console.WriteLine("\tRefreshing...");
-                        _dataRefresher.RefreshCandleData(CoinsToBacktest, (x)=> WriteColoredLine(x, ConsoleColor.Green)).Wait();
+                        _dataRefresher.RefreshCandleData(CoinsToBacktest, (x) => WriteColoredLine(x, ConsoleColor.Green)).Wait();
                         ActionCompleted();
                         continue;
                     case "4":
@@ -230,7 +241,7 @@ namespace Mynt.Backtester
             //if (cacheAge == TimeSpan.MinValue)
             //    WriteColoredLine("\tCache is empty. You must refresh (6) or copy example data (7).", ConsoleColor.Red);
             //else
-                //Console.WriteLine($"\tCache age: {cacheAge}"); // Ofcourse indivual files could differ in time
+            //Console.WriteLine($"\tCache age: {cacheAge}"); // Ofcourse indivual files could differ in time
 
             Console.WriteLine();
             Console.Write("\tWhat do you want to do? ");
