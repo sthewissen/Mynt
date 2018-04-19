@@ -16,6 +16,7 @@ Welcome to the Mynt cryptocurrency trade bot! This bot enables you to trade cryp
 ### Features
 
 - Comes with 25 built-in indicators
+- Comes with 50 built-in strategies
 - Create your own strategies using indicators and price data
 - Runs on multiple platforms
    - Azure Functions
