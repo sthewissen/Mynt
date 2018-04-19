@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
+using Microsoft.Extensions.Configuration;
 using Mynt.Backtester.Models;
+using Mynt.Core.Configuration;
 using Mynt.Core.Enums;
 using Mynt.Core.Exchanges;
 using Mynt.Core.Interfaces;
@@ -14,15 +18,17 @@ namespace Mynt.Backtester
         private static BackTestRunner _backTester;
         private static DataRefresher _dataRefresher;
 
-        private static List<string> CoinsToBacktest = new List<string> { "NEOBTC", "OMGBTC", "LTCBTC", "ETHBTC", "VENBTC" };
-        private static readonly decimal _stakeAmount = 0.1m; // The amount of BTC to use for each trade.
+        public static IConfiguration Configuration { get; set; }
+
+        // Set these in AppSettings.json, these are here to ensure default values.
+        private static List<string> CoinsToBacktest = new List<string> { }; // The coins to use.
+        private static decimal StakeAmount = 0.1m; // The amount of BTC to use for each trade.
 
         static void Main(string[] args)
         {
             try
             {
-                _backTester = new BackTestRunner();
-                _dataRefresher = new DataRefresher(new ExchangeOptions { Exchange = Exchange.Binance });
+                Init();
 
                 WriteIntro();
                 Console.WriteLine();
@@ -43,8 +49,24 @@ namespace Mynt.Backtester
             }
         }
 
+        private static void Init()
+        {
+            var builder = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json", optional: true);
+            Configuration = builder.Build();
+
+            var exchangeOptions = Configuration.Get<ExchangeOptions>();
+            var backtestOptions = Configuration.Get<BacktestOptions>();
+
+            StakeAmount = backtestOptions.StakeAmount;
+            CoinsToBacktest = backtestOptions.Coins;
+
+            _backTester = new BackTestRunner();
+            _dataRefresher = new DataRefresher(exchangeOptions);
+        }
+
         private static List<ITradingStrategy> GetTradingStrategies()
         {
+            // TODO: Perhaps we can optimize this with reflection getting all the BaseStrategy implementations.
             return new List<ITradingStrategy>()
             {
                 // The strategies we want to backtest.
@@ -58,7 +80,13 @@ namespace Mynt.Backtester
                 new AdxMomentum(),
                 new AdxSmas(),
                 new AwesomeSma(),
-                new AwesomeMacd()
+                new AwesomeMacd(),
+                new Base150(),
+                new BbandRsi(),
+                new BreakoutMa(),
+                new CciEma(),
+                new CciRsi(),
+                new CciScalper()
             };
         }
 
@@ -67,7 +95,7 @@ namespace Mynt.Backtester
         private static void BackTest(ITradingStrategy strategy)
         {
             var runner = new BackTestRunner();
-            var results = runner.RunSingleStrategy(strategy, CoinsToBacktest, _stakeAmount);
+            var results = runner.RunSingleStrategy(strategy, CoinsToBacktest, StakeAmount);
 
             Console.WriteLine();
             Console.WriteLine($"\t=============== BACKTESTING REPORT {strategy.Name.ToUpper()} ===============");
@@ -113,7 +141,7 @@ namespace Mynt.Backtester
             foreach (var item in GetTradingStrategies())
             {
                 var stratResult = new BackTestStrategyResult() { Strategy = item.Name };
-                stratResult.Results.AddRange(runner.RunSingleStrategy(item, CoinsToBacktest, _stakeAmount));
+                stratResult.Results.AddRange(runner.RunSingleStrategy(item, CoinsToBacktest, StakeAmount));
                 results.Add(stratResult);
             }
 

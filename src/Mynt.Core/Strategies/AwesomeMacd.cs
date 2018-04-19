@@ -10,7 +10,7 @@ namespace Mynt.Core.Strategies
     public class AwesomeMacd : BaseStrategy
     {
         public override string Name => "Awesome MACD";
-        public override int MinimumAmountOfCandles => 14;
+        public override int MinimumAmountOfCandles => 40;
         public override Period IdealPeriod => Period.Hour;
 
         public override List<TradeAdvice> Prepare(List<Candle> candles)

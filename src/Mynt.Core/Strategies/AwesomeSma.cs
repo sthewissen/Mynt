@@ -13,7 +13,7 @@ namespace Mynt.Core.Strategies
     public class AwesomeSma : BaseStrategy
     {
         public override string Name => "Awesome SMA";
-        public override int MinimumAmountOfCandles => 14;
+        public override int MinimumAmountOfCandles => 40;
         public override Period IdealPeriod => Period.Hour;
 
         public override List<TradeAdvice> Prepare(List<Candle> candles)

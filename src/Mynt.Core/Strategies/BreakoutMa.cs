@@ -7,30 +7,26 @@ using Mynt.Core.Models;
 
 namespace Mynt.Core.Strategies
 {
-    public class SmaCrossover : BaseStrategy
+    public class BreakoutMa : BaseStrategy
     {
-        public override string Name => "SMA Crossover";
-        public override int MinimumAmountOfCandles => 26;
+        public override string Name => "Breakout MA";
+        public override int MinimumAmountOfCandles => 35;
         public override Period IdealPeriod => Period.Hour;
 
         public override List<TradeAdvice> Prepare(List<Candle> candles)
         {
             var result = new List<TradeAdvice>();
 
-            var sma12 = candles.Sma(12);
-            var sma26 = candles.Sma(26);
+            var sma20 = candles.Sma(20, CandleVariable.Low);
+            var ema34 = candles.Ema(34);
+            var adx = candles.Adx(13);
 
             for (int i = 0; i < candles.Count; i++)
             {
-                // Since we look back 1 candle, the first candle can never be a signal.
-                if (i == 0)
-                    result.Add(TradeAdvice.Hold);
-                // When the slow SMA moves above the fast SMA, we have a negative cross-over
-                else if (sma12[i] < sma26[i] && sma12[i - 1] > sma26[i - 1])
-                    result.Add(TradeAdvice.Sell);
-                // When the fast SMA moves above the slow SMA, we have a positive cross-over
-                else if (sma12[i] > sma26[i] && sma12[i - 1] < sma26[i - 1])
+                if (ema34[i] > sma20[i] && adx[i] > 25)
                     result.Add(TradeAdvice.Buy);
+                else if (ema34[i] < sma20[i] && adx[i] > 25)
+                    result.Add(TradeAdvice.Sell);
                 else
                     result.Add(TradeAdvice.Hold);
             }
