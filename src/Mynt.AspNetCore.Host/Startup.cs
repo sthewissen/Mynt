@@ -12,7 +12,8 @@ using Mynt.Core.Interfaces;
 using Mynt.Core.Notifications;
 using Mynt.Core.Strategies;
 using Mynt.Core.TradeManagers;
-using Mynt.Data.AzureTableStorage;
+using Mynt.Data.SqlServer;
+//using Mynt.Data.AzureTableStorage;
 using Serilog;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
@@ -41,6 +42,7 @@ namespace Mynt.AspNetCore.Host
 
             // Set up exchange - TODO
             var exchangeOptions = Configuration.Get<ExchangeOptions>();
+            exchangeOptions.Exchange = Exchange.Binance;
             services.AddSingleton<IExchangeApi>(i => new BaseExchange(exchangeOptions));
 
             var tradeOptions = Configuration.GetSection("TradeOptions").Get<TradeOptions>();
@@ -51,9 +53,12 @@ namespace Mynt.AspNetCore.Host
             services.AddSingleton(s => Activator.CreateInstance(type) as ITradingStrategy ?? new TheScalper())
                 .AddSingleton<INotificationManager, TelegramNotificationManager>()
                 .AddSingleton(i => Configuration.GetSection("Telegram").Get<TelegramNotificationOptions>()) // TODO
+                
+                .AddSingleton<IDataStore, SqlServerDataStore>()
+                .AddSingleton(i => Configuration.GetSection("SqlServerOptions").Get<SqlServerOptions>()) // TODO
 
-                .AddSingleton<IDataStore, AzureTableStorageDataStore>()
-                .AddSingleton(i => Configuration.GetSection("AzureTableStorageOptions").Get<AzureTableStorageOptions>()) // TODO
+                //.AddSingleton<IDataStore, AzureTableStorageDataStore>()
+                //.AddSingleton(i => Configuration.GetSection("AzureTableStorageOptions").Get<AzureTableStorageOptions>()) // TODO
                 .AddSingleton<ITradeManager, PaperTradeManager>()
                 .AddSingleton(i => tradeOptions)
 
@@ -72,8 +77,14 @@ namespace Mynt.AspNetCore.Host
             {
                 app.UseDeveloperExceptionPage();
             }
-
-            app.UseMvc();
+            
+            //app.UseStaticFiles();
+            app.UseMvc(routes =>
+            {
+                routes.MapRoute(
+                    name: "default",
+                    template: "{controller=Mynt}/{action=Dashboard}/{id?}");
+            });
         }
     }
 }

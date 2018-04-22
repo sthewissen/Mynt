@@ -10,7 +10,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\" />
+    <Folder Include="Views\Mynt\" />
+    <Folder Include="Views\Shared\" />
+    <Folder Include="wwwroot\css\" />
+    <Folder Include="wwwroot\images\" />
+    <Folder Include="wwwroot\scripts\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -30,7 +34,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Mynt.Core\Mynt.Core.csproj" />
-    <ProjectReference Include="..\..\src\Mynt.Data.AzureTableStorage\Mynt.Data.AzureTableStorage.csproj" />
+    <ProjectReference Include="..\Mynt.Data.SqlServer\Mynt.Data.SqlServer.csproj" />
   </ItemGroup>
 
 </Project>
