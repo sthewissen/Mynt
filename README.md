@@ -4,9 +4,12 @@
 
 Finding this useful? Consider a donation!
 
-[![Donate with Bitcoin](https://en.cryptobadges.io/badge/small/13myncc3ie6iGjSmJHCdzahwaKizX7NBB1)](https://en.cryptobadges.io/donate/13myncc3ie6iGjSmJHCdzahwaKizX7NBB1)
+[![Donate with Bitcoin](https://en.cryptobadges.io/badge/small/17AM4MFXuyC72HSur44foWBxSDGUPgZJwD)](https://en.cryptobadges.io/donate/17AM4MFXuyC72HSur44foWBxSDGUPgZJwD)
 
-[![Donate with Ethereum](https://en.cryptobadges.io/badge/small/0x4398c958468bEDB41DdEF4C297eB543c6d26f440)](https://en.cryptobadges.io/donate/0x4398c958468bEDB41DdEF4C297eB543c6d26f440)
+[![Donate with Ethereum](https://en.cryptobadges.io/badge/small/0xa6281eb66b919cfa471dc304d326588844fc1228)](https://en.cryptobadges.io/donate/0xa6281eb66b919cfa471dc304d326588844fc1228)
+
+[![Donate with Litecoin](https://en.cryptobadges.io/badge/small/LZ2sL2ZSWLCoG2X39SzEaqXSYTDL7k9Wpz)](https://en.cryptobadges.io/donate/LZ2sL2ZSWLCoG2X39SzEaqXSYTDL7k9Wpz)
+
 
 ## About the project...
 This is an Azure Functions-based cryptocurrency trading bot. It uses the following cloud components to function:
