@@ -8,8 +8,9 @@ namespace Mynt.Backtester.Models
         public decimal ProfitPercentage { get; set; }
         public int Duration { get; set; }
 		public decimal CloseRate { get; set; }
-		public decimal Quatity { get; set; }
+		public decimal Quantity { get; set; }
         public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
-    }
+        public DateTime EndDate { get; set; }		
+        public string Market { get; internal set; }
+	 }
 }

@@ -117,6 +117,48 @@ namespace Mynt.Backtester
             WriteSeparator();
         }
 
+        private static void BackTestShowTrades(ITradingStrategy strategy)
+        {
+            var runner = new BackTestRunner();
+            var results = runner.RunSingleStrategy(strategy, CoinsToBacktest, StakeAmount);
+
+            Console.WriteLine();
+            Console.WriteLine($"\t=============== BACKTESTING REPORT {strategy.Name.ToUpper()} ===============");
+            Console.WriteLine();
+            WriteColoredLine($"\tNote: Profit is based on trading with 0.1 BTC each trade.", ConsoleColor.Cyan);
+            Console.WriteLine();
+            // Prints the results for each coin for this strategy.
+
+            if (results.Count > 0)
+            {
+                var trades = new List<BackTestTradeResult>();
+
+                foreach(var result in results)
+                {
+                    trades.AddRange(result.Trades);
+                }
+
+                Console.WriteLine(trades
+                                  .OrderBy(x => x.StartDate)
+                                  .ToList()
+                                  .ToStringTable<BackTestTradeResult>(new string[] { "Market", "Open", "Close", "BTC Profit", "Profit %", "Duration", "Startdate", "Enddate" },
+                                                                 (x) => x.Market,
+                                                                 (x) => $"{x.OpenRate:0.00000000}",
+                                                                 (x) => $"{x.CloseRate:0.00000000}",
+                                                                 (x) => $"{x.Profit:0.00000000}",
+                                                                 (x) => $"{x.ProfitPercentage:0.00}%",
+                                                                 (x) => $"{(x.Duration):0.00} hours",
+                                                                 (x) => $"{x.StartDate:dd-MM-yyyy hh:mm}",
+                                                                 (x) => $"{x.EndDate:dd-MM-yyyy hh:mm}"));
+            }
+            else
+            {
+                WriteColoredLine("\tNo backtests results found...", ConsoleColor.Red);
+            }
+
+            WriteSeparator();
+        }
+
         private static void BackTestAll()
         {
             var runner = new BackTestRunner();
@@ -176,12 +218,12 @@ namespace Mynt.Backtester
 
                 WriteSeparator();
 
+                var strats = GetTradingStrategies().OrderBy(x => x.Name).ToList();
+
                 // Depending on the option, pick a menu item.
                 switch (result)
                 {
                     case "1":
-                        var strats = GetTradingStrategies().OrderBy(x => x.Name).ToList();
-
                         for (int i = 0; i < strats.Count; i++)
                         {
                             Console.WriteLine($"\t\t{i + 1}. {strats[i].Name}");
@@ -203,16 +245,42 @@ namespace Mynt.Backtester
                         }
 
                         continue;
+
                     case "2":
+                        for (int i = 0; i < strats.Count; i++)
+                        {
+                            Console.WriteLine($"\t\t{i + 1}. {strats[i].Name}");
+                        }
+                        Console.WriteLine();
+                        Console.Write("\tWhich strategy do you want to test? ");
+                        var indexStrategy = Convert.ToInt32(Console.ReadLine());
+
+                        if (indexStrategy - 1 < strats.Count)
+                        {
+                            Console.WriteLine();
+                            Console.WriteLine("\tBacktesting a single strategy. Starting...");
+                            BackTestShowTrades(strats[indexStrategy - 1]);
+                        }
+                        else
+                        {
+                            WriteColoredLine("\tInvalid strategy choice.", ConsoleColor.Red);
+                            PresentMenuToUser();
+                        }
+
+                        continue;
+
+                    case "3":
                         Console.WriteLine("\tBacktesting all strategies takes some time and uses historic data. Starting...");
                         BackTestAll();
                         continue;
-                    case "3":
+
+                    case "4":
                         Console.WriteLine("\tRefreshing...");
                         _dataRefresher.RefreshCandleData(CoinsToBacktest, (x) => WriteColoredLine(x, ConsoleColor.Green)).Wait();
                         ActionCompleted();
                         continue;
-                    case "4":
+
+                    case "5":
                     default:
                         Environment.Exit(1);
                         break;
@@ -252,9 +320,10 @@ namespace Mynt.Backtester
             //TimeSpan cacheAge = GetCacheAge();
 
             Console.WriteLine("\t1. Run a single strategy");
-            Console.WriteLine("\t2. Run all strategies");
-            Console.WriteLine("\t3. Refresh candle data");
-            Console.WriteLine("\t4. Close the tool");
+            Console.WriteLine("\t2. Run a single strategy (show all trades)");
+            Console.WriteLine("\t3. Run all strategies");
+            Console.WriteLine("\t4. Refresh candle data");
+            Console.WriteLine("\t5. Close the tool");
             Console.WriteLine();
 
             //if (cacheAge == TimeSpan.MinValue)

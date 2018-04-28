@@ -40,7 +40,8 @@ namespace Mynt.Backtester
 
                                 backTestResult.Trades.Add(new BackTestTradeResult
                                 {
-                                    Quatity = quantity,
+                                    Market = pair,
+                                    Quantity = quantity,
                                     OpenRate = candles[i].Close,
                                     CloseRate = candles[j].Close,
                                     ProfitPercentage = currentProfitPercentage,
