@@ -171,23 +171,12 @@ namespace Mynt.Core.TradeManagers
                 // Loop our current trades that are still looking to buy if there are any.
                 foreach (var trade in _activeTrades.Where(x => x.IsBuying))
                 {
-<<<<<<< HEAD:functions/Mynt.Core/TradeManagers/GenericTradeManager.cs
                     var exchangeOrder = await _api.GetOrder(trade.BuyOrderId, trade.Market);
                     
                     // if this order is PartiallyFilled, don't cancel
                     if (exchangeOrder?.Status == OrderStatus.PartiallyFilled)
                         continue;  // not yet completed so wait
                     
-                    // Cancel our open buy order.
-=======
-                    // Cancel our open buy order on the exchange.
-                    var exchangeOrder = await _api.GetOrder(trade.BuyOrderId, trade.Market);
-
-                    // If this order is PartiallyFilled, don't cancel
-                    if (exchangeOrder?.Status == OrderStatus.PartiallyFilled)
-                        continue;  // not yet completed so wait
-
->>>>>>> develop:src/Mynt.Core/TradeManagers/LiveTradeManager.cs
                     await _api.CancelOrder(trade.BuyOrderId, trade.Market);
 
                     // Update the buy order in our data storage.
