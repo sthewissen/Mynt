@@ -1,0 +1,41 @@
+﻿{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "",
+    "AzureWebJobsDashboard": "",
+
+    "BindingRedirects": "[ { \"ShortName\": \"Newtonsoft.Json\", \"RedirectToVersion\": \"11.0.0.0\", \"PublicKeyToken\": \"30ad4fe6b2a6aeed\" } ]",
+
+    "Exchange": "Binance", // or 0, look @ Exchange enum
+    "ApiKey": "KeyValue",
+    "ApiSecret": "SecretValue",
+    "PassPhrase": "PassPhrase",
+
+    "AzureTableStorageConnectionString": "",
+    "TelegramBotToken": "",
+    "TelegramChatId": "",
+
+    // TradeOptions
+    "MaxNumberOfConcurrentTrades": 2,
+    "AmountToInvestPerTrader": 0.01,
+    "StopLossPercentage": -0.07,
+    "ImmediatelyPlaceSellOrder": false,
+    "ImmediatelyPlaceSellOrderAtProfit": 0.02,
+    "EnableTrailingStop": true,
+    "TrailingStopStartingPercentage": 0.02,
+    "TrailingStopPercentage": 0.05,
+    "CancelUnboughtOrdersEachCycle": true,
+    "PlaceFirstStopAtSignalCandleLow": false,
+    "MinimumAmountOfVolume": 300,
+    "BuyInPriceStrategy": "SignalCandleClose",
+    "AskLastBalance": 0.2,
+    "BuyInPricePercentage": 0.005,
+    "ProfitStrategy":"Reinvest",
+    // lists todo
+    "ReturnOnInvestment": "[{\"Duration\":1,\"Profit\":1.1},{\"Duration\":2,\"Profit\":2.2}]",
+    "QuoteCurrency": "BTC",
+    "MarketBlackList": "[\"TRX\", \"XVG\"]",
+    "OnlyTradeList": "[\"ETH\", \"LTC\"]",
+    "AlwaysTradeList": "[\"ETH\", \"LTC\"]"
+  }
+}

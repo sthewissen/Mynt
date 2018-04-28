@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Class1.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Indicators\" />
+    <Folder Include="Interfaces\" />
+    <Folder Include="Models\" />
+    <Folder Include="Enums\" />
+    <Folder Include="Extensions\" />
+    <Folder Include="Exchanges\" />
+    <Folder Include="Notifications\" />
+    <Folder Include="Configuration\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="DigitalRuby.ExchangeSharp" Version="0.3.5" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.0.0" />
+    <PackageReference Include="TA-Lib" Version="0.5.0.3" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.4.1" />
+  </ItemGroup>
+</Project>

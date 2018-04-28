@@ -1,0 +1,90 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27428.2015
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.Core", "Mynt.Core\Mynt.Core.csproj", "{0D33270E-D419-4839-9CCB-3DD2DE277A67}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.Data.AzureTableStorage", "Mynt.Data.AzureTableStorage\Mynt.Data.AzureTableStorage.csproj", "{E48797FD-0018-45FC-BD28-8C0F9BB1D27D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{E9BA3CE1-0D22-4E6D-84C0-8BD426318613}"
+	ProjectSection(SolutionItems) = preProject
+		..\LICENSE = ..\LICENSE
+		..\README.md = ..\README.md
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.Data.SqlServer", "Mynt.Data.SqlServer\Mynt.Data.SqlServer.csproj", "{8F96E6F8-B933-4C5A-9592-21A2209385DA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.Data.SQLite", "Mynt.Data.SQLite\Mynt.Data.SQLite.csproj", "{F5934EEF-3636-4A9D-86FA-660B9E8F40B8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "datastores", "datastores", "{F34057AE-AC0B-4A0B-8B26-71FB4DC7F474}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "runtimes", "runtimes", "{0A0E2DD3-2FBE-4B41-A8F3-3B3CA01830A2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.AspNetCore.Host", "Mynt.AspNetCore.Host\Mynt.AspNetCore.Host.csproj", "{192ADA12-7C0D-4671-AE53-329E0643E74B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.Functions", "Mynt.Functions\Mynt.Functions.csproj", "{6CF60DBF-1F5E-4179-B760-2F05EEFEE612}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.UnitTests", "Mynt.UnitTests\Mynt.UnitTests.csproj", "{ADF7D7B5-B761-4CCD-9E9E-E29059D6686B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "core", "core", "{5527361A-B2E1-440A-8153-8F929F382E80}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "testing", "testing", "{605E0963-7988-4131-9D8C-E824F339AA91}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.Backtester", "Mynt.Backtester\Mynt.Backtester.csproj", "{022A5DC4-1CFC-42DC-9027-47C78A981DEA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0D33270E-D419-4839-9CCB-3DD2DE277A67}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D33270E-D419-4839-9CCB-3DD2DE277A67}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D33270E-D419-4839-9CCB-3DD2DE277A67}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D33270E-D419-4839-9CCB-3DD2DE277A67}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E48797FD-0018-45FC-BD28-8C0F9BB1D27D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E48797FD-0018-45FC-BD28-8C0F9BB1D27D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E48797FD-0018-45FC-BD28-8C0F9BB1D27D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E48797FD-0018-45FC-BD28-8C0F9BB1D27D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8F96E6F8-B933-4C5A-9592-21A2209385DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F96E6F8-B933-4C5A-9592-21A2209385DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F96E6F8-B933-4C5A-9592-21A2209385DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F96E6F8-B933-4C5A-9592-21A2209385DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5934EEF-3636-4A9D-86FA-660B9E8F40B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5934EEF-3636-4A9D-86FA-660B9E8F40B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5934EEF-3636-4A9D-86FA-660B9E8F40B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5934EEF-3636-4A9D-86FA-660B9E8F40B8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{192ADA12-7C0D-4671-AE53-329E0643E74B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{192ADA12-7C0D-4671-AE53-329E0643E74B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{192ADA12-7C0D-4671-AE53-329E0643E74B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{192ADA12-7C0D-4671-AE53-329E0643E74B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6CF60DBF-1F5E-4179-B760-2F05EEFEE612}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6CF60DBF-1F5E-4179-B760-2F05EEFEE612}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6CF60DBF-1F5E-4179-B760-2F05EEFEE612}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6CF60DBF-1F5E-4179-B760-2F05EEFEE612}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ADF7D7B5-B761-4CCD-9E9E-E29059D6686B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ADF7D7B5-B761-4CCD-9E9E-E29059D6686B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ADF7D7B5-B761-4CCD-9E9E-E29059D6686B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ADF7D7B5-B761-4CCD-9E9E-E29059D6686B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{022A5DC4-1CFC-42DC-9027-47C78A981DEA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{022A5DC4-1CFC-42DC-9027-47C78A981DEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{022A5DC4-1CFC-42DC-9027-47C78A981DEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{022A5DC4-1CFC-42DC-9027-47C78A981DEA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{E48797FD-0018-45FC-BD28-8C0F9BB1D27D} = {F34057AE-AC0B-4A0B-8B26-71FB4DC7F474}
+		{8F96E6F8-B933-4C5A-9592-21A2209385DA} = {F34057AE-AC0B-4A0B-8B26-71FB4DC7F474}
+		{F5934EEF-3636-4A9D-86FA-660B9E8F40B8} = {F34057AE-AC0B-4A0B-8B26-71FB4DC7F474}
+		{192ADA12-7C0D-4671-AE53-329E0643E74B} = {0A0E2DD3-2FBE-4B41-A8F3-3B3CA01830A2}
+		{6CF60DBF-1F5E-4179-B760-2F05EEFEE612} = {0A0E2DD3-2FBE-4B41-A8F3-3B3CA01830A2}
+		{0D33270E-D419-4839-9CCB-3DD2DE277A67} = {5527361A-B2E1-440A-8153-8F929F382E80}
+		{ADF7D7B5-B761-4CCD-9E9E-E29059D6686B} = {605E0963-7988-4131-9D8C-E824F339AA91}
+		{022A5DC4-1CFC-42DC-9027-47C78A981DEA} = {605E0963-7988-4131-9D8C-E824F339AA91}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {AFCCB5C5-80F3-4AE8-B21C-2007C408EBCD}
+	EndGlobalSection
+EndGlobal

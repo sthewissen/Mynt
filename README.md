@@ -1,7 +1,5 @@
 <img src="https://raw.githubusercontent.com/sthewissen/Mynt/master/img/myntlogo.png" alt="Mynt" width="400" />
 
-## Donating to support further development
-
 Finding this useful? Consider a donation!
 
 [![Donate with Bitcoin](https://en.cryptobadges.io/badge/small/17AM4MFXuyC72HSur44foWBxSDGUPgZJwD)](https://en.cryptobadges.io/donate/17AM4MFXuyC72HSur44foWBxSDGUPgZJwD)
@@ -10,24 +8,37 @@ Finding this useful? Consider a donation!
 
 [![Donate with Litecoin](https://en.cryptobadges.io/badge/small/LZ2sL2ZSWLCoG2X39SzEaqXSYTDL7k9Wpz)](https://en.cryptobadges.io/donate/LZ2sL2ZSWLCoG2X39SzEaqXSYTDL7k9Wpz)
 
+<a target="_blank" href="https://join.slack.com/t/mynt-bot/shared_invite/enQtMzI3ODgzNTE1OTg3LTMyMGQyNTUxNTg2ODEwMjBjMDE0YzI5NDU3ZGI0MzVjMjBhYzBlNWE5MTMwMzIyZTViNmM2YTUxYzZhYjcyMTA"><img src="https://upload.wikimedia.org/wikipedia/commons/b/b9/Slack_Technologies_Logo.svg" alt="Join us on Slack!" width="100" /></a>
 
-## About the project...
-This is an Azure Functions-based cryptocurrency trading bot. It uses the following cloud components to function:
+# Mynt
+Welcome to the Mynt cryptocurrency trade bot! This bot enables you to trade cryptocurrencies in an automated fashion and comes with a lot of different configuration options. It is a .NET based trade bot that runs at set intervals to find trades and monitor them for sell conditions.
 
-- Azure Functions
-- Azure Table Storage
+### Features
 
-A lot of the logic is based on the [Freqtrade] bot and was converted to C#. The bot currently supports trading on the Bittrex exchange. This software was primarily created for educational purposes only. Don't risk money which you are afraid to lose. This bot was first mentioned in [one of my blogposts].
-
-![Build status](https://sthewissen.visualstudio.com/_apis/public/build/definitions/c865956c-413b-4c44-b678-45d3026ae0b0/20/badge)
-
-## Get in touch!
-
-Want to have a chat? [Come find us on Slack!]
-
-<a href="https://join.slack.com/t/mynt-bot/signup"><img src="https://upload.wikimedia.org/wikipedia/commons/b/b9/Slack_Technologies_Logo.svg" alt="Join us on Slack!" width="100" /></a>
-
----
+- Comes with 25 built-in indicators
+- Comes with 50 built-in strategies
+- Create your own strategies using indicators and price data
+- Runs on multiple platforms
+   - Azure Functions
+   - Console app
+   - Windows service
+- Supports multiple data storage engines
+   - Azure Table Storage
+   - SQL Server
+   - SQLite
+- Supports multiple exchanges
+   - Binance
+   - Bitfinex
+   - Bittrex
+   - Poloniex
+- Ability to send notifications about your trades
+   - Slack
+   - Telegram
+   - Discord
+   
+### History
+   
+A lot of the logic is based on the [Freqtrade] bot and was converted to C#. This software was initially created for educational purposes only. Don't risk money which you are afraid to lose. The bot runs at a pre-defined interval of 1 hour, since that matches the candle data it retrieves from the exchange. This bot was first mentioned in [one of my blogposts].
 
 ### Documentation
 
@@ -39,12 +50,9 @@ Want to have a chat? [Come find us on Slack!]
 * [Notifications](https://github.com/sthewissen/Mynt/wiki/Notifications)
 * [Backtesting](https://github.com/sthewissen/Mynt/wiki/Backtesting)
 
----
-
 ### Additional tools used
 
-- Binance API wrapper - https://github.com/JKorf/Binance.Net
-- Bittrex API wrapper - https://github.com/Coinio/Bittrex.Api.Client
+- ExchangeSharp - https://github.com/jjxtra/ExchangeSharp
 - TA-Lib wrapper - https://www.nuget.org/packages/TA-Lib/
 
 ### Contributing
