@@ -1,7 +1,44 @@
 ﻿@page
+@using Mynt.Core.Models
 
 @{
     ViewBag.Title = "Mynt - Dashboard";
 }
 
-Hello world!
+<h1 class="mt-5">Traders</h1>
+
+
+@if (ViewBag.traders != null)
+{
+    <table class="table table-hover" id="history">
+     <thead>
+     <tr>
+         <th>
+             Current Balance
+         </th>
+         <th >
+             State
+         </th>
+         <th >
+             Last update
+         </th>
+         <th class="bearbeiten"></th>
+     </tr>
+     </thead>
+
+     @foreach (Trader trader in ViewBag.traders)
+     {
+         <tr>
+             <td>
+                 @trader.CurrentBalance
+             </td>
+             <td >
+                 @trader.IsBusy
+             </td>
+             <td >
+                 @trader.LastUpdated
+             </td>
+         </tr>
+     }
+ </table>
+}
