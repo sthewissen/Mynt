@@ -50,6 +50,7 @@ namespace Mynt.Backtester
                                     StartDate = candles[i].Timestamp,
                                     EndDate = candles[j].Timestamp
                                 });
+
                                 break;
                             }
                         }
