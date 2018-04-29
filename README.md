@@ -2,11 +2,11 @@
 
 Finding this useful? Consider a donation!
 
-[![Donate with Bitcoin](https://en.cryptobadges.io/badge/small/13myncc3ie6iGjSmJHCdzahwaKizX7NBB1)](https://en.cryptobadges.io/donate/13myncc3ie6iGjSmJHCdzahwaKizX7NBB1)
+[![Donate with Bitcoin](https://en.cryptobadges.io/badge/small/17AM4MFXuyC72HSur44foWBxSDGUPgZJwD)](https://en.cryptobadges.io/donate/17AM4MFXuyC72HSur44foWBxSDGUPgZJwD)
 
-[![Donate with Ethereum](https://en.cryptobadges.io/badge/small/0x4398c958468bEDB41DdEF4C297eB543c6d26f440)](https://en.cryptobadges.io/donate/0x4398c958468bEDB41DdEF4C297eB543c6d26f440)
+[![Donate with Ethereum](https://en.cryptobadges.io/badge/small/0xa6281eb66b919cfa471dc304d326588844fc1228)](https://en.cryptobadges.io/donate/0xa6281eb66b919cfa471dc304d326588844fc1228)
 
-![Build status](https://sthewissen.visualstudio.com/_apis/public/build/definitions/c865956c-413b-4c44-b678-45d3026ae0b0/23/badge)
+[![Donate with Litecoin](https://en.cryptobadges.io/badge/small/LZ2sL2ZSWLCoG2X39SzEaqXSYTDL7k9Wpz)](https://en.cryptobadges.io/donate/LZ2sL2ZSWLCoG2X39SzEaqXSYTDL7k9Wpz)
 
 <a target="_blank" href="https://join.slack.com/t/mynt-bot/shared_invite/enQtMzI3ODgzNTE1OTg3LTMyMGQyNTUxNTg2ODEwMjBjMDE0YzI5NDU3ZGI0MzVjMjBhYzBlNWE5MTMwMzIyZTViNmM2YTUxYzZhYjcyMTA"><img src="https://upload.wikimedia.org/wikipedia/commons/b/b9/Slack_Technologies_Logo.svg" alt="Join us on Slack!" width="100" /></a>
 

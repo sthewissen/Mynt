@@ -467,7 +467,10 @@ namespace Mynt.Core.TradeManagers
             await UpdateOpenSellOrders();
 
             // Third, our current trades need to be checked if one of these has hit its sell targets...
-            await CheckForSellConditions();
+            if (!_settings.OnlySellOnStrategySignals)
+            {
+                await CheckForSellConditions();
+            }
 
             // Save the changes
             // await _dataStore.SaveTradesAsync(_activeTrades);

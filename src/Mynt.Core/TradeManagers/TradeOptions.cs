@@ -38,6 +38,8 @@ namespace Mynt.Core.TradeManagers
         public bool ImmediatelyPlaceSellOrder { get; set; } = false;
         public decimal ImmediatelyPlaceSellOrderAtProfit { get; set; } = 0.02m;
 
+        public bool OnlySellOnStrategySignals = false;
+
         // Use a trailing stop to lock in your profits.
         // WARNING: This can't be used in combination with ImmediatelyPlaceSellOrder.
         public bool EnableTrailingStop { get; set; } = true;
