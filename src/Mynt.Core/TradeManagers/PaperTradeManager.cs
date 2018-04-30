@@ -124,6 +124,8 @@ namespace Mynt.Core.TradeManagers
             // Initialize the things we'll be using throughout the process.
             await Initialize(true);
 
+            _logger.LogInformation($"Looking for trades using {_strategy.Name}");
+
             // This means an order to buy has been open for an entire buy cycle.
             if (_settings.CancelUnboughtOrdersEachCycle)
                 await CancelUnboughtOrders();
