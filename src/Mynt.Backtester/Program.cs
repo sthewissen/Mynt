@@ -20,9 +20,8 @@ namespace Mynt.Backtester
 
         public static IConfiguration Configuration { get; set; }
 
-        // Set these in AppSettings.json, these are here to ensure default values.
-        private static List<string> CoinsToBacktest = new List<string> { }; // The coins to use.
-        private static decimal StakeAmount = 0.1m; // The amount of BTC to use for each trade.
+        public static BacktestOptions BacktestOptions { get; set; }
+
 
         static void Main(string[] args)
         {
@@ -55,10 +54,7 @@ namespace Mynt.Backtester
             Configuration = builder.Build();
 
             var exchangeOptions = Configuration.Get<ExchangeOptions>();
-            var backtestOptions = Configuration.Get<BacktestOptions>();
-
-            StakeAmount = backtestOptions.StakeAmount;
-            CoinsToBacktest = backtestOptions.Coins;
+            BacktestOptions = Configuration.Get<BacktestOptions>();
 
             _backTester = new BackTestRunner();
             _dataRefresher = new DataRefresher(exchangeOptions);
@@ -86,7 +82,7 @@ namespace Mynt.Backtester
         private static void BackTest(ITradingStrategy strategy)
         {
             var runner = new BackTestRunner();
-            var results = runner.RunSingleStrategy(strategy, CoinsToBacktest, StakeAmount);
+            var results = runner.RunSingleStrategy(strategy, BacktestOptions.Coins, BacktestOptions.StakeAmount, BacktestOptions.OnlyStartNewTradesWhenSold);
 
             Console.WriteLine();
             Console.WriteLine($"\t=============== BACKTESTING REPORT {strategy.Name.ToUpper()} ===============");
@@ -120,7 +116,7 @@ namespace Mynt.Backtester
         private static void BackTestShowTrades(ITradingStrategy strategy)
         {
             var runner = new BackTestRunner();
-            var results = runner.RunSingleStrategy(strategy, CoinsToBacktest, StakeAmount);
+            var results = runner.RunSingleStrategy(strategy, BacktestOptions.Coins, BacktestOptions.StakeAmount, BacktestOptions.OnlyStartNewTradesWhenSold);
 
             Console.WriteLine();
             Console.WriteLine($"\t=============== BACKTESTING REPORT {strategy.Name.ToUpper()} ===============");
@@ -174,7 +170,7 @@ namespace Mynt.Backtester
             foreach (var item in GetTradingStrategies())
             {
                 var stratResult = new BackTestStrategyResult() { Strategy = item.Name };
-                stratResult.Results.AddRange(runner.RunSingleStrategy(item, CoinsToBacktest, StakeAmount));
+                stratResult.Results.AddRange(runner.RunSingleStrategy(item, BacktestOptions.Coins, BacktestOptions.StakeAmount, BacktestOptions.OnlyStartNewTradesWhenSold));
                 results.Add(stratResult);
             }
 
@@ -276,7 +272,7 @@ namespace Mynt.Backtester
 
                     case "4":
                         Console.WriteLine("\tRefreshing...");
-                        _dataRefresher.RefreshCandleData(CoinsToBacktest, (x) => WriteColoredLine(x, ConsoleColor.Green)).Wait();
+                        _dataRefresher.RefreshCandleData(BacktestOptions.Coins, (x) => WriteColoredLine(x, ConsoleColor.Green)).Wait();
                         ActionCompleted();
                         continue;
 
