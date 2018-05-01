@@ -139,6 +139,24 @@ namespace Mynt.Core.Extensions
         }
 
 
+        public static List<bool> Crossunder(this List<decimal?> source, List<decimal?> value)
+        {
+            var result = new List<bool>();
+
+            for (int i = 0; i < source.Count; i++)
+            {
+                if (i == 0)
+                    result.Add(false);
+                else
+                {
+                    result.Add(source[i] < value[i] && source[i - 1] >= value[i - 1]);
+                }
+            }
+
+            return result;
+        }
+
+
         public static List<bool> Crossover(this List<decimal?> source, decimal value)
         {
             var result = new List<bool>();
@@ -150,6 +168,24 @@ namespace Mynt.Core.Extensions
                 else
                 {
                     result.Add(source[i] > value && source[i - 1] <= value);
+                }
+            }
+
+            return result;
+        }
+
+
+        public static List<bool> Crossover(this List<decimal?> source, List<decimal?> value)
+        {
+            var result = new List<bool>();
+
+            for (int i = 0; i < source.Count; i++)
+            {
+                if (i == 0)
+                    result.Add(false);
+                else
+                {
+                    result.Add(source[i] > value[i] && source[i - 1] <= value[i - 1]);
                 }
             }
 
