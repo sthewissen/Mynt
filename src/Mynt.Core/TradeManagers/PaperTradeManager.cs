@@ -209,8 +209,8 @@ namespace Mynt.Core.TradeManagers
         private async Task CheckActiveTradesAgainstStrategy()
         {
             // Check our active trades for a sell signal from the strategy
-            foreach (var trade in _activeTrades.Where(x => (x.OpenOrderId == null || x.SellType == SellType.Immediate) && x.IsOpen))
-            {
+            foreach (var trade in _activeTrades.Where(x => !x.IsSelling && x.IsOpen))
+            { 
                 var signal = await GetStrategySignal(trade.Market);
 
                 // If the strategy is telling us to sell we need to do so.
@@ -473,9 +473,6 @@ namespace Mynt.Core.TradeManagers
             {
                 await CheckForSellConditions();
             }
-
-            // Save the changes
-            // await _dataStore.SaveTradesAsync(_activeTrades);
         }
 
         /// <summary>
@@ -486,7 +483,7 @@ namespace Mynt.Core.TradeManagers
         {
             // There are trades that have an open order ID set & no sell order id set
             // that means its a buy trade that is waiting to get bought. See if we can update that first.
-            foreach (var trade in _activeTrades.Where(x => x.OpenOrderId != null && x.SellOrderId == null))
+            foreach (var trade in _activeTrades.Where(x => x.IsBuying))
             {
                 var candles = await _api.GetTickerHistory(trade.Market, Period.Minute, 1);
                 var candle = candles.FirstOrDefault();
@@ -531,7 +528,7 @@ namespace Mynt.Core.TradeManagers
             // There are trades that have an open order ID set & sell order id set
             // that means its a sell trade that is waiting to get sold. See if we can update that first.
 
-            foreach (var order in _activeTrades.Where(x => x.OpenOrderId != null && x.SellOrderId != null))
+            foreach (var order in _activeTrades.Where(x => x.IsSelling))
             {
                 var candles = await _api.GetTickerHistory(order.Market, Period.Minute, 1);
                 var candle = candles.FirstOrDefault();
@@ -581,7 +578,7 @@ namespace Mynt.Core.TradeManagers
             // that means its a trade that is waiting to get sold. See if we can update that first.
 
             // An open order currently not selling or being an immediate sell are checked for SL  etc.
-            foreach (var trade in _activeTrades.Where(x => (x.OpenOrderId == null || x.SellType == SellType.Immediate) && x.IsOpen))
+            foreach (var trade in _activeTrades.Where(x => !x.IsSelling && !x.IsBuying && x.IsOpen))
             {
                 // These are trades that are not being bought or sold at the moment so these need to be checked for sell conditions.
                 var ticker = await _api.GetTicker(trade.Market);
