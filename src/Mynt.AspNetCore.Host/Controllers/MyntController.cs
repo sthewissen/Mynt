@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Mynt.Core.Interfaces;
+using Mynt.Core.TradeManagers;
 
 namespace Mynt.AspNetCore.Host.Controllers
 {
@@ -19,7 +22,11 @@ namespace Mynt.AspNetCore.Host.Controllers
         // GET: /<controller>/
         public IActionResult Dashboard()
         {
+            var tradeOptions = Startup.Configuration.GetSection("TradeOptions").Get<TradeOptions>();
+
+            ViewBag.quoteCurrency = tradeOptions.QuoteCurrency;
             ViewBag.traders = _dataStore.GetTradersAsync().Result;
+            ViewBag.closedTrades = _dataStore.GetClosedTradesAsync().Result;
 
             return View();
         }
