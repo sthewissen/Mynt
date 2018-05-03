@@ -210,7 +210,7 @@ namespace Mynt.Core.TradeManagers
         {
             // Check our active trades for a sell signal from the strategy
             foreach (var trade in _activeTrades.Where(x => !x.IsSelling && x.IsOpen))
-            { 
+            {
                 var signal = await GetStrategySignal(trade.Market);
 
                 // If the strategy is telling us to sell we need to do so.
@@ -245,7 +245,7 @@ namespace Mynt.Core.TradeManagers
             // Check if there are markets matching our volume.
             markets = markets.Where(x =>
                 (x.Volume > _settings.MinimumAmountOfVolume ||
-                 _settings.AlwaysTradeList.Contains(x.CurrencyPair.BaseCurrency)) && 
+                 _settings.AlwaysTradeList.Contains(x.CurrencyPair.BaseCurrency)) &&
                  _settings.QuoteCurrency.ToUpper() == x.CurrencyPair.QuoteCurrency.ToUpper()).ToList();
 
             // If there are items on the only trade list remove the rest
@@ -578,7 +578,7 @@ namespace Mynt.Core.TradeManagers
             // that means its a trade that is waiting to get sold. See if we can update that first.
 
             // An open order currently not selling or being an immediate sell are checked for SL  etc.
-            foreach (var trade in _activeTrades.Where(x => !x.IsSelling && !x.IsBuying && x.IsOpen))
+            foreach (var trade in _activeTrades.Where(x => (!x.IsSelling && !x.IsBuying && x.IsOpen) || (x.IsOpen && x.SellType == SellType.Immediate)))
             {
                 // These are trades that are not being bought or sold at the moment so these need to be checked for sell conditions.
                 var ticker = await _api.GetTicker(trade.Market);
@@ -621,19 +621,67 @@ namespace Mynt.Core.TradeManagers
 
             _logger.LogInformation("Should sell {Market}? Profit: {Profit}%...", trade.Market, (currentProfit * 100).ToString("0.00"));
 
-            // Let's not do a stoploss for now...
-            if (currentProfit < _settings.StopLossPercentage)
+            if (trade.SellType != SellType.Immediate)
             {
-                _logger.LogInformation("Stop loss hit: {StopLoss}%", _settings.StopLossPercentage);
-                return SellType.StopLoss;
-            }
+                // Let's not do a stoploss for now...
+                if (currentProfit < _settings.StopLossPercentage)
+                {
+                    _logger.LogInformation("Stop loss hit: {StopLoss}%", _settings.StopLossPercentage);
+                    return SellType.StopLoss;
+                }
 
-            // Only use ROI when no stoploss is set, because the stop loss
-            // will be the anchor that sells when the trade falls below it.
-            // This gives the trade room to rise further instead of selling directly.
-            if (!trade.StopLossRate.HasValue)
+                // Only use ROI when no stoploss is set, because the stop loss
+                // will be the anchor that sells when the trade falls below it.
+                // This gives the trade room to rise further instead of selling directly.
+                if (!trade.StopLossRate.HasValue)
+                {
+                    // Check if time matches and current rate is above threshold
+                    foreach (var item in _settings.ReturnOnInvestment)
+                    {
+                        var timeDiff = (utcNow - trade.OpenDate).TotalSeconds / 60;
+
+                        if (timeDiff > item.Duration && currentProfit > item.Profit)
+                        {
+                            _logger.LogInformation("Timer hit: {TimeDifference} mins, profit {Profit}%", timeDiff, item.Profit.ToString("0.00"));
+                            return SellType.Timed;
+                        }
+                    }
+                }
+
+                // Only run this when we're past our starting percentage for trailing stop.
+                if (_settings.EnableTrailingStop)
+                {
+                    // If the current rate is below our current stoploss percentage, close the trade.
+                    if (trade.StopLossRate.HasValue && currentRateBid < trade.StopLossRate.Value)
+                        return SellType.TrailingStopLoss;
+
+                    // The new stop would be at a specific percentage above our starting point.
+                    var newStopRate = trade.OpenRate * (1 + (currentProfit - _settings.TrailingStopPercentage));
+
+                    // Only update the trailing stop when its above our starting percentage and higher than the previous one.
+                    if (currentProfit > _settings.TrailingStopStartingPercentage && (trade.StopLossRate < newStopRate || !trade.StopLossRate.HasValue))
+                    {
+                        _logger.LogInformation("Trailing stop loss updated for {Market} from {StopLossRate} to {NewStopRate}", trade.Market, trade.StopLossRate?.ToString("0.00000000"), newStopRate.ToString("0.00000000"));
+
+                        // The current profit percentage is high enough to create the trailing stop value.
+                        // If we are getting our first stop loss raise, we set it to break even. From there the stop
+                        // gets increased every given TrailingStopPercentage...
+                        if (!trade.StopLossRate.HasValue)
+                            trade.StopLossRate = trade.OpenRate;
+                        else
+                            trade.StopLossRate = Math.Round(newStopRate, 8);
+
+                        return SellType.TrailingStopLossUpdated;
+                    }
+
+                    return SellType.None;
+                }
+            }
+            else
             {
-                // Check if time matches and current rate is above threshold
+                // Immediates have a bit different behavior...
+
+                // Check for an ROI
                 foreach (var item in _settings.ReturnOnInvestment)
                 {
                     var timeDiff = (utcNow - trade.OpenDate).TotalSeconds / 60;
@@ -644,35 +692,6 @@ namespace Mynt.Core.TradeManagers
                         return SellType.Timed;
                     }
                 }
-            }
-
-            // Only run this when we're past our starting percentage for trailing stop.
-            if (_settings.EnableTrailingStop)
-            {
-                // If the current rate is below our current stoploss percentage, close the trade.
-                if (trade.StopLossRate.HasValue && currentRateBid < trade.StopLossRate.Value)
-                    return SellType.TrailingStopLoss;
-
-                // The new stop would be at a specific percentage above our starting point.
-                var newStopRate = trade.OpenRate * (1 + (currentProfit - _settings.TrailingStopPercentage));
-
-                // Only update the trailing stop when its above our starting percentage and higher than the previous one.
-                if (currentProfit > _settings.TrailingStopStartingPercentage && (trade.StopLossRate < newStopRate || !trade.StopLossRate.HasValue))
-                {
-                    _logger.LogInformation("Trailing stop loss updated for {Market} from {StopLossRate} to {NewStopRate}", trade.Market, trade.StopLossRate?.ToString("0.00000000"), newStopRate.ToString("0.00000000"));
-
-                    // The current profit percentage is high enough to create the trailing stop value.
-                    // If we are getting our first stop loss raise, we set it to break even. From there the stop
-                    // gets increased every given TrailingStopPercentage...
-                    if (!trade.StopLossRate.HasValue)
-                        trade.StopLossRate = trade.OpenRate;
-                    else
-                        trade.StopLossRate = Math.Round(newStopRate, 8);
-
-                    return SellType.TrailingStopLossUpdated;
-                }
-
-                return SellType.None;
             }
 
             return SellType.None;
