@@ -8,8 +8,9 @@ namespace Mynt.Data.Sqlite
     public class TradeAdapter
     {
         [Key]
-        public int TradeId { get; set; }
+        public int Id { get; set; }
 
+        public string TradeId { get; set; }
         public string TraderId { get; set; }
         public string Market { get; set; }
 

@@ -27,7 +27,7 @@ namespace Mynt.Core.Indicators
                     var maxH = 0.0m;
                     var minH = 0.0m;
 
-                    if (i < 9)
+                    if (i < period - 1)
                     {
                         maxH = highLowAverages.Take(i + 1).Max();
                         minH = highLowAverages.Take(i + 1).Min();
