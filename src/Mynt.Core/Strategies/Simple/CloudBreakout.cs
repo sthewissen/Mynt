@@ -8,11 +8,14 @@ using Mynt.Core.Models;
 
 namespace Mynt.Core.Strategies.Simple
 {
-    public class CloudBreakout : BaseStrategy
+    public class CloudBreakout : BaseStrategy, INotificationTradingStrategy
     {
         public override string Name => "Cloud Breakout";
         public override int MinimumAmountOfCandles => 120;
         public override Period IdealPeriod => Period.Hour;
+
+        public string BuyMessage => "Ichimoku: *Positive cloud break*\nTrend reversal to the *upside* is near.";
+        public string SellMessage => "Ichimoku: *Negative cloud break*\nTrend reversal to the *downside* is near.";
 
         public override List<TradeAdvice> Prepare(List<Candle> candles)
         {

@@ -8,11 +8,14 @@ using Mynt.Core.Models;
 
 namespace Mynt.Core.Strategies.Simple
 {
-    public class RsiOversoldOverbought : BaseStrategy
+    public class RsiOversoldOverbought : BaseStrategy, INotificationTradingStrategy
     {
         public override string Name => "RSI Oversold/Overbought";
         public override int MinimumAmountOfCandles => 14;
         public override Period IdealPeriod => Period.Hour;
+
+        public string BuyMessage => "RSI: *Oversold*\nTrend reversal to the *upside* is near.";
+        public string SellMessage => "RSI: *Overbought*\nTrend reversal to the *downside* is near.";
 
         public override List<TradeAdvice> Prepare(List<Candle> candles)
         {

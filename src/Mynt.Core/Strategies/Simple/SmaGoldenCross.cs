@@ -8,11 +8,14 @@ using Mynt.Core.Models;
 
 namespace Mynt.Core.Strategies.Simple
 {
-    public class SmaGoldenCross : BaseStrategy
+    public class SmaGoldenCross : BaseStrategy, INotificationTradingStrategy
     {
         public override string Name => "SMA 50/200 Golden Cross";
         public override int MinimumAmountOfCandles => 200;
         public override Period IdealPeriod => Period.Hour;
+
+        public string BuyMessage => "Golden Cross: *Crossover*\nTrend reversal to the *upside* is near.";
+        public string SellMessage => "Golden Cross: *Crossunder*\nTrend reversal to the *downside* is near.";
 
         public override List<TradeAdvice> Prepare(List<Candle> candles)
         {

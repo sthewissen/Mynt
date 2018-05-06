@@ -8,11 +8,14 @@ using Mynt.Core.Models;
 
 namespace Mynt.Core.Strategies.Simple
 {
-    public class MacdCross : BaseStrategy
+    public class MacdCross : BaseStrategy, INotificationTradingStrategy
     {
         public override string Name => "MACD X";
         public override int MinimumAmountOfCandles => 26;
         public override Period IdealPeriod => Period.Hour;
+
+        public string BuyMessage => "MACD: *Oversold*\nTrend reversal to the *upside* is near.";
+        public string SellMessage => "MACD: *Overbought*\nTrend reversal to the *downside* is near.";
 
         public override List<TradeAdvice> Prepare(List<Candle> candles)
         {
