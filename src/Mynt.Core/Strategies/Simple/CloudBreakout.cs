@@ -6,7 +6,7 @@ using Mynt.Core.Indicators;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
 
-namespace Mynt.Core.Strategies
+namespace Mynt.Core.Strategies.Simple
 {
     public class CloudBreakout : BaseStrategy
     {

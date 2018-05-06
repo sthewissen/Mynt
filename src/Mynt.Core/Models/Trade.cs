@@ -9,9 +9,7 @@ namespace Mynt.Core.Models
         public int Id { get; set; }
 
         public string TradeId { get; set; }
-
         public string TraderId { get; set; }
-        
         public string Market { get; set; }
 
         public decimal OpenRate { get; set; }

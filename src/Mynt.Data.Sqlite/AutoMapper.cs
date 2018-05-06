@@ -30,11 +30,9 @@ namespace Mynt.Data.Sqlite
 
             CreateMap<Trade, TradeAdapter>();
 
-            CreateMap<TraderAdapter, Trader>()
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.TraderId));
+            CreateMap<TraderAdapter, Trader>();
 
-            CreateMap<Trader, TraderAdapter>()
-                .ForMember(dest => dest.TraderId, opt => opt.MapFrom(src => src.Id));
+            CreateMap<Trader, TraderAdapter>();
         }
     }
 }
