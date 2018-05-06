@@ -94,7 +94,7 @@ namespace Mynt.Core.Exchanges
                         Ask = summary.Value.Ask,
                         Bid = summary.Value.Bid,
                         Last = summary.Value.Last,
-                        Volume = summary.Value.Volume.QuantityAmount,
+                        Volume = summary.Value.Volume.ConvertedVolume,
                     });
                 }
 
@@ -172,7 +172,7 @@ namespace Mynt.Core.Exchanges
                     Ask = ticker.Ask,
                     Bid = ticker.Bid,
                     Last = ticker.Last,
-                    Volume = ticker.Volume.QuantityAmount
+                    Volume = ticker.Volume.ConvertedVolume
                 };
 
             return null;
@@ -190,7 +190,7 @@ namespace Mynt.Core.Exchanges
                     Low = x.LowPrice,
                     Open = x.OpenPrice,
                     Timestamp = x.Timestamp,
-                    Volume = (decimal)x.VolumeQuantity
+                    Volume = (decimal)x.ConvertedVolume
                 }).ToList();
 
             return new List<Candle>();
@@ -208,7 +208,7 @@ namespace Mynt.Core.Exchanges
                     Low = x.LowPrice,
                     Open = x.OpenPrice,
                     Timestamp = x.Timestamp,
-                    Volume = (decimal)x.VolumeQuantity
+                    Volume = (decimal)x.ConvertedVolume
                 }).ToList();
 
             return new List<Candle>();
