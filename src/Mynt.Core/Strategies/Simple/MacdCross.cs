@@ -11,7 +11,7 @@ namespace Mynt.Core.Strategies.Simple
     public class MacdCross : BaseStrategy, INotificationTradingStrategy
     {
         public override string Name => "MACD X";
-        public override int MinimumAmountOfCandles => 26;
+        public override int MinimumAmountOfCandles => 50;
         public override Period IdealPeriod => Period.Hour;
 
         public string BuyMessage => "MACD: *Oversold*\nTrend reversal to the *upside* is near.";
@@ -21,7 +21,7 @@ namespace Mynt.Core.Strategies.Simple
         {
             var result = new List<TradeAdvice>();
 
-            var macd = candles.Macd(14);
+            var macd = candles.Macd();
             var crossUnder = macd.Macd.Crossunder(macd.Signal);
             var crossOver = macd.Macd.Crossover(macd.Signal);
 

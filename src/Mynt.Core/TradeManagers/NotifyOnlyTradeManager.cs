@@ -103,12 +103,7 @@ namespace Mynt.Core.TradeManagers
                 {
                     if (item.TradeAdvice != TradeAdvice.Hold)
                     {
-                        pairs.Add(new TradeSignal()
-                        {
-                            MarketName = market.MarketName,
-                            TradeAdvice = item.TradeAdvice,
-                            SignalCandle = item.SignalCandle
-                        });
+                        pairs.Add(item);
                     }
                 }
             }

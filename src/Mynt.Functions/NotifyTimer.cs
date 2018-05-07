@@ -46,10 +46,7 @@ namespace Mynt.Functions
                     new TelegramNotificationManager(telegramNotificationOptions),
                     logger,
                     tradeOptions,
-                    new RsiOversoldOverbought(),
-                    new MacdCross(),
-                    new SmaGoldenCross(),
-                    new CloudBreakout());
+                    new RsiOversoldOverbought());
 
                 // Start running this thing!
                 await tradeManager.LookForNewTrades();
