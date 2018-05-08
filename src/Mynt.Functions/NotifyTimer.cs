@@ -24,7 +24,7 @@ namespace Mynt.Functions
             ApplicationHelper.Startup();
         }
 
-        [FunctionName("NotifyTimer")]
+        [Disable, FunctionName("NotifyTimer")]
         public static async Task Run([TimerTrigger("10 1 * * * *")]TimerInfo notifyTimer, TraceWriter log)
         {
             var serilogger = new LoggerConfiguration().WriteTo.TraceWriter(log).CreateLogger();
