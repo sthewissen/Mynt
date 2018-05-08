@@ -94,6 +94,10 @@ namespace Mynt.Core.TradeManagers
             foreach (var market in _settings.MarketBlackList)
                 markets.RemoveAll(x => x.CurrencyPair.BaseCurrency == market);
 
+            // If there are items on the only trade list remove the rest
+            foreach (var item in _settings.OnlyTradeList)
+                markets.RemoveAll(x => x.CurrencyPair.BaseCurrency != item);
+
             // Prioritize markets with high volume.
             foreach (var market in markets.Distinct().OrderByDescending(x => x.Volume).ToList())
             {

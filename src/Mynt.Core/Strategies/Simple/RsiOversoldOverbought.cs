@@ -11,7 +11,7 @@ namespace Mynt.Core.Strategies.Simple
     public class RsiOversoldOverbought : BaseStrategy, INotificationTradingStrategy
     {
         public override string Name => "RSI Oversold/Overbought";
-        public override int MinimumAmountOfCandles => 20;
+        public override int MinimumAmountOfCandles => 200;
         public override Period IdealPeriod => Period.Hour;
 
         public string BuyMessage => "RSI: *Oversold*\nTrend reversal to the *upside* is near.";
