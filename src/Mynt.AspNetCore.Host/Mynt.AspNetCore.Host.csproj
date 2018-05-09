@@ -10,18 +10,26 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\" />
+    <Folder Include="wwwroot\css\" />
+    <Folder Include="wwwroot\images\" />
+    <Folder Include="wwwroot\lib\" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore" Version="2.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Hosting.WindowsServices" Version="2.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="2.0.2" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.BrowserLink" Version="2.0.2" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.0.3" />
     <PackageReference Include="ncrontab" Version="3.3.0" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="2.0.2" />
     <PackageReference Include="Serilog.Settings.Configuration" Version="2.6.1" />
     <PackageReference Include="Serilog.Sinks.Async" Version="1.1.0" />
-    <PackageReference Include="Serilog.Sinks.RollingFile" Version="3.3.0" />
+    <PackageReference Include="Serilog.Sinks.RollingFile" Version="3.3.0" />  
+    <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.0.2" />
   </ItemGroup>
 
   <ItemGroup>
@@ -30,7 +38,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Mynt.Core\Mynt.Core.csproj" />
-    <ProjectReference Include="..\..\src\Mynt.Data.AzureTableStorage\Mynt.Data.AzureTableStorage.csproj" />
+    <ProjectReference Include="..\Mynt.Data.SqlServer\Mynt.Data.SqlServer.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,0 +1,9 @@
+﻿
+@if (@ViewBag.log != null)
+{
+    foreach (string line in ViewBag.log)
+    {
+        @line
+        <br />
+    }
+}

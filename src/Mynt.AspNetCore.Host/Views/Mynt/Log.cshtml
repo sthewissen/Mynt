@@ -1,0 +1,17 @@
+﻿@page
+
+@{
+    ViewBag.Title = "Mynt - Log";
+}
+
+
+<h1 class="mt-5">Log</h1>
+<div class="container">
+    @if (@ViewBag.log != null)
+    {
+        foreach (string line in ViewBag.log)
+        {
+            @line <br/>
+        }
+    }
+</div>

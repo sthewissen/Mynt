@@ -1,0 +1,36 @@
+﻿@{
+    ViewBag.Title = "Mynt - trading bot";
+}
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    <link rel="icon" type="image/x-icon" class="js-site-favicon" href="~/images/favicon.ico">
+    <link rel="stylesheet" href="~/css/Style.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+</head>
+
+<body>
+    <!-- Begin nav content -->
+    @Html.Partial("Nav/Nav")
+
+    <!-- Begin page content -->
+    <main role="main" class="container">
+        <div>
+            @RenderBody()
+        </div>
+    </main>
+    
+    <!-- Begin footer content -->
+    @Html.Partial("Footer/Footer")
+
+    
+    <!-- Begin scripts -->
+    <script src="~/js/Script.js"></script>
+    <script src="~/lib/jquery/dist/jquery.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+
+</body>
+</html>
