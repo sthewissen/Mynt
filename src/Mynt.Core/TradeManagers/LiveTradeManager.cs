@@ -292,8 +292,9 @@ namespace Mynt.Core.TradeManagers
                  _settings.QuoteCurrency.ToUpper() == x.CurrencyPair.QuoteCurrency.ToUpper()).ToList();
 
             // If there are items on the only trade list remove the rest
-            foreach (var item in _settings.OnlyTradeList)
-                markets.RemoveAll(x => x.CurrencyPair.BaseCurrency != item);
+            markets = markets.Where(m => _settings.OnlyTradeList
+                                            .Any(c => c == m.CurrencyPair.BaseCurrency))
+                             .ToList();
 
             // Remove existing trades from the list to check.
             foreach (var trade in _activeTrades)
