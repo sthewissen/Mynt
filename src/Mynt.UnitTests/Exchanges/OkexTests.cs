@@ -18,7 +18,7 @@ namespace Mynt.UnitTests
             var exchange = new BaseExchange(new ExchangeOptions { Exchange = Exchange.Okex, ApiKey = "NONE", ApiSecret = "NONE", PassPhrase = "NONE" });
 
             // Act
-            var markets = await exchange.GetMarketSummaries("BTC");
+			var markets = await exchange.GetMarketSummaries("BTC");
 
             // Assert
             markets.Count.ShouldBeGreaterThan(0);

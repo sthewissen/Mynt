@@ -95,8 +95,8 @@ namespace Mynt.Core.Exchanges
 
 		public async Task<List<Models.MarketSummary>> GetMarketSummaries(string quoteCurrency)
 		{
-			if (_exchange == Exchange.Huobi)
-				return await GetHuobiMarketSummaries(quoteCurrency);
+			if (_exchange == Exchange.Huobi || _exchange == Exchange.Okex)
+				return await GetExtendedMarketSummaries(quoteCurrency);
 
 			var summaries = await _api.GetTickersAsync();
 
@@ -265,13 +265,14 @@ namespace Mynt.Core.Exchanges
 
 		#region non-default implementations
 
-		private async Task<List<Models.MarketSummary>> GetHuobiMarketSummaries(string quoteCurrency)
+		private async Task<List<Models.MarketSummary>> GetExtendedMarketSummaries(string quoteCurrency)
 		{
 			var summaries = new List<Models.MarketSummary>();
 			var symbols = await _api.GetSymbolsMetadataAsync();
 			var list = await _api.GetSymbolsAsync();
+			var filteredList = list.Where(x => x.ToLower().EndsWith(quoteCurrency.ToLower(), StringComparison.Ordinal));
 
-			foreach (var item in list.Where(x => x.ToLower().EndsWith(quoteCurrency.ToLower())))
+			foreach (var item in filteredList)
 			{
 				var ticker = await _api.GetTickerAsync(item);
 				var symbol = symbols.FirstOrDefault(x => x.MarketName == item);
