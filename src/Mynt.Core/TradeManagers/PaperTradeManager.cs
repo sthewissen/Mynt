@@ -18,15 +18,17 @@ namespace Mynt.Core.TradeManagers
 		private List<Trade> _activeTrades;
 		private List<Trader> _currentTraders;
 		private readonly IDataStore _dataStore;
+		private readonly OrderBehavior _orderBehavior;
 		private readonly TradeOptions _settings;
 
-		public PaperTradeManager(IExchangeApi api, ITradingStrategy strategy, INotificationManager notificationManager, ILogger logger, TradeOptions settings, IDataStore dataStore, BuyBehavior buyBehavior = BuyBehavior.AlwaysFill)
+		public PaperTradeManager(IExchangeApi api, ITradingStrategy strategy, INotificationManager notificationManager, ILogger logger, TradeOptions settings, IDataStore dataStore, OrderBehavior orderBehavior = OrderBehavior.AlwaysFill)
 		{
 			_api = api;
 			_strategy = strategy;
 			_logger = logger;
 			_notification = notificationManager;
 			_dataStore = dataStore;
+			_orderBehavior = orderBehavior;
 			_settings = settings;
 
 			if (_api == null) throw new ArgumentException("Invalid exchange provided...");
@@ -127,7 +129,7 @@ namespace Mynt.Core.TradeManagers
 			_logger.LogInformation($"Looking for trades using {_strategy.Name}");
 
 			// This means an order to buy has been open for an entire buy cycle.
-			if (_settings.CancelUnboughtOrdersEachCycle)
+			if (_settings.CancelUnboughtOrdersEachCycle && _orderBehavior == OrderBehavior.CheckMarket)
 				await CancelUnboughtOrders();
 
 			// Check active trades against our strategy.
@@ -491,7 +493,7 @@ namespace Mynt.Core.TradeManagers
 
 				// This means the order probably would've gotten filled...
 				// We have no other way to check this, because no actual orders are being placed.
-				if (candle != null && (trade.OpenRate >= candle.High || (trade.OpenRate >= candle.Low && trade.OpenRate <= candle.High)))
+				if (candle != null && (trade.OpenRate >= candle.High || (trade.OpenRate >= candle.Low && trade.OpenRate <= candle.High) || _orderBehavior == OrderBehavior.AlwaysFill))
 				{
 					trade.OpenOrderId = null;
 					trade.IsBuying = false;
@@ -536,7 +538,7 @@ namespace Mynt.Core.TradeManagers
 
 				// This means the order probably would've gotten filled...
 				// We have no other way to check this, because no actual orders are being placed.
-				if (candle != null && (order.CloseRate <= candle.Low || (order.CloseRate >= candle.Low && order.CloseRate <= candle.High)))
+				if (candle != null && (order.CloseRate <= candle.Low || (order.CloseRate >= candle.Low && order.CloseRate <= candle.High) || _orderBehavior == OrderBehavior.AlwaysFill))
 				{
 					order.OpenOrderId = null;
 					order.IsOpen = false;
