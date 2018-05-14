@@ -49,6 +49,9 @@ namespace Mynt.Core.Exchanges
 				case Exchange.Cryptopia:
 					_api = new ExchangeSharp.ExchangeCryptopiaAPI();
 					break;
+                case Exchange.Kucoin:
+                    _api = new ExchangeSharp.ExchangeKucoinAPI();
+                    break;
 			}
 
 			_api.LoadAPIKeysUnsecure(options.ApiKey, options.ApiSecret, options.PassPhrase);
@@ -290,8 +293,8 @@ namespace Mynt.Core.Exchanges
 					});
 				}
 			}
-
-			return summaries;
+            
+ 			return summaries;
 		}
 
 		#endregion

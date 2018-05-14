@@ -11,6 +11,7 @@ namespace Mynt.Core.Enums
 		HitBtc = 5,
 		Gdax = 6,
 		Okex = 7,
-		Cryptopia = 8
+		Cryptopia = 8,
+        Kucoin = 9
 	}
 }
