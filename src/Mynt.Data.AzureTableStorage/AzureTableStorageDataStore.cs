@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
+using Mynt.Core.Enums;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
 
@@ -33,6 +34,22 @@ namespace Mynt.Data.AzureTableStorage
             await table.CreateIfNotExistsAsync();
 
             return table;
+        }
+
+        public async Task<List<Trade>> GetAllTradesNotCancelledAsync()
+        {
+            var query = new TableQuery<TradeAdapter>().Where(TableQuery.GenerateFilterConditionForInt("SellType", QueryComparisons.NotEqual, (int)SellType.Cancelled));
+            TableContinuationToken token = null;
+            var items = new List<TradeAdapter>();
+            do
+            {
+                var results = await _orderTable.ExecuteQuerySegmentedAsync(query, token);
+                items.AddRange(results);
+                token = results.ContinuationToken;
+            } while (token != null);
+
+            var destination = Mapping.Mapper.Map<List<Trade>>(items);
+            return destination;
         }
 
         public async Task<List<Trader>> GetTradersAsync()

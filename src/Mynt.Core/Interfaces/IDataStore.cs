@@ -20,5 +20,7 @@ namespace Mynt.Core.Interfaces
         Task<List<Trader>> GetAvailableTradersAsync();
         Task SaveTradersAsync(List<Trader> traders);
         Task SaveTraderAsync(Trader trader);
+
+        Task<List<Trade>> GetAllTradesNotCancelledAsync();
     }
 }

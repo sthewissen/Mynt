@@ -12,6 +12,7 @@ using Mynt.Core.Notifications;
 using Mynt.Data.AzureTableStorage;
 using Serilog;
 using Serilog.Sinks.AzureWebJobsTraceWriter;
+using System.Linq;
 
 namespace Mynt.Functions
 {
@@ -23,7 +24,7 @@ namespace Mynt.Functions
         }
 
         [FunctionName("OverviewTimer")]
-        public static async Task Run([TimerTrigger("0 0 * * * *")]TimerInfo overviewTimer, TraceWriter log)
+        public static async Task Run([TimerTrigger("0 * * * * *")]TimerInfo overviewTimer, TraceWriter log)
         {
             var logger = new LoggerConfiguration().WriteTo.TraceWriter(log).CreateLogger();
 
@@ -42,8 +43,8 @@ namespace Mynt.Functions
 
                 var telegram = new TelegramNotificationManager(telegramNotificationOptions);
 
-                await SendTradeOverviewMessage(telegram, dataStore);
-                await SendProfitText(telegram, dataStore);
+                await SendOpenedTradesProfitText(telegram, dataStore);
+                await SendClosedTradesProfitText(telegram, dataStore);
 
                 logger.Information("Done...");
             }
@@ -57,31 +58,40 @@ namespace Mynt.Functions
             }
         }
 
-        private static async Task SendProfitText(INotificationManager notificationManager, IDataStore dataStore)
+        private static async Task SendClosedTradesProfitText(INotificationManager notificationManager, IDataStore dataStore)
         {
-            var traders = await dataStore.GetTradersAsync();
-
-            if (traders.Count > 0)
-            {
-                var balance = traders.Sum(x => x.CurrentBalance);
-                var stake = traders.Sum(x => x.StakeAmount);
-
-                if (balance - stake == 0)
-                    return;
-
-                await notificationManager.SendNotification($"Current profit is {(balance - stake):0.00000000} BTC ({(((balance - stake) / stake) * 100):0.00}%)");
-            }
-        }
-
-        private static async Task SendTradeOverviewMessage(INotificationManager notificationManager, IDataStore dataStore)
-        {
-            var trades = await dataStore.GetActiveTradesAsync();
+            var trades = await dataStore.GetAllTradesNotCancelledAsync();
+            trades = trades.Where(x => x.CloseDate.HasValue == true).OrderBy(x => x.CloseDate).ToList();
 
             if (trades.Count > 0)
             {
                 var exchangeOptions = AppSettings.Get<ExchangeOptions>();
                 var exchange = new BaseExchange(exchangeOptions);
                 var stringResult = new StringBuilder();
+                stringResult.AppendLine("*** Closed Trades Profit ***");
+
+                foreach (var item in trades)
+                {
+                    stringResult.AppendLine($"#{item.Market}: *{item.CloseProfitPercentage:0.00}%* opened {item.OpenDate.Humanize()} at {item.OpenRate:0.00000000} BTC closed {item.CloseDate.Humanize()} at {item.CloseRate:0.00000000} BTC");
+                }
+
+                stringResult.AppendLine($"*Current profit is {trades.Sum(x => x.CloseProfit):0.00000000} BTC ({(trades.Sum(x => x.CloseProfitPercentage)):0.00}%)*");
+
+                await notificationManager.SendNotification(stringResult.ToString());
+            }                       
+        }
+
+        private static async Task SendOpenedTradesProfitText(INotificationManager notificationManager, IDataStore dataStore)
+        {
+            var trades = await dataStore.GetAllTradesNotCancelledAsync();
+            trades = trades.Where(x => x.CloseDate.HasValue == false).ToList();
+
+            if (trades.Count > 0)
+            {
+                var exchangeOptions = AppSettings.Get<ExchangeOptions>();
+                var exchange = new BaseExchange(exchangeOptions);
+                var stringResult = new StringBuilder();
+                stringResult.AppendLine("*** Opened Trades Profit ***");
 
                 foreach (var item in trades)
                 {
