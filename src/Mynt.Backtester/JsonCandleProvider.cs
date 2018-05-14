@@ -24,10 +24,18 @@ namespace Mynt.Backtester
             var basePath = AppDomain.CurrentDomain.BaseDirectory;
             var filePath = Path.Combine(basePath, $"{folder}/{symbol}.db");
 
+            DateTime startDate = Convert.ToDateTime(Program.BacktestOptions.StartDate);
+            DateTime endDate = DateTime.UtcNow;
+
+            if (Program.BacktestOptions.EndDate != null && Program.BacktestOptions.EndDate != "")
+            {
+                endDate = Convert.ToDateTime(Program.BacktestOptions.EndDate);
+            }
+
             LiteDatabase database = new LiteDatabase(filePath);
             LiteCollection<Candle> candleCollection = database.GetCollection<Candle>("Candle_" + period);
             candleCollection.EnsureIndex("Timestamp");
-            List<Candle> candles = candleCollection.Find(Query.All("Timestamp", Query.Ascending)).ToList();
+            List<Candle> candles = candleCollection.Find(Query.Between("Timestamp", startDate, endDate)).ToList();
 
             if (!File.Exists(filePath))
                 throw new FileNotFoundException($"The .db '{filePath}' file used to load the candles from was not found.");

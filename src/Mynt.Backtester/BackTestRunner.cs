@@ -19,11 +19,12 @@ namespace Mynt.Backtester
 
                 // This creates a list of buy signals.
                 var candles = candleProvider.GetCandles(pair, Program.BacktestOptions.CandlePeriod);
-                var trend = strategy.Prepare(candles);
-
                 var backTestResult = new BackTestResult { Market = pair };
+
                 try
                 {
+                    var trend = strategy.Prepare(candles);
+
                     for (int i = 0; i < trend.Count; i++)
                     {
                         if (trend[i] == TradeAdvice.Buy)

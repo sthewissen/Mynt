@@ -11,5 +11,6 @@ namespace Mynt.Backtester
         public int CandlePeriod { get; set; } = 60;
         public bool UpdateCandles { get; set; } = true;
         public string StartDate { get; set; } = "2018-01-01";
+        public string EndDate { get; set; } = null;
     }
 }
