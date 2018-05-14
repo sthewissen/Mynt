@@ -15,13 +15,10 @@ namespace Mynt.Data.MongoDB
         private IMongoCollection<TraderAdapter> traderAdapter;
         private IMongoCollection<TradeAdapter> ordersAdapter;
 
-        //private readonly MyntDbContext _context;
-
-        public MongoDBDataStore()
+        public MongoDBDataStore(MongoDBOptions options)
         {
-            //_context = new MyntDbContext(options.SqliteConnectionString);
-            client = new MongoClient("mongodb://127.0.0.1:27017");
-            database = client.GetDatabase("Mynt");
+			client = new MongoClient(options.MongoUrl);
+            database = client.GetDatabase(options.MongoDatabaseName);
             ordersAdapter = database.GetCollection<TradeAdapter>("Orders");
             traderAdapter = database.GetCollection<TraderAdapter>("Trader");
         }
