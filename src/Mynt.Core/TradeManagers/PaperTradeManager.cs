@@ -20,7 +20,7 @@ namespace Mynt.Core.TradeManagers
 		private readonly IDataStore _dataStore;
 		private readonly TradeOptions _settings;
 
-		public PaperTradeManager(IExchangeApi api, ITradingStrategy strategy, INotificationManager notificationManager, ILogger logger, TradeOptions settings, IDataStore dataStore)
+		public PaperTradeManager(IExchangeApi api, ITradingStrategy strategy, INotificationManager notificationManager, ILogger logger, TradeOptions settings, IDataStore dataStore, BuyBehavior buyBehavior = BuyBehavior.AlwaysFill)
 		{
 			_api = api;
 			_strategy = strategy;
