@@ -6,6 +6,56 @@
 
   <ItemGroup>
     <Compile Remove="Class1.cs" />
+    <Compile Remove="Strategies\AdxMomentum.cs" />
+    <Compile Remove="Strategies\AdxSmas.cs" />
+    <Compile Remove="Strategies\AwesomeMacd.cs" />
+    <Compile Remove="Strategies\AwesomeSma.cs" />
+    <Compile Remove="Strategies\Base150.cs" />
+    <Compile Remove="Strategies\BbandRsi.cs" />
+    <Compile Remove="Strategies\BigThree.cs" />
+    <Compile Remove="Strategies\BollingerAwe.cs" />
+    <Compile Remove="Strategies\BreakoutMa.cs" />
+    <Compile Remove="Strategies\BullishEngulfing.cs" />
+    <Compile Remove="Strategies\CciEma.cs" />
+    <Compile Remove="Strategies\CciRsi.cs" />
+    <Compile Remove="Strategies\CciScalper.cs" />
+    <Compile Remove="Strategies\DerivativeOscillator.cs" />
+    <Compile Remove="Strategies\DoubleVolatility.cs" />
+    <Compile Remove="Strategies\EmaAdx.cs" />
+    <Compile Remove="Strategies\EmaAdxF.cs" />
+    <Compile Remove="Strategies\EmaAdxMacd.cs" />
+    <Compile Remove="Strategies\EmaAdxSmall.cs" />
+    <Compile Remove="Strategies\EmaCross.cs" />
+    <Compile Remove="Strategies\EmaStochRsi.cs" />
+    <Compile Remove="Strategies\FaMaMaMa.cs" />
+    <Compile Remove="Strategies\FifthElement.cs" />
+    <Compile Remove="Strategies\FisherTransform.cs" />
+    <Compile Remove="Strategies\Fractals.cs" />
+    <Compile Remove="Strategies\FreqModded.cs" />
+    <Compile Remove="Strategies\FreqTrade.cs" />
+    <Compile Remove="Strategies\MacdSma.cs" />
+    <Compile Remove="Strategies\MacdTema.cs" />
+    <Compile Remove="Strategies\Momentum.cs" />
+    <Compile Remove="Strategies\PowerRanger.cs" />
+    <Compile Remove="Strategies\QuickSma.cs" />
+    <Compile Remove="Strategies\Replex.cs" />
+    <Compile Remove="Strategies\RsiBbands.cs" />
+    <Compile Remove="Strategies\RsiMacd.cs" />
+    <Compile Remove="Strategies\RsiMacdAwesome.cs" />
+    <Compile Remove="Strategies\RsiMacdMfi.cs" />
+    <Compile Remove="Strategies\RsiSarAwesome.cs" />
+    <Compile Remove="Strategies\SarAwesome.cs" />
+    <Compile Remove="Strategies\SarRsi.cs" />
+    <Compile Remove="Strategies\SarStoch.cs" />
+    <Compile Remove="Strategies\SimpleBearBull.cs" />
+    <Compile Remove="Strategies\SmaCrossover.cs" />
+    <Compile Remove="Strategies\SmaSar.cs" />
+    <Compile Remove="Strategies\SmaStochRsi.cs" />
+    <Compile Remove="Strategies\StochAdx.cs" />
+    <Compile Remove="Strategies\ThreeMAgos.cs" />
+    <Compile Remove="Strategies\TripleMa.cs" />
+    <Compile Remove="Strategies\Wvf.cs" />
+    <Compile Remove="Strategies\WvfExtended.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Indicators\" />
