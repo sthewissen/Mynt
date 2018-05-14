@@ -36,6 +36,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "experimental", "experimenta
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.ResistanceSupport", "Mynt.ResistanceSupport\Mynt.ResistanceSupport.csproj", "{65068D9C-A149-4960-AF50-0BBD6F7E09F8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.Data.MongoDB", "Mynt.Data.MongoDB\Mynt.Data.MongoDB.csproj", "{ED32E689-FACD-4DEA-80EE-639241C92AD5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -78,6 +80,10 @@ Global
 		{65068D9C-A149-4960-AF50-0BBD6F7E09F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{65068D9C-A149-4960-AF50-0BBD6F7E09F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{65068D9C-A149-4960-AF50-0BBD6F7E09F8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED32E689-FACD-4DEA-80EE-639241C92AD5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED32E689-FACD-4DEA-80EE-639241C92AD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED32E689-FACD-4DEA-80EE-639241C92AD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED32E689-FACD-4DEA-80EE-639241C92AD5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -92,6 +98,7 @@ Global
 		{ADF7D7B5-B761-4CCD-9E9E-E29059D6686B} = {605E0963-7988-4131-9D8C-E824F339AA91}
 		{022A5DC4-1CFC-42DC-9027-47C78A981DEA} = {605E0963-7988-4131-9D8C-E824F339AA91}
 		{65068D9C-A149-4960-AF50-0BBD6F7E09F8} = {9ECA0F3A-981A-4643-9632-137F39D8BB8F}
+		{ED32E689-FACD-4DEA-80EE-639241C92AD5} = {F34057AE-AC0B-4A0B-8B26-71FB4DC7F474}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AFCCB5C5-80F3-4AE8-B21C-2007C408EBCD}
