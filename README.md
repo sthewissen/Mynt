@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/sthewissen/Mynt/master/img/myntlogo.png" alt="Mynt" width="400" />
+<img src="https://raw.githubusercontent.com/sthewissen/Mynt/master/img/myntlogo.png" alt="Mynt" height="200" />
 
 Welcome to the Mynt cryptocurrency trade bot! This bot enables you to trade cryptocurrencies in an automated fashion and comes with a lot of different configuration options. It is a .NET based trade bot that runs at set intervals to find trades and monitor them for sell conditions.
 
