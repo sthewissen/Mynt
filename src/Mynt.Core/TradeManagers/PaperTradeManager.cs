@@ -241,7 +241,7 @@ namespace Mynt.Core.TradeManagers
 		private async Task<List<TradeSignal>> FindBuyOpportunities()
 		{
 			// Retrieve our current markets
-			var markets = await _api.GetMarketSummaries();
+			var markets = await _api.GetMarketSummaries(_settings.QuoteCurrency);
 			var pairs = new List<TradeSignal>();
 
 			// Check if there are markets matching our volume.

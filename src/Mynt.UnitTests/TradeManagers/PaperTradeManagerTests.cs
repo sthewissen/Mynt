@@ -68,8 +68,6 @@ namespace Mynt.UnitTests.TradeManagers
         }
 
         #endregion
-        
-
-    
+            
     }
 }

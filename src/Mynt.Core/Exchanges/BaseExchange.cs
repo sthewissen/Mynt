@@ -54,6 +54,8 @@ namespace Mynt.Core.Exchanges
 			_api.LoadAPIKeysUnsecure(options.ApiKey, options.ApiSecret, options.PassPhrase);
 		}
 
+		#region default implementations
+
 		public async Task<string> Buy(string market, decimal quantity, decimal rate)
 		{
 			var request = new ExchangeSharp.ExchangeOrderRequest()
@@ -91,11 +93,14 @@ namespace Mynt.Core.Exchanges
 				return new AccountBalance(currency, 0, 0);
 		}
 
-		public async Task<List<Models.MarketSummary>> GetMarketSummaries()
+		public async Task<List<Models.MarketSummary>> GetMarketSummaries(string quoteCurrency)
 		{
-			var summaries = (await _api.GetTickersAsync()).ToList();
+			if (_exchange == Exchange.Huobi)
+				return await GetHuobiMarketSummaries(quoteCurrency);
 
-			if (summaries.Count > 0)
+			var summaries = await _api.GetTickersAsync();
+
+			if (summaries.Any())
 			{
 				var result = new List<Models.MarketSummary>();
 
@@ -121,9 +126,9 @@ namespace Mynt.Core.Exchanges
 
 		public async Task<List<OpenOrder>> GetOpenOrders(string market)
 		{
-			var orders = (await _api.GetOpenOrderDetailsAsync(market)).ToList();
+			var orders = await _api.GetOpenOrderDetailsAsync(market);
 
-			if (orders.Count > 0)
+			if (orders.Count() > 0)
 			{
 				return orders.Select(x => new OpenOrder
 				{
@@ -195,9 +200,9 @@ namespace Mynt.Core.Exchanges
 
 		public async Task<List<Candle>> GetTickerHistory(string market, Period period, DateTime startDate, DateTime? endDate = null)
 		{
-			var ticker = (await _api.GetCandlesAsync(market, period.ToMinutesEquivalent() * 60, startDate, endDate)).ToList();
+			var ticker = await _api.GetCandlesAsync(market, period.ToMinutesEquivalent() * 60, startDate, endDate);
 
-			if (ticker.Count > 0)
+			if (ticker.Any())
 				return ticker.Select(x => new Candle
 				{
 					Close = x.ClosePrice,
@@ -213,9 +218,9 @@ namespace Mynt.Core.Exchanges
 
 		public async Task<List<Candle>> GetTickerHistory(string market, Period period, int length)
 		{
-			var ticker = (await _api.GetCandlesAsync(market, period.ToMinutesEquivalent() * 60, null, null, length)).ToList();
+			var ticker = await _api.GetCandlesAsync(market, period.ToMinutesEquivalent() * 60, null, null, length);
 
-			if (ticker.Count() > 0)
+			if (ticker.Any())
 				return ticker.Select(x => new Candle
 				{
 					Close = x.ClosePrice,
@@ -255,5 +260,40 @@ namespace Mynt.Core.Exchanges
 
 			return _exchangeInfo.FirstOrDefault(x => x.MarketName == symbol);
 		}
+
+		#endregion
+
+		#region non-default implementations
+
+		private async Task<List<Models.MarketSummary>> GetHuobiMarketSummaries(string quoteCurrency)
+		{
+			var summaries = new List<Models.MarketSummary>();
+			var symbols = await _api.GetSymbolsMetadataAsync();
+			var list = await _api.GetSymbolsAsync();
+
+			foreach (var item in list.Where(x => x.ToLower().EndsWith(quoteCurrency.ToLower())))
+			{
+				var ticker = await _api.GetTickerAsync(item);
+				var symbol = symbols.FirstOrDefault(x => x.MarketName == item);
+
+				if (symbol != null)
+				{
+					summaries.Add(new Models.MarketSummary()
+					{
+						CurrencyPair = new CurrencyPair() { BaseCurrency = symbol.MarketCurrency, QuoteCurrency = symbol.BaseCurrency },
+						MarketName = item,
+						Ask = ticker.Ask,
+						Bid = ticker.Bid,
+						Last = ticker.Last,
+						Volume = ticker.Volume.ConvertedVolume,
+					});
+				}
+			}
+
+			return summaries;
+		}
+
+		#endregion
+
 	}
 }

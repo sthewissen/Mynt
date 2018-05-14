@@ -14,7 +14,7 @@ namespace Mynt.Core.Interfaces
 
         Task<AccountBalance> GetBalance(string currency);
 
-        Task<List<MarketSummary>> GetMarketSummaries();
+        Task<List<MarketSummary>> GetMarketSummaries(string quoteCurrency);
 
         Task<Order> GetOrder(string orderId, string market);
 
