@@ -6,7 +6,7 @@ namespace Mynt.Data.Sqlite
     public class TraderAdapter
     {
         [Key]
-        public int Id { get; set; }
+        public int TraderId { get; set; }
 
         public string Identifier { get; set; }
         public double StakeAmount { get; set; }

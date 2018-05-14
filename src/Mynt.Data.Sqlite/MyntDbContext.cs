@@ -7,11 +7,6 @@ namespace Mynt.Data.Sqlite
     {
         private string _connectionString;
 
-        public MyntDbContext()
-        {
-            _connectionString = new SqliteOptions().SqliteConnectionString;
-        }
-
         public MyntDbContext(string connectionString)
         {
             _connectionString = connectionString;

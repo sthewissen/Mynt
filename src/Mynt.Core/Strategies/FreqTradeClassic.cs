@@ -10,9 +10,9 @@ using Mynt.Core.Models;
 
 namespace Mynt.Core.Strategies
 {
-    public class FreqModded : BaseStrategy
+    public class FreqTradeClassic : BaseStrategy
     {
-        public override string Name => "FreqModded";
+        public override string Name => "FreqTrade Classic";
         public override int MinimumAmountOfCandles => 100;
         public override Period IdealPeriod => Period.Hour;
 
@@ -25,14 +25,19 @@ namespace Mynt.Core.Strategies
             var adx = candles.Adx();
             var tema = candles.Tema(4);
             var mfi = candles.Mfi(14);
+            var sar = candles.Sar(0.02, 0.22);
+
             var cci = candles.Cci(5);
-            var rsi = candles.Rsi();
+            var stoch = candles.StochFast();
+            var bbandsLower = candles.Bbands().MiddleBand;
+            var fishers = candles.Fisher();
 
             for (int i = 0; i < candles.Count; i++)
             {
-                if (closes[i] < sma[i] && cci[i] < -100 && adx[i] > 20 && mfi[i] < 30 && rsi[i] < 25)
+                if (closes[i] < sma[i] && cci[i] < -100 && stoch.D[i] < 20 && fishers[i] < 0 &&
+                    adx[i] > 20 && mfi[i] < 30 && tema[i] <= bbandsLower[i])
                     result.Add(TradeAdvice.Buy);
-                else if (cci[i] > 100 && mfi[i] > 80 && rsi[i] > 70)
+                else if (fishers[i] == 1)
                     result.Add(TradeAdvice.Sell);
                 else
                     result.Add(TradeAdvice.Hold);
