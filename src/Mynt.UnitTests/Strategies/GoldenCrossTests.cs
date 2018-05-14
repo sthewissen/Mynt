@@ -5,7 +5,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Mynt.Core.Enums;
 using Mynt.Core.Models;
 using Mynt.Core.Strategies;
-using Mynt.Core.Strategies.Simple;
 
 namespace Mynt.UnitTests
 {
@@ -17,7 +16,7 @@ namespace Mynt.UnitTests
         public void PrepareGoldenCrossWithNullInputThrowsException()
         {
             // Arrange
-            var target = new SmaGoldenCross();
+            var target = new GoldenCross();
 
             // Act
             target.Prepare(null);
@@ -28,7 +27,7 @@ namespace Mynt.UnitTests
         public void PrepareGoldenCrossWithEmptyInputThrowsException()
         {
             // Arrange
-            var target = new SmaGoldenCross();
+            var target = new GoldenCross();
 
             // Act
             target.Prepare(new List<Candle>());
@@ -38,7 +37,7 @@ namespace Mynt.UnitTests
         public void PrepareGoldenCrossWithNoCrossoversReturnsListOfHolds()
         {
             // Arrange
-            var target = new SmaGoldenCross();
+            var target = new GoldenCross();
             var list = Enumerable.Range(1, 250).Select(_ => new Candle { Close = _ }).ToList();
 
             // Act
@@ -52,7 +51,7 @@ namespace Mynt.UnitTests
         public void PrepareGoldenCrossWithMultipleCrossoversReturnsExpectedPattern()
         {
             // Arrange
-            var target = new SmaGoldenCross();
+            var target = new GoldenCross();
 
             var list = Enumerable.Range(1, 250).
                 Select(_ => new Candle { Close = 2.0m * (decimal)Math.Sin(_) * (decimal)Math.Sin(_) }).ToList();

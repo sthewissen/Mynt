@@ -8,11 +8,6 @@ namespace Mynt.Data.SqlServer
     {
         private string _connectionString;
 
-        public MyntDbContext()
-        {
-            _connectionString = new SqlServerOptions().SqlServerConnectionString;
-        }
-
         public MyntDbContext(string connectionString)
         {
             _connectionString = connectionString;

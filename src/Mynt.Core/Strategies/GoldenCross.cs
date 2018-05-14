@@ -1,21 +1,17 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Mynt.Core.Enums;
-using Mynt.Core.Extensions;
 using Mynt.Core.Indicators;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
 
-namespace Mynt.Core.Strategies.Simple
+namespace Mynt.Core.Strategies
 {
-    public class SmaGoldenCross : BaseStrategy, INotificationTradingStrategy
+    public class GoldenCross : BaseStrategy
     {
-        public override string Name => "SMA 50/200 Golden Cross";
-        public override int MinimumAmountOfCandles => 200;
+        public override string Name => "Golden Cross";
+        public override int MinimumAmountOfCandles => 202;
         public override Period IdealPeriod => Period.Hour;
-
-        public string BuyMessage => "Golden Cross: *Crossover*\nTrend reversal to the *upside* is near.";
-        public string SellMessage => "Golden Cross: *Crossunder*\nTrend reversal to the *downside* is near.";
 
         public override List<TradeAdvice> Prepare(List<Candle> candles)
         {
@@ -24,8 +20,6 @@ namespace Mynt.Core.Strategies.Simple
 
                 var sma50 = candles.Sma(50);
                 var sma200 = candles.Sma(200);
-                var crossUnder = sma50.Crossunder(sma200);
-                var crossOver = sma50.Crossover(sma200);
 
                 for (int i = 0; i < candles.Count; i++)
                 {
@@ -33,10 +27,10 @@ namespace Mynt.Core.Strategies.Simple
                     if (i == 0)
                         result.Add(TradeAdvice.Hold);
                     // When the slow SMA moves above the fast SMA, we have a negative cross-over
-                    else if (crossUnder[i])
+                    else if (sma50[i] < sma200[i] && sma50[i - 1] > sma200[i - 1])
                         result.Add(TradeAdvice.Sell);
                     // When the fast SMA moves above the slow SMA, we have a positive cross-over
-                    else if (crossOver[i])
+                    else if (sma50[i] > sma200[i] && sma50[i - 1] < sma200[i - 1])
                         result.Add(TradeAdvice.Buy);
                     else
                         result.Add(TradeAdvice.Hold);
