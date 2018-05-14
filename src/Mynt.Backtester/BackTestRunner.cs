@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Mynt.Backtester.Models;
 using Mynt.Core.Enums;
 using Mynt.Core.Interfaces;
@@ -13,7 +14,8 @@ namespace Mynt.Backtester
             var results = new List<BackTestResult>();
 
             // Go through our coinpairs and backtest them.
-            foreach (var pair in coinsToTest)
+            var parallelOptions = new ParallelOptions() { MaxDegreeOfParallelism = 16 };
+            Parallel.ForEach(coinsToTest, parallelOptions, pair =>
             {
                 var candleProvider = new JsonCandleProvider("data");
 
@@ -70,7 +72,7 @@ namespace Mynt.Backtester
                 }
 
                 results.Add(backTestResult);
-            }
+            });
 
             return results;
         }
