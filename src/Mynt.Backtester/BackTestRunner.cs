@@ -8,7 +8,7 @@ namespace Mynt.Backtester
 {
     internal class BackTestRunner
     {
-        public List<BackTestResult> RunSingleStrategy(ITradingStrategy strategy, List<string> coinsToTest, decimal stakeAmount)
+        public List<BackTestResult> RunSingleStrategy(ITradingStrategy strategy, List<string> coinsToTest, decimal stakeAmount, bool startNewTradesWhenSold)
         {
             var results = new List<BackTestResult>();
 
@@ -40,7 +40,8 @@ namespace Mynt.Backtester
 
                                 backTestResult.Trades.Add(new BackTestTradeResult
                                 {
-                                    Quatity = quantity,
+                                    Market = pair,
+                                    Quantity = quantity,
                                     OpenRate = candles[i].Close,
                                     CloseRate = candles[j].Close,
                                     ProfitPercentage = currentProfitPercentage,
@@ -49,6 +50,10 @@ namespace Mynt.Backtester
                                     StartDate = candles[i].Timestamp,
                                     EndDate = candles[j].Timestamp
                                 });
+
+                                if (startNewTradesWhenSold)
+                                    i = j;
+
                                 break;
                             }
                         }

@@ -13,7 +13,7 @@ namespace Mynt.Data.SqlServer.Migrations
                 name: "Orders",
                 columns: table => new
                 {
-                    TradeId = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     BuyOrderId = table.Column<string>(nullable: true),
                     CloseDate = table.Column<DateTime>(nullable: true),
@@ -33,28 +33,30 @@ namespace Mynt.Data.SqlServer.Migrations
                     StakeAmount = table.Column<double>(nullable: false),
                     StopLossRate = table.Column<double>(nullable: true),
                     StrategyUsed = table.Column<string>(nullable: true),
+                    TradeId = table.Column<string>(nullable: true),
                     TraderId = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Orders", x => x.TradeId);
+                    table.PrimaryKey("PK_Orders", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "Traders",
                 columns: table => new
                 {
-                    TraderId = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
                     CurrentBalance = table.Column<double>(nullable: false),
                     Identifier = table.Column<string>(nullable: true),
+                    IsArchived = table.Column<bool>(nullable: false),
                     IsBusy = table.Column<bool>(nullable: false),
                     LastUpdated = table.Column<DateTime>(nullable: false),
                     StakeAmount = table.Column<double>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Traders", x => x.TraderId);
+                    table.PrimaryKey("PK_Traders", x => x.Id);
                 });
         }
 

@@ -23,9 +23,11 @@ namespace Mynt.Core.Strategies
 
             for (int i = 0; i < candles.Count; i++)
             {
-                if (ema34[i] > sma20[i] && adx[i] > 25)
+                if (i == 0)
+                    result.Add(TradeAdvice.Hold);
+                else if (ema34[i - 1] > sma20[i - 1] && ema34[i] < sma20[i] && adx[i] > 25)
                     result.Add(TradeAdvice.Buy);
-                else if (ema34[i] < sma20[i] && adx[i] > 25)
+                else if (ema34[i] > sma20[i] && ema34[i-1] < sma20[i-1] && adx[i] > 25)
                     result.Add(TradeAdvice.Sell);
                 else
                     result.Add(TradeAdvice.Hold);

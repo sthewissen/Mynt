@@ -18,6 +18,7 @@
   <ItemGroup>
     <Folder Include="Strategies\" />
     <Folder Include="TradeManagers\" />
+    <Folder Include="Extensions\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mynt.Core\Mynt.Core.csproj" />

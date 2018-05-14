@@ -13,7 +13,7 @@ namespace Mynt.Core.Indicators
             {
                 var highs = source.Select(x => x.High).ToList();
                 var lows = source.Select(x => x.Low).ToList();
-                var closes = source.Select(x => x.Close).Skip(displacement).ToList();
+                var closes = source.Select(x => x.Close).ToList();
 
                 var ichi = new IchimokuItem();
 
@@ -36,13 +36,23 @@ namespace Mynt.Core.Indicators
                     }
                 }
 
+                // Add the displacement for the cloud
+                for (int i = 0; i < displacement; i++)
+                {
+                    ichi.SenkouSpanA.Insert(0, null);
+                    ichi.SenkouSpanB.Insert(0, null);
+                }
+
                 // Add the ChikouSpan
                 ichi.ChikouSpan = new List<decimal?>();
 
-                for (int i = 0; i < source.Count; i++)
+                // Add the displacement for the lagging span
+                var displacedCloses = closes.Skip(displacement).ToList();
+
+                for (int i = 0; i < closes.Count; i++)
                 {
-                    if (i < closes.Count)
-                        ichi.ChikouSpan.Add(closes[i]);
+                    if (i < closes.Count - displacement)
+                        ichi.ChikouSpan.Add(displacedCloses[i]);
                     else
                         ichi.ChikouSpan.Add(null);
                 }
