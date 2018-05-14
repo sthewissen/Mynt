@@ -2,9 +2,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27428.2015
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.Core", "Mynt.Core\Mynt.Core.csproj", "{0D33270E-D419-4839-9CCB-3DD2DE277A67}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mynt.Core", "Mynt.Core\Mynt.Core.csproj", "{0D33270E-D419-4839-9CCB-3DD2DE277A67}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.Data.AzureTableStorage", "Mynt.Data.AzureTableStorage\Mynt.Data.AzureTableStorage.csproj", "{E48797FD-0018-45FC-BD28-8C0F9BB1D27D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mynt.Data.AzureTableStorage", "Mynt.Data.AzureTableStorage\Mynt.Data.AzureTableStorage.csproj", "{E48797FD-0018-45FC-BD28-8C0F9BB1D27D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{E9BA3CE1-0D22-4E6D-84C0-8BD426318613}"
 	ProjectSection(SolutionItems) = preProject
@@ -12,31 +12,33 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{E9BA3CE1-0
 		..\README.md = ..\README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.Data.SqlServer", "Mynt.Data.SqlServer\Mynt.Data.SqlServer.csproj", "{8F96E6F8-B933-4C5A-9592-21A2209385DA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mynt.Data.SqlServer", "Mynt.Data.SqlServer\Mynt.Data.SqlServer.csproj", "{8F96E6F8-B933-4C5A-9592-21A2209385DA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.Data.SQLite", "Mynt.Data.SQLite\Mynt.Data.SQLite.csproj", "{F5934EEF-3636-4A9D-86FA-660B9E8F40B8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mynt.Data.SQLite", "Mynt.Data.SQLite\Mynt.Data.SQLite.csproj", "{F5934EEF-3636-4A9D-86FA-660B9E8F40B8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "datastores", "datastores", "{F34057AE-AC0B-4A0B-8B26-71FB4DC7F474}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "runtimes", "runtimes", "{0A0E2DD3-2FBE-4B41-A8F3-3B3CA01830A2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.AspNetCore.Host", "Mynt.AspNetCore.Host\Mynt.AspNetCore.Host.csproj", "{192ADA12-7C0D-4671-AE53-329E0643E74B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mynt.AspNetCore.Host", "Mynt.AspNetCore.Host\Mynt.AspNetCore.Host.csproj", "{192ADA12-7C0D-4671-AE53-329E0643E74B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.Functions", "Mynt.Functions\Mynt.Functions.csproj", "{6CF60DBF-1F5E-4179-B760-2F05EEFEE612}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mynt.Functions", "Mynt.Functions\Mynt.Functions.csproj", "{6CF60DBF-1F5E-4179-B760-2F05EEFEE612}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.UnitTests", "Mynt.UnitTests\Mynt.UnitTests.csproj", "{ADF7D7B5-B761-4CCD-9E9E-E29059D6686B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mynt.UnitTests", "Mynt.UnitTests\Mynt.UnitTests.csproj", "{ADF7D7B5-B761-4CCD-9E9E-E29059D6686B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "core", "core", "{5527361A-B2E1-440A-8153-8F929F382E80}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "testing", "testing", "{605E0963-7988-4131-9D8C-E824F339AA91}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.Backtester", "Mynt.Backtester\Mynt.Backtester.csproj", "{022A5DC4-1CFC-42DC-9027-47C78A981DEA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mynt.Backtester", "Mynt.Backtester\Mynt.Backtester.csproj", "{022A5DC4-1CFC-42DC-9027-47C78A981DEA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "experimental", "experimental", "{9ECA0F3A-981A-4643-9632-137F39D8BB8F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.ResistanceSupport", "Mynt.ResistanceSupport\Mynt.ResistanceSupport.csproj", "{65068D9C-A149-4960-AF50-0BBD6F7E09F8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mynt.ResistanceSupport", "Mynt.ResistanceSupport\Mynt.ResistanceSupport.csproj", "{65068D9C-A149-4960-AF50-0BBD6F7E09F8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mynt.Data.MongoDB", "Mynt.Data.MongoDB\Mynt.Data.MongoDB.csproj", "{ED32E689-FACD-4DEA-80EE-639241C92AD5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mynt.Data.MongoDB", "Mynt.Data.MongoDB\Mynt.Data.MongoDB.csproj", "{ED32E689-FACD-4DEA-80EE-639241C92AD5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mynt.Data.LiteDB", "Mynt.Data.LiteDB\Mynt.Data.LiteDB.csproj", "{2B923A4F-C4A2-4435-AC0F-1834656A8C69}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -84,21 +86,26 @@ Global
 		{ED32E689-FACD-4DEA-80EE-639241C92AD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ED32E689-FACD-4DEA-80EE-639241C92AD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ED32E689-FACD-4DEA-80EE-639241C92AD5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2B923A4F-C4A2-4435-AC0F-1834656A8C69}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2B923A4F-C4A2-4435-AC0F-1834656A8C69}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2B923A4F-C4A2-4435-AC0F-1834656A8C69}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2B923A4F-C4A2-4435-AC0F-1834656A8C69}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{0D33270E-D419-4839-9CCB-3DD2DE277A67} = {5527361A-B2E1-440A-8153-8F929F382E80}
 		{E48797FD-0018-45FC-BD28-8C0F9BB1D27D} = {F34057AE-AC0B-4A0B-8B26-71FB4DC7F474}
 		{8F96E6F8-B933-4C5A-9592-21A2209385DA} = {F34057AE-AC0B-4A0B-8B26-71FB4DC7F474}
 		{F5934EEF-3636-4A9D-86FA-660B9E8F40B8} = {F34057AE-AC0B-4A0B-8B26-71FB4DC7F474}
 		{192ADA12-7C0D-4671-AE53-329E0643E74B} = {0A0E2DD3-2FBE-4B41-A8F3-3B3CA01830A2}
 		{6CF60DBF-1F5E-4179-B760-2F05EEFEE612} = {0A0E2DD3-2FBE-4B41-A8F3-3B3CA01830A2}
-		{0D33270E-D419-4839-9CCB-3DD2DE277A67} = {5527361A-B2E1-440A-8153-8F929F382E80}
 		{ADF7D7B5-B761-4CCD-9E9E-E29059D6686B} = {605E0963-7988-4131-9D8C-E824F339AA91}
 		{022A5DC4-1CFC-42DC-9027-47C78A981DEA} = {605E0963-7988-4131-9D8C-E824F339AA91}
 		{65068D9C-A149-4960-AF50-0BBD6F7E09F8} = {9ECA0F3A-981A-4643-9632-137F39D8BB8F}
 		{ED32E689-FACD-4DEA-80EE-639241C92AD5} = {F34057AE-AC0B-4A0B-8B26-71FB4DC7F474}
+		{2B923A4F-C4A2-4435-AC0F-1834656A8C69} = {F34057AE-AC0B-4A0B-8B26-71FB4DC7F474}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AFCCB5C5-80F3-4AE8-B21C-2007C408EBCD}
