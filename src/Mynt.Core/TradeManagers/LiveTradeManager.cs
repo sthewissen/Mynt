@@ -38,7 +38,7 @@ namespace Mynt.Core.TradeManagers
 
         #region SETUP
 
-        private async Task Initialize(bool initTraders=false)
+        private async Task Initialize(bool initTraders = false)
         {
             // First initialize a few things
             await _dataStore.InitializeAsync();
@@ -292,9 +292,8 @@ namespace Mynt.Core.TradeManagers
                  _settings.QuoteCurrency.ToUpper() == x.CurrencyPair.QuoteCurrency.ToUpper()).ToList();
 
             // If there are items on the only trade list remove the rest
-            markets = markets.Where(m => _settings.OnlyTradeList
-                                            .Any(c => c == m.CurrencyPair.BaseCurrency))
-                             .ToList();
+            if (_settings.OnlyTradeList.Count > 0)
+                markets = markets.Where(m => _settings.OnlyTradeList.Any(c => c == m.CurrencyPair.BaseCurrency)).ToList();
 
             // Remove existing trades from the list to check.
             foreach (var trade in _activeTrades)
