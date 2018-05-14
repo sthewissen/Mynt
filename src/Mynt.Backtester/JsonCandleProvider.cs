@@ -35,7 +35,7 @@ namespace Mynt.Backtester
             LiteDatabase database = new LiteDatabase(filePath);
             LiteCollection<Candle> candleCollection = database.GetCollection<Candle>("Candle_" + period);
             candleCollection.EnsureIndex("Timestamp");
-            List<Candle> candles = candleCollection.Find(Query.Between("Timestamp", startDate, endDate)).ToList();
+            List<Candle> candles = candleCollection.Find(Query.Between("Timestamp", startDate, endDate), Query.Ascending).ToList();
 
             if (!File.Exists(filePath))
                 throw new FileNotFoundException($"The .db '{filePath}' file used to load the candles from was not found.");
