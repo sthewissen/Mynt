@@ -272,7 +272,7 @@ namespace Mynt.Backtester
 
                     case "4":
                         Console.WriteLine("\tRefreshing...");
-                        _dataRefresher.RefreshCandleData(BacktestOptions.Coins, (x) => WriteColoredLine(x, ConsoleColor.Green)).Wait();
+                        _dataRefresher.RefreshCandleData(BacktestOptions.Coins, (x) => WriteColoredLine(x, ConsoleColor.Green), BacktestOptions.UpdateCandles, BacktestOptions.CandlePeriod).Wait();
                         ActionCompleted();
                         continue;
 
@@ -302,7 +302,7 @@ namespace Mynt.Backtester
             Console.WriteLine(@"                   \______/");
         }
 
-        private static void WriteColoredLine(string line, ConsoleColor color, bool padded = false)
+        public static void WriteColoredLine(string line, ConsoleColor color, bool padded = false)
         {
             Console.ForegroundColor = color;
             if (padded) Console.WriteLine();

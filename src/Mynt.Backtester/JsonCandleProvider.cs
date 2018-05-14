@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using LiteDB;
+using Mynt.Core.Enums;
+using Mynt.Core.Extensions;
 using Mynt.Core.Models;
 using Newtonsoft.Json;
 
@@ -15,16 +19,19 @@ namespace Mynt.Backtester
             this.folder = folder;
         }
 
-        public List<Candle> GetCandles(string symbol)
+        public List<Candle> GetCandles(string symbol, int period)
         {
             var basePath = AppDomain.CurrentDomain.BaseDirectory;
-            var filePath = Path.Combine(basePath, $"{folder}/{symbol}.json");
+            var filePath = Path.Combine(basePath, $"{folder}/{symbol}.db");
+
+            LiteDatabase database = new LiteDatabase(filePath);
+            LiteCollection<Candle> candleCollection = database.GetCollection<Candle>("Candle_" + period);
+            candleCollection.EnsureIndex("Timestamp");
+            List<Candle> candles = candleCollection.Find(Query.All("Timestamp", Query.Ascending)).ToList();
 
             if (!File.Exists(filePath))
-                throw new FileNotFoundException($"The .json '{filePath}' file used to load the candles from was not found.");
+                throw new FileNotFoundException($"The .db '{filePath}' file used to load the candles from was not found.");
 
-            var dataString = File.ReadAllText(filePath);
-            var candles = JsonConvert.DeserializeObject<List<Candle>>(dataString);
             return candles;
         }
     }
