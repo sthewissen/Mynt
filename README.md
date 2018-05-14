@@ -16,8 +16,6 @@ Finding this useful? Consider a donation!
 
 [![Donate with Litecoin](https://en.cryptobadges.io/badge/small/LZ2sL2ZSWLCoG2X39SzEaqXSYTDL7k9Wpz)](https://en.cryptobadges.io/donate/LZ2sL2ZSWLCoG2X39SzEaqXSYTDL7k9Wpz)
 
-<a target="_blank" href="https://join.slack.com/t/mynt-bot/shared_invite/enQtMzI3ODgzNTE1OTg3LTMyMGQyNTUxNTg2ODEwMjBjMDE0YzI5NDU3ZGI0MzVjMjBhYzBlNWE5MTMwMzIyZTViNmM2YTUxYzZhYjcyMTA"><img src="https://upload.wikimedia.org/wikipedia/commons/b/b9/Slack_Technologies_Logo.svg" alt="Join us on Slack!" width="100" /></a>
-
 ## Main Features
 
 - Comes with 25 built-in indicators
