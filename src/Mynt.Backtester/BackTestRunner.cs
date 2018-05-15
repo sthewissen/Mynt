@@ -7,7 +7,7 @@ using Mynt.Core.Interfaces;
 
 namespace Mynt.Backtester
 {
-    internal class BackTestRunner
+    public class BackTestRunner
     {
         public List<BackTestResult> RunSingleStrategy(ITradingStrategy strategy, List<string> coinsToTest, decimal stakeAmount, bool startNewTradesWhenSold)
         {
@@ -20,7 +20,7 @@ namespace Mynt.Backtester
                 var candleProvider = new JsonCandleProvider("data");
 
                 // This creates a list of buy signals.
-                var candles = candleProvider.GetCandles(pair, Program.BacktestOptions.CandlePeriod);
+                var candles = candleProvider.GetCandles(pair, BacktestOptions.CandlePeriod);
                 var backTestResult = new BackTestResult { Market = pair };
 
                 try
@@ -67,8 +67,11 @@ namespace Mynt.Backtester
                 }
                 catch (Exception ex)
                 {
-                    Program.WriteColoredLine($"Error in Strategy: {strategy.Name}", ConsoleColor.Red);
-                    Program.WriteColoredLine($"\t{ex.Message}", ConsoleColor.Red);
+                    if (BacktestOptions.ConsoleMode)
+                    {
+                        Program.WriteColoredLine($"Error in Strategy: {strategy.Name}", ConsoleColor.Red);
+                        Program.WriteColoredLine($"\t{ex.Message}", ConsoleColor.Red);
+                    }
                 }
 
                 results.Add(backTestResult);

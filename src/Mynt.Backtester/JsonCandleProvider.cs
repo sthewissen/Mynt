@@ -22,14 +22,14 @@ namespace Mynt.Backtester
         public List<Candle> GetCandles(string symbol, int period)
         {
             var basePath = AppDomain.CurrentDomain.BaseDirectory;
-            var filePath = Path.Combine(basePath, $"{folder}/{symbol}.db");
+            var filePath = Path.Combine(basePath, $"{folder}/{BacktestOptions.Exchange.ToLower()}_{symbol}.db");
 
-            DateTime startDate = Convert.ToDateTime(Program.BacktestOptions.StartDate);
+            DateTime startDate = Convert.ToDateTime(BacktestOptions.StartDate);
             DateTime endDate = DateTime.UtcNow;
 
-            if (Program.BacktestOptions.EndDate != null && Program.BacktestOptions.EndDate != "")
+            if (BacktestOptions.EndDate != null && BacktestOptions.EndDate != "")
             {
-                endDate = Convert.ToDateTime(Program.BacktestOptions.EndDate);
+                endDate = Convert.ToDateTime(BacktestOptions.EndDate);
             }
 
             LiteDatabase database = new LiteDatabase(filePath);

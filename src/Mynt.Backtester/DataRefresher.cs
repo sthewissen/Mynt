@@ -12,7 +12,7 @@ using Newtonsoft.Json;
 
 namespace Mynt.Backtester
 {
-    internal class DataRefresher
+    public class DataRefresher
     {
         private readonly ExchangeOptions _exchangeOptions;
         private readonly BaseExchange _api;
@@ -42,7 +42,7 @@ namespace Mynt.Backtester
         private string GetJsonFilePath(string pair)
         {
             var basePath = AppDomain.CurrentDomain.BaseDirectory;
-            return Path.Combine(GetDataDirectory(), $"{pair}.db");
+            return Path.Combine(GetDataDirectory(), $"{BacktestOptions.Exchange.ToLower()}_{pair}.db");
         }
 
         public async Task RefreshCandleData(List<string> coinsToRefresh, Action<string> callback, bool updateCandles, int period)
@@ -51,7 +51,7 @@ namespace Mynt.Backtester
 
             foreach (var coinToBuy in coinsToRefresh)
             {
-                DateTime startDate = Convert.ToDateTime(Program.BacktestOptions.StartDate);
+                DateTime startDate = Convert.ToDateTime(BacktestOptions.StartDate).ToUniversalTime();
                 DateTime endDate = DateTime.UtcNow;
                 var jsonPath = GetJsonFilePath(coinToBuy);
 
