@@ -34,6 +34,9 @@ namespace Mynt.Core.Exchanges
                 case Exchange.Poloniex:
                     _api = new ExchangeSharp.ExchangePoloniexAPI();
                     break;
+                case Exchange.Gdax:
+                    _api = new ExchangeSharp.ExchangeGdaxAPI();
+                    break;
             }
 
             _api.LoadAPIKeysUnsecure(options.ApiKey, options.ApiSecret, options.PassPhrase);

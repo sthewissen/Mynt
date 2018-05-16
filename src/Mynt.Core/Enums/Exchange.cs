@@ -6,6 +6,7 @@ namespace Mynt.Core.Enums
         Binance = 0,
         Bitfinex = 1,
         Bittrex = 2,
-        Poloniex = 3
+        Poloniex = 3,
+        Gdax = 4
     }
 }
