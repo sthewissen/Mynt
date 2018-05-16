@@ -12,7 +12,6 @@ using Mynt.Core.Notifications;
 using Mynt.Data.AzureTableStorage;
 using Serilog;
 using Serilog.Sinks.AzureWebJobsTraceWriter;
-using System.Linq;
 
 namespace Mynt.Functions
 {
@@ -24,7 +23,7 @@ namespace Mynt.Functions
         }
 
         [FunctionName("OverviewTimer")]
-        public static async Task Run([TimerTrigger("0 * * * * *")]TimerInfo overviewTimer, TraceWriter log)
+        public static async Task Run([TimerTrigger("0 0 * * * *")]TimerInfo overviewTimer, TraceWriter log)
         {
             var logger = new LoggerConfiguration().WriteTo.TraceWriter(log).CreateLogger();
 
@@ -70,10 +69,10 @@ namespace Mynt.Functions
                 var stringResult = new StringBuilder();
                 stringResult.AppendLine("*** Closed Trades Profit ***");
 
-                foreach (var item in trades)
-                {
-                    stringResult.AppendLine($"#{item.Market}: *{item.CloseProfitPercentage:0.00}%* opened {item.OpenDate.Humanize()} at {item.OpenRate:0.00000000} BTC closed {item.CloseDate.Humanize()} at {item.CloseRate:0.00000000} BTC");
-                }
+                //foreach (var item in trades)
+                //{
+                //    stringResult.AppendLine($"#{item.Market}: *{item.CloseProfitPercentage:0.00}%* opened {item.OpenDate.Humanize()} at {item.OpenRate:0.00000000} BTC closed {item.CloseDate.Humanize()} at {item.CloseRate:0.00000000} BTC");
+                //}
 
                 stringResult.AppendLine($"*Current profit is {trades.Sum(x => x.CloseProfit):0.00000000} BTC ({(trades.Sum(x => x.CloseProfitPercentage)):0.00}%)*");
 

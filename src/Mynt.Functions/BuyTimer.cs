@@ -25,7 +25,7 @@ namespace Mynt.Functions
         }
 
         [FunctionName("BuyTimer")]
-        public static async Task Run([TimerTrigger("10 1 * * * *")]TimerInfo buyTimer, TraceWriter log)
+        public static async Task Run([TimerTrigger("0 * * * * *")]TimerInfo buyTimer, TraceWriter log)
         {
             var serilogger = new LoggerConfiguration().WriteTo.TraceWriter(log).CreateLogger();
             var logger = new LoggerFactory().AddSerilog(serilogger).CreateLogger(nameof(BuyTimer));
