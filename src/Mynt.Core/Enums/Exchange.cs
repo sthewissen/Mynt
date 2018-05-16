@@ -7,6 +7,11 @@ namespace Mynt.Core.Enums
         Bitfinex = 1,
         Bittrex = 2,
         Poloniex = 3,
-        Gdax = 4
-    }
+		Huobi = 4,
+		HitBtc = 5,
+		Gdax = 6,
+		Okex = 7,
+		Cryptopia = 8,
+        Kucoin = 9
+	}
 }

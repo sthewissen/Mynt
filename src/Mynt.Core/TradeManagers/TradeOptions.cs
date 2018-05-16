@@ -49,7 +49,7 @@ namespace Mynt.Core.TradeManagers
         // If set to true, orders that have not been bought for an entire cycle of the BuyTimer
         // are cancelled. This frees up a trader to look for other opportunities.
         public bool CancelUnboughtOrdersEachCycle { get; set; } = true;
-       
+
         // When enabled a first stop price is set to the current signal candle's low.
         public bool PlaceFirstStopAtSignalCandleLow { get; set; } = false;
 

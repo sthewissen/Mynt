@@ -38,7 +38,7 @@ namespace Mynt.Core.TradeManagers
 
         #region SETUP
 
-        private async Task Initialize(bool initTraders=false)
+        private async Task Initialize(bool initTraders = false)
         {
             // First initialize a few things
             await _dataStore.InitializeAsync();
@@ -282,7 +282,7 @@ namespace Mynt.Core.TradeManagers
         private async Task<List<TradeSignal>> FindBuyOpportunities()
         {
             // Retrieve our current markets
-            var markets = await _api.GetMarketSummaries();
+            var markets = await _api.GetMarketSummaries(_settings.QuoteCurrency);
             var pairs = new List<TradeSignal>();
 
             // Check if there are markets matching our volume.
@@ -292,8 +292,8 @@ namespace Mynt.Core.TradeManagers
                  _settings.QuoteCurrency.ToUpper() == x.CurrencyPair.QuoteCurrency.ToUpper()).ToList();
 
             // If there are items on the only trade list remove the rest
-            foreach (var item in _settings.OnlyTradeList)
-                markets.RemoveAll(x => x.CurrencyPair.BaseCurrency != item);
+            if (_settings.OnlyTradeList.Count > 0)
+                markets = markets.Where(m => _settings.OnlyTradeList.Any(c => c == m.CurrencyPair.BaseCurrency)).ToList();
 
             // Remove existing trades from the list to check.
             foreach (var trade in _activeTrades)

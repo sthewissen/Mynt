@@ -16,9 +16,10 @@ namespace Mynt.Core.Strategies
         public override List<TradeAdvice> Prepare(List<Candle> candles)
         {
             var result = new List<TradeAdvice> { TradeAdvice.Buy };
-            var holdAdvices = new TradeAdvice[candles.Count - 1];
+            var holdAdvices = new TradeAdvice[candles.Count - 2];
 
             result.AddRange(holdAdvices);
+            result.Add(TradeAdvice.Sell);
 
             return result;
         }

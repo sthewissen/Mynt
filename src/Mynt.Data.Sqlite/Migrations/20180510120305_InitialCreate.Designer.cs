@@ -6,25 +6,24 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Storage.Internal;
 using Mynt.Core.Enums;
-using Mynt.Data.SqlServer;
+using Mynt.Data.Sqlite;
 using System;
 
-namespace Mynt.Data.SqlServer.Migrations
+namespace Mynt.Data.Sqlite.Migrations
 {
     [DbContext(typeof(MyntDbContext))]
-    [Migration("20180330094956_InitialCreate")]
+    [Migration("20180510120305_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.0.2-rtm-10011")
-                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                .HasAnnotation("ProductVersion", "2.0.3-rtm-10026");
 
-            modelBuilder.Entity("Mynt.Data.SqlServer.TradeAdapter", b =>
+            modelBuilder.Entity("Mynt.Data.Sqlite.TradeAdapter", b =>
                 {
-                    b.Property<int>("TradeId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
                     b.Property<string>("BuyOrderId");
@@ -63,21 +62,25 @@ namespace Mynt.Data.SqlServer.Migrations
 
                     b.Property<string>("StrategyUsed");
 
+                    b.Property<string>("TradeId");
+
                     b.Property<string>("TraderId");
 
-                    b.HasKey("TradeId");
+                    b.HasKey("Id");
 
                     b.ToTable("Orders");
                 });
 
-            modelBuilder.Entity("Mynt.Data.SqlServer.TraderAdapter", b =>
+            modelBuilder.Entity("Mynt.Data.Sqlite.TraderAdapter", b =>
                 {
-                    b.Property<int>("TraderId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
                     b.Property<double>("CurrentBalance");
 
                     b.Property<string>("Identifier");
+
+                    b.Property<bool>("IsArchived");
 
                     b.Property<bool>("IsBusy");
 
@@ -85,7 +88,7 @@ namespace Mynt.Data.SqlServer.Migrations
 
                     b.Property<double>("StakeAmount");
 
-                    b.HasKey("TraderId");
+                    b.HasKey("Id");
 
                     b.ToTable("Traders");
                 });

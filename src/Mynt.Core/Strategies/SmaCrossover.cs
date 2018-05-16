@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Mynt.Core.Enums;
+using Mynt.Core.Extensions;
 using Mynt.Core.Indicators;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
@@ -20,6 +21,9 @@ namespace Mynt.Core.Strategies
             var sma12 = candles.Sma(12);
             var sma16 = candles.Sma(16);
             var rsi = candles.Rsi(14);
+
+            var crossOver = sma12.Crossover(sma16);
+            var crossUnder = sma12.Crossunder(sma16);
 
             var startRsi = 0m;
 

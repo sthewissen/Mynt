@@ -1,8 +1,8 @@
 ﻿namespace Mynt.Core.Enums
 {
-    public enum ProfitType
-    {
-        Reinvest,
-        SetAside
-    }
+	public enum ProfitType
+	{
+		Reinvest = 0,
+		SetAside = 1
+	}
 }

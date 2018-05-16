@@ -8,15 +8,17 @@ namespace Mynt.Data.SqlServer
     {
         private string _connectionString;
 
+        public MyntDbContext()
+        {
+            _connectionString = new SqlServerOptions().SqlServerConnectionString;
+        }
+
         public MyntDbContext(string connectionString)
         {
             _connectionString = connectionString;
         }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlServer(_connectionString);
-        }
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) => optionsBuilder.UseSqlServer(_connectionString);
 
         public DbSet<TradeAdapter> Orders { get; set; }
         public DbSet<TraderAdapter> Traders { get; set; }
