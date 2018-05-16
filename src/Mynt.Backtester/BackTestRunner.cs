@@ -14,10 +14,9 @@ namespace Mynt.Backtester
             var results = new List<BackTestResult>();
 
             // Go through our coinpairs and backtest them.
-            var parallelOptions = new ParallelOptions() { MaxDegreeOfParallelism = 16 };
-            Parallel.ForEach(coinsToTest, parallelOptions, pair =>
+            foreach(var pair in coinsToTest)
             {
-                var candleProvider = new JsonCandleProvider("data");
+                var candleProvider = new DatabaseCandleProvider("data");
 
                 // This creates a list of buy signals.
                 var candles = candleProvider.GetCandles(pair, BacktestOptions.CandlePeriod);
@@ -75,7 +74,7 @@ namespace Mynt.Backtester
                 }
 
                 results.Add(backTestResult);
-            });
+            };
 
             return results;
         }

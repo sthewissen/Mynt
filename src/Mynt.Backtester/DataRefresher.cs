@@ -23,27 +23,11 @@ namespace Mynt.Backtester
             _api = new BaseExchange(_exchangeOptions);
         }
 
-        private string GetDataDirectory()
-        {
-            var basePath = AppDomain.CurrentDomain.BaseDirectory;
-            var path = Path.Combine(basePath, "data");
-
-            if (!Directory.Exists(path))
-                Directory.CreateDirectory(path);
-
-            return path;
-        }
-
         public bool CheckForCandleData()
         {
-            return Directory.GetFiles(GetDataDirectory(), "*.db", SearchOption.TopDirectoryOnly).Count() != 0;
+            return Directory.GetFiles(BacktesterDatabase.GetDataDirectory(), "*.db", SearchOption.TopDirectoryOnly).Count() != 0;
         }
 
-        private string GetJsonFilePath(string pair)
-        {
-            var basePath = AppDomain.CurrentDomain.BaseDirectory;
-            return Path.Combine(GetDataDirectory(), $"{BacktestOptions.Exchange.ToLower()}_{pair}.db");
-        }
 
         public async Task RefreshCandleData(List<string> coinsToRefresh, Action<string> callback, bool updateCandles, int period)
         {
@@ -53,17 +37,16 @@ namespace Mynt.Backtester
             {
                 DateTime startDate = Convert.ToDateTime(BacktestOptions.StartDate).ToUniversalTime();
                 DateTime endDate = DateTime.UtcNow;
-                var jsonPath = GetJsonFilePath(coinToBuy);
+                var filePath = BacktesterDatabase.GetDataDirectory(BacktestOptions.Exchange.ToLower(), coinToBuy);
 
-                LiteDatabase database = new LiteDatabase(jsonPath);
-                LiteCollection<Candle> candleCollection = database.GetCollection<Candle>("Candle_" + period.ToString());
+                LiteCollection<Candle> candleCollection = BacktesterDatabase.DataStore.GetInstance(filePath).GetTable<Candle>("Candle_" + period.ToString());
 
                 // Delete an existing file if this is no update
                 if (!updateCandles)
                 {
-                    if (File.Exists(jsonPath))
+                    if (File.Exists(filePath))
                     {
-                        File.Delete(jsonPath);
+                        File.Delete(filePath);
                     } 
                     callback($"Recreate database with Period {period.ToString()}min for {coinToBuy.ToString()} from {startDate.ToString()} UTC to {endDate.RoundDown(TimeSpan.FromMinutes(period))} UTC");
                 }
@@ -90,31 +73,56 @@ namespace Mynt.Backtester
                 }
 
                 callback($"Refreshed data for {coinToBuy}...");
-                writtenFiles.Add(jsonPath);
+                writtenFiles.Add(filePath);
             }
 
-            // Delete everything that's not refreshed
-            foreach (FileInfo fi in new DirectoryInfo(GetDataDirectory()).EnumerateFiles())
+            // Delete everything that's not refreshed if we are not in update mode
+            if (!updateCandles)
             {
-                if (!writtenFiles.Contains(fi.FullName))
+                foreach (FileInfo fi in new DirectoryInfo(BacktesterDatabase.GetDataDirectory()).EnumerateFiles())
                 {
-                    File.Delete(fi.FullName);
+                    if (!writtenFiles.Contains(fi.FullName))
+                    {
+                        File.Delete(fi.FullName);
+                    }
                 }
             }
-        }
 
-        private TimeSpan GetCacheAge()
+            }
+
+        public static void GetCacheAge()
         {
-            string dataFolder = Path.GetDirectoryName(GetJsonFilePath("dummy-dummy"));
+            Console.WriteLine("\tBacktest StartDate: " + Convert.ToDateTime(BacktestOptions.StartDate).ToUniversalTime().ToString() + " UTC");
+            if (BacktestOptions.EndDate != null && BacktestOptions.EndDate != "")
+            {
+                Console.WriteLine("\tBacktest EndDate: " + Convert.ToDateTime(BacktestOptions.EndDate).ToUniversalTime().ToString() + " UTC");
+            } else
+            {
+                Console.WriteLine("\tBacktest EndDate: " + DateTime.UtcNow.ToString() + " UTC");
+            }
 
-            if (Directory.GetFiles(dataFolder).Length == 0)
-                return TimeSpan.MinValue;
+            Console.WriteLine("");
 
-            var fileInfo = new DirectoryInfo(dataFolder).GetFileSystemInfos()
-                                                        .OrderBy(fi => fi.CreationTime)
-                                                        .First();
+            int dataCount = 0;
+            foreach (var coin in BacktestOptions.Coins)
+            {
+                string instance = BacktesterDatabase.GetDataDirectory() + "/" + BacktestOptions.Exchange.ToLower() + "_" + coin + ".db";
+                if (File.Exists(instance))
+                {
+                    LiteCollection<Candle> getCacheAge = BacktesterDatabase.DataStore.GetInstance(instance).GetTable<Candle>("Candle_" + BacktestOptions.CandlePeriod);
+                    Candle currentHistoricalDataLast = getCacheAge.Find(Query.All("Timestamp", Query.Descending), limit: 1).FirstOrDefault();
+                    Candle currentHistoricalDataFirst = getCacheAge.Find(Query.All("Timestamp", Query.Ascending), limit: 1).FirstOrDefault();
+                    Console.WriteLine("\tAvailable Cache for " + BacktestOptions.Exchange + " " + coin + " Period: " + BacktestOptions.CandlePeriod + "min  - from " + currentHistoricalDataFirst.Timestamp.ToUniversalTime() + " until " + currentHistoricalDataLast.Timestamp.ToUniversalTime());
+                    dataCount = dataCount + 1;
+                }
+            }
 
-            return DateTime.Now - fileInfo.LastWriteTime;
+            if (dataCount == 0)
+            {
+                Console.WriteLine("\tNo data - Please run 4. Refresh candle data first");
+            }
+
+            Console.WriteLine("");
         }
     }
 }

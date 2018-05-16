@@ -174,7 +174,7 @@ namespace Mynt.Backtester
 
         public static void WriteMenu()
         {
-            //TimeSpan cacheAge = GetCacheAge();
+            DataRefresher.GetCacheAge();
 
             Console.WriteLine("\t1. Run a single strategy");
             Console.WriteLine("\t2. Run a single strategy (show all trades)");
@@ -182,11 +182,6 @@ namespace Mynt.Backtester
             Console.WriteLine("\t4. Refresh candle data");
             Console.WriteLine("\t5. Close the tool");
             Console.WriteLine();
-
-            //if (cacheAge == TimeSpan.MinValue)
-            //    WriteColoredLine("\tCache is empty. You must refresh (6) or copy example data (7).", ConsoleColor.Red);
-            //else
-            //Console.WriteLine($"\tCache age: {cacheAge}"); // Ofcourse indivual files could differ in time
 
             Console.WriteLine();
             Console.Write("\tWhat do you want to do? ");
