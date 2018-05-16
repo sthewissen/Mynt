@@ -290,3 +290,4 @@ __pycache__/
 .DS_Store
 src/Mynt.Functions/local.settings.json
 src/Mynt.Functions/local.settings.json
+src/Mynt.Functions/local.settings.json
