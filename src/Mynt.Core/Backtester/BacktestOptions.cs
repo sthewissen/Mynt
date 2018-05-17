@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Mynt.Core.Backtester
 {
     public class BacktestOptions
     {
 		public Enums.Exchange Exchange { get; set; } = Enums.Exchange.Binance;
+        public string DataFolder { get; set; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "data");
         public decimal StakeAmount { get; set; } = 0.1m;
         public bool OnlyStartNewTradesWhenSold { get; set; } = true;
         public List<string> Coins { get; set; } = new List<string> { };

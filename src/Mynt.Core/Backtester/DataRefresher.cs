@@ -17,9 +17,9 @@ namespace Mynt.Core.Backtester
 {
     public class DataRefresher
     {
-        public static bool CheckForCandleData()
+        public static bool CheckForCandleData(BacktestOptions backtestOptions)
         {
-            return Directory.GetFiles(BacktesterDatabase.GetDataDirectory(), "*.db", SearchOption.TopDirectoryOnly).Count() != 0;
+            return Directory.GetFiles(BacktesterDatabase.GetDataDirectory(backtestOptions.DataFolder), "*.db", SearchOption.TopDirectoryOnly).Count() != 0;
         }
 
         public static async Task RefreshCandleData(Action<string> callback, BacktestOptions backtestOptions)
@@ -32,7 +32,7 @@ namespace Mynt.Core.Backtester
             {
                 DateTime startDate = Convert.ToDateTime(backtestOptions.StartDate).ToUniversalTime();
                 DateTime endDate = DateTime.UtcNow;
-				var filePath = BacktesterDatabase.GetDataDirectory(backtestOptions.Exchange.ToString().ToLower(), coinToBuy);
+				var filePath = BacktesterDatabase.GetDataDirectory(backtestOptions.DataFolder, backtestOptions.Exchange.ToString().ToLower(), coinToBuy);
 
                 LiteCollection<Candle> candleCollection = BacktesterDatabase.DataStore.GetInstance(filePath).GetTable<Candle>("Candle_" + backtestOptions.CandlePeriod.ToString());
 
@@ -74,7 +74,7 @@ namespace Mynt.Core.Backtester
             // Delete everything that's not refreshed if we are not in update mode
             if (!backtestOptions.UpdateCandles)
             {
-                foreach (FileInfo fi in new DirectoryInfo(BacktesterDatabase.GetDataDirectory()).EnumerateFiles())
+                foreach (FileInfo fi in new DirectoryInfo(BacktesterDatabase.GetDataDirectory(backtestOptions.DataFolder)).EnumerateFiles())
                 {
                     if (!writtenFiles.Contains(fi.FullName))
                     {
@@ -90,7 +90,7 @@ namespace Mynt.Core.Backtester
 
             foreach (var coin in backtestOptions.Coins)
             {
-				string instance = BacktesterDatabase.GetDataDirectory() + "/" + backtestOptions.Exchange.ToString().ToLower() + "_" + coin + ".db";
+				string instance = BacktesterDatabase.GetDataDirectory(backtestOptions.DataFolder) + "/" + backtestOptions.Exchange.ToString().ToLower() + "_" + coin + ".db";
                 if (File.Exists(instance))
                 {
                     LiteCollection<Candle> getCacheAge = BacktesterDatabase.DataStore.GetInstance(instance).GetTable<Candle>("Candle_" + backtestOptions.CandlePeriod);
@@ -127,7 +127,7 @@ namespace Mynt.Core.Backtester
             int dataCount = 0;
             foreach (var coin in backtestOptions.Coins)
             {
-				string instance = BacktesterDatabase.GetDataDirectory() + "/" + backtestOptions.Exchange.ToString().ToLower() + "_" + coin + ".db";
+				string instance = BacktesterDatabase.GetDataDirectory(backtestOptions.DataFolder) + "/" + backtestOptions.Exchange.ToString().ToLower() + "_" + coin + ".db";
                 if (File.Exists(instance))
                 {
                     LiteCollection<Candle> getCacheAge = BacktesterDatabase.DataStore.GetInstance(instance).GetTable<Candle>("Candle_" + backtestOptions.CandlePeriod);

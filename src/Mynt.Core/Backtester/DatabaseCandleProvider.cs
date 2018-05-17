@@ -22,7 +22,7 @@ namespace Mynt.Core.Backtester
         public List<Candle> GetCandles(string symbol, BacktestOptions backtestOptions)
         {
             //var basePath = AppDomain.CurrentDomain.BaseDirectory;
-            var filePath = BacktesterDatabase.GetDataDirectory(backtestOptions.Exchange.ToString().ToLower(), symbol);
+            var filePath = BacktesterDatabase.GetDataDirectory(backtestOptions.DataFolder, backtestOptions.Exchange.ToString().ToLower(), symbol);
 
             DateTime startDate = Convert.ToDateTime(backtestOptions.StartDate);
             DateTime endDate = DateTime.UtcNow;

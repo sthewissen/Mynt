@@ -11,19 +11,16 @@ namespace Mynt.Core.Backtester
     {
         public static Dictionary<string, DataStore> instance = new Dictionary<string, DataStore>();
 
-        public static string GetDataDirectory(string exchange = null, string pair = null)
+        public static string GetDataDirectory(string datafolder, string exchange = null, string pair = null)
         {
-            var basePath = AppDomain.CurrentDomain.BaseDirectory;
-            var path = Path.Combine(basePath, "data");
-
-            if (!Directory.Exists(path))
-                Directory.CreateDirectory(path);
+            if (!Directory.Exists(datafolder))
+                Directory.CreateDirectory(datafolder);
 
             if (exchange == null && pair == null)
             {
-                return path.Replace("\\","/");
+                return datafolder.Replace("\\","/");
             }
-            return path.Replace("\\", "/") + "/" + exchange + "_" + pair + ".db";
+            return datafolder.Replace("\\", "/") + "/" + exchange + "_" + pair + ".db";
         }
 
         public class DataStore
