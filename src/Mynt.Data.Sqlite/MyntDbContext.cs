@@ -17,10 +17,7 @@ namespace Mynt.Data.Sqlite
             _connectionString = connectionString;
         }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlite(_connectionString);
-        }
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) => optionsBuilder.UseSqlite(_connectionString);
 
         public DbSet<TradeAdapter> Orders { get; set; }
         public DbSet<TraderAdapter> Traders { get; set; }
