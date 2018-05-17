@@ -53,7 +53,7 @@ namespace Mynt.AspNetCore.Host.Controllers
             //Sample init with custom Values:
 
             BacktestOptions backtestOptions = new BacktestOptions();
-            backtestOptions.Exchange = "Binance";
+            backtestOptions.Exchange = Core.Enums.Exchange.Binance;
             backtestOptions.Coins = new List<string>(new string[] { "NEOBTC", "OMGBTC", "ARKBTC", "XRPBTC", "REQBTC", "LTCBTC", "ETHBTC", "VENBTC" });
 
             await DataRefresher.RefreshCandleData((x) => Console.WriteLine(x), backtestOptions);
@@ -71,7 +71,7 @@ namespace Mynt.AspNetCore.Host.Controllers
             //Sample init with custom Values:
 
             BacktestOptions backtestOptions = new BacktestOptions();
-            backtestOptions.Exchange = "Binance";
+            backtestOptions.Exchange = Core.Enums.Exchange.Binance;
             backtestOptions.Coins =  new List<string>(new string[] { "NEOBTC", "OMGBTC", "ARKBTC", "XRPBTC", "REQBTC", "LTCBTC", "ETHBTC", "VENBTC" });
 
             return BacktestFunctions.BackTestAllJson(backtestOptions);
