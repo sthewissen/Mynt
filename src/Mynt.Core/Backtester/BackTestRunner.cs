@@ -10,17 +10,17 @@ namespace Mynt.Core.Backtester
 {
     public class BackTestRunner
     {
-        public List<BackTestResult> RunSingleStrategy(ITradingStrategy strategy, List<string> coinsToTest, decimal stakeAmount, bool startNewTradesWhenSold)
+        public List<BackTestResult> RunSingleStrategy(ITradingStrategy strategy, BacktestOptions backtestOptions)
         {
             var results = new List<BackTestResult>();
 
             // Go through our coinpairs and backtest them.
-            foreach(var pair in coinsToTest)
+            foreach (var pair in backtestOptions.Coins)
             {
                 var candleProvider = new DatabaseCandleProvider("data");
 
                 // This creates a list of buy signals.
-                var candles = candleProvider.GetCandles(pair, BacktestOptions.CandlePeriod);
+                var candles = candleProvider.GetCandles(pair, backtestOptions);
                 var backTestResult = new BackTestResult { Market = pair };
 
                 try
@@ -39,7 +39,7 @@ namespace Mynt.Core.Backtester
                                 {
                                     // We ignore fees for now. Goal of the backtester is to compare strategy efficiency.
                                     var currentProfitPercentage = ((candles[j].Close - candles[i].Close) / candles[i].Close) * 100;
-                                    var quantity = stakeAmount / candles[i].Close; // We always trade with 0.1 BTC.
+                                    var quantity = backtestOptions.StakeAmount / candles[i].Close; // We always trade with 0.1 BTC.
                                     var currentProfit = (candles[j].Close - candles[i].Close) * quantity;
 
                                     backTestResult.Trades.Add(new BackTestTradeResult
@@ -55,7 +55,7 @@ namespace Mynt.Core.Backtester
                                         EndDate = candles[j].Timestamp
                                     });
 
-                                    if (startNewTradesWhenSold)
+                                    if (backtestOptions.OnlyStartNewTradesWhenSold)
                                         i = j;
 
                                     break;
@@ -67,11 +67,8 @@ namespace Mynt.Core.Backtester
                 }
                 catch (Exception ex)
                 {
-                    if (BacktestOptions.ConsoleMode)
-                    {
-                        ConsoleUtility.WriteColoredLine($"Error in Strategy: {strategy.Name}", ConsoleColor.Red);
-                        ConsoleUtility.WriteColoredLine($"\t{ex.Message}", ConsoleColor.Red);
-                    }
+                    ConsoleUtility.WriteColoredLine($"Error in Strategy: {strategy.Name}", ConsoleColor.Red);
+                    ConsoleUtility.WriteColoredLine($"\t{ex.Message}", ConsoleColor.Red);
                 }
 
                 results.Add(backTestResult);

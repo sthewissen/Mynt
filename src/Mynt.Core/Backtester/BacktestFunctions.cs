@@ -2,6 +2,7 @@
 using Mynt.Core.Interfaces;
 using Mynt.Core.Strategies;
 using Mynt.Core.Utility;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,21 +32,40 @@ namespace Mynt.Core.Backtester
 
         #region backtesting
 
-        public static void BackTest(ITradingStrategy strategy)
+        public static List<BackTestResult> BackTest(ITradingStrategy strategy, BacktestOptions backtestOptions)
         {
             var runner = new BackTestRunner();
-            var results = runner.RunSingleStrategy(strategy, BacktestOptions.Coins, BacktestOptions.StakeAmount, BacktestOptions.OnlyStartNewTradesWhenSold);
+            var results = runner.RunSingleStrategy(strategy, backtestOptions);
+            return results;
+        }
 
-            if (BacktestOptions.ConsoleMode)
+        public static JArray BackTestJson(ITradingStrategy strategy, BacktestOptions backtestOptions)
+        {
+            List<BackTestResult> results = BackTest(strategy, backtestOptions);
+            JArray jArrayResult = new JArray();
+
+            if (results.Count > 0)
             {
-                Console.WriteLine();
-                Console.WriteLine($"\t=============== BACKTESTING REPORT {strategy.Name.ToUpper()} ===============");
-                Console.WriteLine();
-                ConsoleUtility.WriteColoredLine($"\tNote: Profit is based on trading with 0.1 BTC each trade.", ConsoleColor.Cyan);
-                Console.WriteLine();
+                foreach (var result in results)
+                {
+                    JObject currentResult = new JObject();
+                    currentResult["Strategy"] = strategy.Name;
+                    currentResult["AmountOfTrades"] = result.AmountOfTrades;
+                    currentResult["AmountOfProfitableTrades"] = result.AmountOfProfitableTrades;
+                    currentResult["SuccessRate"] = result.SuccessRate;
+                    currentResult["TotalProfit"] = result.TotalProfit;
+                    currentResult["TotalProfitPercentage"] = result.TotalProfitPercentage;
+                    currentResult["AverageDuration"] = result.AverageDuration;
+                    currentResult["DataPeriod"] = result.DataPeriod;
+                    jArrayResult.Add(currentResult);
+                }
             }
+            return jArrayResult;
+        }
 
-            // Prints the results for each coin for this strategy.
+        public static void BackTestConsole(ITradingStrategy strategy, BacktestOptions backtestOptions)
+        {
+            List<BackTestResult> results = BackTest(strategy, backtestOptions);
             if (results.Count > 0)
             {
                 Console.WriteLine(results
@@ -63,33 +83,57 @@ namespace Mynt.Core.Backtester
             }
             else
             {
-                if (BacktestOptions.ConsoleMode)
-                {
-                    ConsoleUtility.WriteColoredLine("\tNo backtests results found...", ConsoleColor.Red);
-                }
-                    
+                ConsoleUtility.WriteColoredLine("\tNo backtests results found...", ConsoleColor.Red);
             }
-
-            if (BacktestOptions.ConsoleMode)
-            {
-                ConsoleUtility.WriteSeparator();
-            }
-            
+            ConsoleUtility.WriteSeparator();
         }
 
-        public static void BackTestShowTrades(ITradingStrategy strategy)
+        public static List<BackTestResult> BackTestShowTrades(ITradingStrategy strategy, BacktestOptions backtestOptions)
         {
             var runner = new BackTestRunner();
-            var results = runner.RunSingleStrategy(strategy, BacktestOptions.Coins, BacktestOptions.StakeAmount, BacktestOptions.OnlyStartNewTradesWhenSold);
+            var results = runner.RunSingleStrategy(strategy, backtestOptions);
+            return results;
+        }
 
-            if (BacktestOptions.ConsoleMode)
+        public static JArray BackTestShowTradesJson(ITradingStrategy strategy, BacktestOptions backtestOptions)
+        {
+            var results = BackTestShowTrades(strategy, backtestOptions);
+
+            JArray jArrayResult = new JArray();
+
+            var trades = new List<BackTestTradeResult>();
+
+            foreach (var result in results)
             {
-                Console.WriteLine();
-                Console.WriteLine($"\t=============== BACKTESTING REPORT {strategy.Name.ToUpper()} ===============");
-                Console.WriteLine();
-                ConsoleUtility.WriteColoredLine($"\tNote: Profit is based on trading with 0.1 BTC each trade.", ConsoleColor.Cyan);
-                Console.WriteLine();
+                trades.AddRange(result.Trades);
             }
+
+            foreach (var trade in trades)
+            {
+                JObject currentResult = new JObject();
+                currentResult["Strategy"] = strategy.Name;
+                currentResult["Market"] = trade.Market;
+                currentResult["OpenRate"] = trade.OpenRate;
+                currentResult["CloseRate"] = trade.CloseRate;
+                currentResult["Profit"] = trade.Profit;
+                currentResult["ProfitPercentage"] = trade.ProfitPercentage;
+                currentResult["Duration"] = trade.Duration;
+                currentResult["StartDate"] = trade.StartDate;
+                currentResult["EndDate"] = trade.EndDate;
+                jArrayResult.Add(currentResult);
+            }
+            return jArrayResult;
+        }
+
+        public static void BackTestShowTradesConsole(ITradingStrategy strategy, BacktestOptions backtestOptions)
+        {
+            var results = BackTestShowTrades(strategy, backtestOptions);
+
+            Console.WriteLine();
+            Console.WriteLine($"\t=============== BACKTESTING REPORT {strategy.Name.ToUpper()} ===============");
+            Console.WriteLine();
+            ConsoleUtility.WriteColoredLine($"\tNote: Profit is based on trading with 0.1 BTC each trade.", ConsoleColor.Cyan);
+            Console.WriteLine();
 
             // Prints the results for each coin for this strategy.
 
@@ -117,39 +161,61 @@ namespace Mynt.Core.Backtester
             }
             else
             {
-                if (BacktestOptions.ConsoleMode)
-                {
-                    ConsoleUtility.WriteColoredLine("\tNo backtests results found...", ConsoleColor.Red);
-                }
+                ConsoleUtility.WriteColoredLine("\tNo backtests results found...", ConsoleColor.Red);
             }
-            if (BacktestOptions.ConsoleMode)
-            {
-                ConsoleUtility.WriteSeparator();
-            }
-            
+            ConsoleUtility.WriteSeparator();
         }
 
-        public static void BackTestAll()
+
+        public static List<BackTestStrategyResult> BackTestAll(BacktestOptions backtestOptions)
         {
+            JArray strategies = new JArray();
+
             var runner = new BackTestRunner();
-
-            if (BacktestOptions.ConsoleMode)
-            {
-                Console.WriteLine();
-                Console.WriteLine($"\t=============== BACKTESTING REPORT ===============");
-                Console.WriteLine();
-                ConsoleUtility.WriteColoredLine($"\tNote: Profit is based on trading with 0.1 BTC each trade.", ConsoleColor.Cyan);
-                Console.WriteLine();
-            }
-
             var results = new List<BackTestStrategyResult>();
 
             foreach (var item in GetTradingStrategies())
             {
                 var stratResult = new BackTestStrategyResult() { Strategy = item.Name };
-                stratResult.Results.AddRange(runner.RunSingleStrategy(item, BacktestOptions.Coins, BacktestOptions.StakeAmount, BacktestOptions.OnlyStartNewTradesWhenSold));
+                stratResult.Results.AddRange(runner.RunSingleStrategy(item, backtestOptions));
                 results.Add(stratResult);
             };
+
+            return results;
+        }
+
+        public static JArray BackTestAllJson(BacktestOptions backtestOptions)
+        {
+            List<BackTestStrategyResult> results = BackTestAll(backtestOptions);
+            JArray jArrayResult = new JArray();
+
+            foreach (var result in results)
+            {
+                JObject currentResult = new JObject();
+                currentResult["Strategy"] = result.Strategy;
+                currentResult["AmountOfTrades"] = result.AmountOfTrades;
+                currentResult["AmountOfProfitableTrades"] = result.AmountOfProfitableTrades;
+                currentResult["SuccessRate"] = result.SuccessRate;
+                currentResult["TotalProfit"] = result.TotalProfit;
+                currentResult["TotalProfitPercentage"] = result.TotalProfitPercentage;
+                currentResult["AverageDuration"] = result.AverageDuration;
+                currentResult["DataPeriod"] = result.DataPeriod;
+                jArrayResult.Add(currentResult);
+            }
+            return jArrayResult;
+        }
+
+
+        public static void BackTestAllConsole(BacktestOptions backtestOptions)
+        {
+
+            List<BackTestStrategyResult> results = BackTestAll(backtestOptions);
+
+            Console.WriteLine();
+            Console.WriteLine($"\t=============== BACKTESTING REPORT ===============");
+            Console.WriteLine();
+            ConsoleUtility.WriteColoredLine($"\tNote: Profit is based on trading with 0.1 BTC each trade.", ConsoleColor.Cyan);
+            Console.WriteLine();
 
             // Prints the results for each coin for this strategy.
             if (results.Count > 0)
@@ -169,20 +235,12 @@ namespace Mynt.Core.Backtester
             }
             else
             {
-                if (BacktestOptions.ConsoleMode)
-                {
-                    ConsoleUtility.WriteColoredLine("\tNo backtests results found...", ConsoleColor.Red);
-                }
+
+                ConsoleUtility.WriteColoredLine("\tNo backtests results found...", ConsoleColor.Red);
             }
-            if (BacktestOptions.ConsoleMode)
-            {
-                ConsoleUtility.WriteSeparator();
-            }
+            ConsoleUtility.WriteSeparator();
         }
 
         #endregion
-
-
-
     }
 }

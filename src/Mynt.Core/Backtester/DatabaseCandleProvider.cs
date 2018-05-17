@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 
 namespace Mynt.Core.Backtester
 {
-    internal class DatabaseCandleProvider
+    public class DatabaseCandleProvider
     {
         private readonly string folder;
 
@@ -19,20 +19,20 @@ namespace Mynt.Core.Backtester
             this.folder = folder;
         }
 
-        public List<Candle> GetCandles(string symbol, int period)
+        public List<Candle> GetCandles(string symbol, BacktestOptions backtestOptions)
         {
             //var basePath = AppDomain.CurrentDomain.BaseDirectory;
-            var filePath = BacktesterDatabase.GetDataDirectory(BacktestOptions.Exchange.ToLower(), symbol);
+            var filePath = BacktesterDatabase.GetDataDirectory(backtestOptions.Exchange.ToLower(), symbol);
 
-            DateTime startDate = Convert.ToDateTime(BacktestOptions.StartDate);
+            DateTime startDate = Convert.ToDateTime(backtestOptions.StartDate);
             DateTime endDate = DateTime.UtcNow;
 
-            if (BacktestOptions.EndDate != null && BacktestOptions.EndDate != "")
+            if (backtestOptions.EndDate != null && backtestOptions.EndDate != "")
             {
-                endDate = Convert.ToDateTime(BacktestOptions.EndDate);
+                endDate = Convert.ToDateTime(backtestOptions.EndDate);
             }
 
-            LiteCollection<Candle> candleCollection = BacktesterDatabase.DataStore.GetInstance(filePath).GetTable<Candle>("Candle_" + period.ToString());
+            LiteCollection<Candle> candleCollection = BacktesterDatabase.DataStore.GetInstance(filePath).GetTable<Candle>("Candle_" + backtestOptions.CandlePeriod.ToString());
 
             candleCollection.EnsureIndex("Timestamp");
             List<Candle> candles = candleCollection.Find(Query.Between("Timestamp", startDate, endDate), Query.Ascending).ToList();
