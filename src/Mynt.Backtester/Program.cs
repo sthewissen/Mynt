@@ -152,7 +152,7 @@ namespace Mynt.Backtester
         {
             if (writeMenuCount == 0)
             {
-                DataRefresher.GetCacheAge(BacktestOptions);
+                DataRefresher.GetCacheAgeConsole(BacktestOptions);
             }
             writeMenuCount = writeMenuCount + 1;
 

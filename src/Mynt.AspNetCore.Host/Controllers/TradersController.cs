@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Mynt.Core.Backtester;
+using Mynt.Core.Enums;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
 using Newtonsoft.Json.Linq;
@@ -35,9 +36,9 @@ namespace Mynt.AspNetCore.Host.Controllers
         public async Task<JArray> Get()
         {
             //Sample init with custom Values:
-
+            string exchange = "Binance";
             BacktestOptions backtestOptions = new BacktestOptions();
-            backtestOptions.Exchange = "Binance";
+            backtestOptions.Exchange = (Exchange)Enum.Parse(typeof(Exchange), exchange);
             backtestOptions.Coins = new List<string>(new string[] { "NEOBTC", "OMGBTC", "ARKBTC", "XRPBTC", "REQBTC", "LTCBTC", "ETHBTC", "VENBTC" });
 
             return DataRefresher.GetCacheAge(backtestOptions);
@@ -51,9 +52,9 @@ namespace Mynt.AspNetCore.Host.Controllers
         public async Task<string> Get()
         {
             //Sample init with custom Values:
-
+            string exchange = "Binance";
             BacktestOptions backtestOptions = new BacktestOptions();
-            backtestOptions.Exchange = Core.Enums.Exchange.Binance;
+            backtestOptions.Exchange = (Exchange)Enum.Parse(typeof(Exchange), exchange);
             backtestOptions.Coins = new List<string>(new string[] { "NEOBTC", "OMGBTC", "ARKBTC", "XRPBTC", "REQBTC", "LTCBTC", "ETHBTC", "VENBTC" });
 
             await DataRefresher.RefreshCandleData((x) => Console.WriteLine(x), backtestOptions);
@@ -69,9 +70,9 @@ namespace Mynt.AspNetCore.Host.Controllers
         public async Task<JArray> Get()
         {
             //Sample init with custom Values:
-
+            string exchange = "Binance";
             BacktestOptions backtestOptions = new BacktestOptions();
-            backtestOptions.Exchange = Core.Enums.Exchange.Binance;
+            backtestOptions.Exchange = (Exchange)Enum.Parse(typeof(Exchange), exchange);
             backtestOptions.Coins =  new List<string>(new string[] { "NEOBTC", "OMGBTC", "ARKBTC", "XRPBTC", "REQBTC", "LTCBTC", "ETHBTC", "VENBTC" });
 
             return BacktestFunctions.BackTestAllJson(backtestOptions);

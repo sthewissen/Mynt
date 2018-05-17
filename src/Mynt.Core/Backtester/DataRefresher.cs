@@ -24,13 +24,7 @@ namespace Mynt.Core.Backtester
 
         public static async Task RefreshCandleData(Action<string> callback, BacktestOptions backtestOptions)
         {
-
-            var builder = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json", optional: true);
-            IConfiguration Configuration = builder.Build();
-
-            var exchangeOptions = Configuration.Get<ExchangeOptions>();
-            Console.WriteLine(exchangeOptions);
-            BaseExchange _api = new BaseExchange(exchangeOptions);
+            BaseExchange _api = new BaseExchangeInstance().BaseExchange(backtestOptions.Exchange.ToString());
 
             List<string> writtenFiles = new List<string>();
 
@@ -102,13 +96,16 @@ namespace Mynt.Core.Backtester
                     LiteCollection<Candle> getCacheAge = BacktesterDatabase.DataStore.GetInstance(instance).GetTable<Candle>("Candle_" + backtestOptions.CandlePeriod);
                     Candle currentHistoricalDataLast = getCacheAge.Find(Query.All("Timestamp", Query.Descending), limit: 1).FirstOrDefault();
                     Candle currentHistoricalDataFirst = getCacheAge.Find(Query.All("Timestamp", Query.Ascending), limit: 1).FirstOrDefault();
-                    JObject currentResult = new JObject();
-                    currentResult["Exchange"] = coin;
-                    currentResult["Coin"] = coin;
-                    currentResult["CandlePeriod"] = backtestOptions.CandlePeriod;
-                    currentResult["FirstCandleDate"] = currentHistoricalDataFirst.Timestamp.ToUniversalTime();
-                    currentResult["LastCandleDate"] = currentHistoricalDataLast.Timestamp.ToUniversalTime();
-                    jArrayResult.Add(currentResult);
+                    if (currentHistoricalDataFirst != null && currentHistoricalDataLast != null)
+                    {
+                        JObject currentResult = new JObject();
+                        currentResult["Exchange"] = coin;
+                        currentResult["Coin"] = coin;
+                        currentResult["CandlePeriod"] = backtestOptions.CandlePeriod;
+                        currentResult["FirstCandleDate"] = currentHistoricalDataFirst.Timestamp.ToUniversalTime();
+                        currentResult["LastCandleDate"] = currentHistoricalDataLast.Timestamp.ToUniversalTime();
+                        jArrayResult.Add(currentResult);
+                    }
                 }
             }
             return jArrayResult;
@@ -136,8 +133,11 @@ namespace Mynt.Core.Backtester
                     LiteCollection<Candle> getCacheAge = BacktesterDatabase.DataStore.GetInstance(instance).GetTable<Candle>("Candle_" + backtestOptions.CandlePeriod);
                     Candle currentHistoricalDataLast = getCacheAge.Find(Query.All("Timestamp", Query.Descending), limit: 1).FirstOrDefault();
                     Candle currentHistoricalDataFirst = getCacheAge.Find(Query.All("Timestamp", Query.Ascending), limit: 1).FirstOrDefault();
-                    Console.WriteLine("\tAvailable Cache for " + backtestOptions.Exchange + " " + coin + " Period: " + backtestOptions.CandlePeriod + "min  - from " + currentHistoricalDataFirst.Timestamp.ToUniversalTime() + " until " + currentHistoricalDataLast.Timestamp.ToUniversalTime());
-                    dataCount = dataCount + 1;
+                    if (currentHistoricalDataFirst != null && currentHistoricalDataLast != null)
+                    {
+                        Console.WriteLine("\tAvailable Cache for " + backtestOptions.Exchange + " " + coin + " Period: " + backtestOptions.CandlePeriod + "min  - from " + currentHistoricalDataFirst.Timestamp.ToUniversalTime() + " until " + currentHistoricalDataLast.Timestamp.ToUniversalTime());
+                        dataCount = dataCount + 1;
+                    }
                 }
             }
 
