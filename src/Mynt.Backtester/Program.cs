@@ -3,12 +3,11 @@ using System.IO;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Mynt.Core.Backtester;
-using Mynt.Core.Exchanges;
 using Mynt.Core.Utility;
 
 namespace Mynt.Backtester
 {
-    class Program
+	class Program
     {
         public static IConfiguration Configuration { get; set; }
         public static BacktestOptions BacktestOptions { get; set; }
@@ -181,9 +180,7 @@ namespace Mynt.Backtester
             Console.WriteLine();
         }
 
-        #endregion
-
-
+        #endregion      
 
     }
 }

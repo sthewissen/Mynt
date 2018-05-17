@@ -38,7 +38,7 @@ namespace Mynt.Core.Backtester
             {
                 DateTime startDate = Convert.ToDateTime(backtestOptions.StartDate).ToUniversalTime();
                 DateTime endDate = DateTime.UtcNow;
-                var filePath = BacktesterDatabase.GetDataDirectory(backtestOptions.Exchange.ToLower(), coinToBuy);
+				var filePath = BacktesterDatabase.GetDataDirectory(backtestOptions.Exchange.ToString().ToLower(), coinToBuy);
 
                 LiteCollection<Candle> candleCollection = BacktesterDatabase.DataStore.GetInstance(filePath).GetTable<Candle>("Candle_" + backtestOptions.CandlePeriod.ToString());
 
@@ -49,7 +49,7 @@ namespace Mynt.Core.Backtester
                     {
                         File.Delete(filePath);
                     } 
-                    callback($"Recreate database with Period {backtestOptions.CandlePeriod.ToString()}min for {coinToBuy.ToString()} from {startDate.ToString()} UTC to {endDate.RoundDown(TimeSpan.FromMinutes(backtestOptions.CandlePeriod))} UTC");
+					callback($"\tRecreate database with Period {backtestOptions.CandlePeriod.ToString()}min for {coinToBuy.ToString()} from {startDate.ToString()} UTC to {endDate.RoundDown(TimeSpan.FromMinutes(backtestOptions.CandlePeriod))} UTC");
                 }
                 else
                 {
@@ -58,10 +58,10 @@ namespace Mynt.Core.Backtester
                     if (currentHistoricalData != null)
                     {
                         startDate = currentHistoricalData.Timestamp.ToUniversalTime();
-                        callback($"Update database with Period {backtestOptions.CandlePeriod.ToString()}min for {coinToBuy.ToString()} from {startDate.ToString()} UTC to {endDate.RoundDown(TimeSpan.FromMinutes(backtestOptions.CandlePeriod))} UTC");
+						callback($"\tUpdate database with Period {backtestOptions.CandlePeriod.ToString()}min for {coinToBuy.ToString()} from {startDate.ToString()} UTC to {endDate.RoundDown(TimeSpan.FromMinutes(backtestOptions.CandlePeriod))} UTC");
                     } else
                     {
-                        callback($"Create new database with Period {backtestOptions.CandlePeriod.ToString()}min for {coinToBuy.ToString()} from {startDate.ToString()} UTC to {endDate.RoundDown(TimeSpan.FromMinutes(backtestOptions.CandlePeriod))} UTC");
+						callback($"\tCreate new database with Period {backtestOptions.CandlePeriod.ToString()}min for {coinToBuy.ToString()} from {startDate.ToString()} UTC to {endDate.RoundDown(TimeSpan.FromMinutes(backtestOptions.CandlePeriod))} UTC");
                     }
                 }
 
@@ -73,7 +73,7 @@ namespace Mynt.Core.Backtester
                     candleCollection.InsertBulk(candles);
                 }
 
-                callback($"Refreshed data for {coinToBuy}...");
+				callback($"\tRefreshed data for {coinToBuy}...");
                 writtenFiles.Add(filePath);
             }
 
@@ -96,7 +96,7 @@ namespace Mynt.Core.Backtester
 
             foreach (var coin in backtestOptions.Coins)
             {
-                string instance = BacktesterDatabase.GetDataDirectory() + "/" + backtestOptions.Exchange.ToLower() + "_" + coin + ".db";
+				string instance = BacktesterDatabase.GetDataDirectory() + "/" + backtestOptions.Exchange.ToString().ToLower() + "_" + coin + ".db";
                 if (File.Exists(instance))
                 {
                     LiteCollection<Candle> getCacheAge = BacktesterDatabase.DataStore.GetInstance(instance).GetTable<Candle>("Candle_" + backtestOptions.CandlePeriod);
@@ -130,7 +130,7 @@ namespace Mynt.Core.Backtester
             int dataCount = 0;
             foreach (var coin in backtestOptions.Coins)
             {
-                string instance = BacktesterDatabase.GetDataDirectory() + "/" + backtestOptions.Exchange.ToLower() + "_" + coin + ".db";
+				string instance = BacktesterDatabase.GetDataDirectory() + "/" + backtestOptions.Exchange.ToString().ToLower() + "_" + coin + ".db";
                 if (File.Exists(instance))
                 {
                     LiteCollection<Candle> getCacheAge = BacktesterDatabase.DataStore.GetInstance(instance).GetTable<Candle>("Candle_" + backtestOptions.CandlePeriod);
@@ -146,7 +146,7 @@ namespace Mynt.Core.Backtester
                 Console.WriteLine("\tNo data - Please run 4. Refresh candle data first");
             }
 
-            Console.WriteLine("");
+            Console.WriteLine();
         }
     }
 }

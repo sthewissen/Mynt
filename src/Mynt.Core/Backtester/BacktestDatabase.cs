@@ -32,7 +32,7 @@ namespace Mynt.Core.Backtester
 
             private DataStore(string databasePath)
             {
-                //Workaround on OSX -> Dont support Locking/unlocking file regions 
+                // Workaround on OSX -> Dont support Locking/unlocking file regions 
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                 {
                     liteDataBase = new LiteDatabase("filename=" + databasePath + ";mode=Exclusive");

@@ -5,7 +5,7 @@ namespace Mynt.Core.Backtester
 {
     public class BacktestOptions
     {
-        public string Exchange { get; set; } = "Binance";
+		public Enums.Exchange Exchange { get; set; } = Enums.Exchange.Binance;
         public decimal StakeAmount { get; set; } = 0.1m;
         public bool OnlyStartNewTradesWhenSold { get; set; } = true;
         public List<string> Coins { get; set; } = new List<string> { };
