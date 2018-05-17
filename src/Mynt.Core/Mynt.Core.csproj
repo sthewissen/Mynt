@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -19,6 +19,7 @@
     <Folder Include="Strategies\Simple\" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="LiteDB" Version="4.1.2" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.0.0" />
     <PackageReference Include="TA-Lib" Version="0.5.0.3" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.4.1" />

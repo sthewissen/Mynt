@@ -5,7 +5,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Mynt.Backtester
+namespace Mynt.Core.Backtester
 {
     public class BacktesterDatabase
     {

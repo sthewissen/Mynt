@@ -5,11 +5,13 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Mynt.Backtester.Models;
+using Mynt.Core.Backtester;
 using Mynt.Core.Configuration;
 using Mynt.Core.Enums;
 using Mynt.Core.Exchanges;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Strategies;
+using Mynt.Core.Utility;
 
 namespace Mynt.Backtester
 {
@@ -36,7 +38,7 @@ namespace Mynt.Backtester
 
                 if (!_dataRefresher.CheckForCandleData())
                 {
-                    WriteColoredLine("\tNo data present. Please retrieve data first.", ConsoleColor.Red);
+                    ConsoleUtility.WriteColoredLine("\tNo data present. Please retrieve data first.", ConsoleColor.Red);
                     Console.WriteLine();
                 }
 
@@ -44,7 +46,7 @@ namespace Mynt.Backtester
             }
             catch (Exception ex)
             {
-                WriteColoredLine($"\t{ex.Message}", ConsoleColor.Red);
+                ConsoleUtility.WriteColoredLine($"\t{ex.Message}", ConsoleColor.Red);
                 Console.ReadLine();
             }
         }
@@ -73,7 +75,7 @@ namespace Mynt.Backtester
                 // Get the option the user picked.
                 var result = Console.ReadLine();
 
-                WriteSeparator();
+                ConsoleUtility.WriteSeparator();
 
                 var strats = BacktestFunctions.GetTradingStrategies().OrderBy(x => x.Name).ToList();
 
@@ -97,7 +99,7 @@ namespace Mynt.Backtester
                         }
                         else
                         {
-                            WriteColoredLine("\tInvalid strategy choice.", ConsoleColor.Red);
+                            ConsoleUtility.WriteColoredLine("\tInvalid strategy choice.", ConsoleColor.Red);
                             PresentMenuToUser();
                         }
 
@@ -120,7 +122,7 @@ namespace Mynt.Backtester
                         }
                         else
                         {
-                            WriteColoredLine("\tInvalid strategy choice.", ConsoleColor.Red);
+                            ConsoleUtility.WriteColoredLine("\tInvalid strategy choice.", ConsoleColor.Red);
                             PresentMenuToUser();
                         }
 
@@ -133,7 +135,7 @@ namespace Mynt.Backtester
 
                     case "4":
                         Console.WriteLine("\tRefreshing...");
-                        Program._dataRefresher.RefreshCandleData(BacktestOptions.Coins, (x) => WriteColoredLine(x, ConsoleColor.Green), BacktestOptions.UpdateCandles, BacktestOptions.CandlePeriod).Wait();
+                        Program._dataRefresher.RefreshCandleData(BacktestOptions.Coins, (x) => ConsoleUtility.WriteColoredLine(x, ConsoleColor.Green), BacktestOptions.UpdateCandles, BacktestOptions.CandlePeriod).Wait();
                         ActionCompleted();
                         continue;
 
@@ -163,15 +165,6 @@ namespace Mynt.Backtester
             Console.WriteLine(@"                   \______/");
         }
 
-        public static void WriteColoredLine(string line, ConsoleColor color, bool padded = false)
-        {
-            Console.ForegroundColor = color;
-            if (padded) Console.WriteLine();
-            Console.WriteLine(line);
-            if (padded) Console.WriteLine();
-            Console.ResetColor();
-        }
-
         public static void WriteMenu()
         {
             DataRefresher.GetCacheAge();
@@ -187,26 +180,12 @@ namespace Mynt.Backtester
             Console.Write("\tWhat do you want to do? ");
         }
 
-        public static void WriteColored(string line, ConsoleColor color, bool padded = false)
-        {
-            Console.ForegroundColor = color;
-            if (padded) Console.WriteLine();
-            Console.Write(line);
-            if (padded) Console.WriteLine();
-            Console.ResetColor();
-        }
 
-        public static void WriteSeparator()
-        {
-            Console.WriteLine();
-            Console.WriteLine("\t============================================================");
-            Console.WriteLine();
-        }
 
         private static void ActionCompleted()
         {
-            WriteColoredLine("\tCompleted...", ConsoleColor.DarkGreen);
-            WriteColoredLine("\tPress key to continue...", ConsoleColor.Gray);
+            ConsoleUtility.WriteColoredLine("\tCompleted...", ConsoleColor.DarkGreen);
+            ConsoleUtility.WriteColoredLine("\tPress key to continue...", ConsoleColor.Gray);
             Console.ReadKey();
             Console.Clear();
             WriteIntro();

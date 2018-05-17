@@ -10,7 +10,7 @@ using Mynt.Core.Extensions;
 using Mynt.Core.Models;
 using Newtonsoft.Json;
 
-namespace Mynt.Backtester
+namespace Mynt.Core.Backtester
 {
     public class DataRefresher
     {

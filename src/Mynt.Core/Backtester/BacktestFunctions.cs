@@ -1,13 +1,14 @@
 ﻿using Mynt.Backtester.Models;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Strategies;
+using Mynt.Core.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 
-namespace Mynt.Backtester
+namespace Mynt.Core.Backtester
 {
     public class BacktestFunctions
     {
@@ -40,7 +41,7 @@ namespace Mynt.Backtester
                 Console.WriteLine();
                 Console.WriteLine($"\t=============== BACKTESTING REPORT {strategy.Name.ToUpper()} ===============");
                 Console.WriteLine();
-                Program.WriteColoredLine($"\tNote: Profit is based on trading with 0.1 BTC each trade.", ConsoleColor.Cyan);
+                ConsoleUtility.WriteColoredLine($"\tNote: Profit is based on trading with 0.1 BTC each trade.", ConsoleColor.Cyan);
                 Console.WriteLine();
             }
 
@@ -64,14 +65,14 @@ namespace Mynt.Backtester
             {
                 if (BacktestOptions.ConsoleMode)
                 {
-                    Program.WriteColoredLine("\tNo backtests results found...", ConsoleColor.Red);
+                    ConsoleUtility.WriteColoredLine("\tNo backtests results found...", ConsoleColor.Red);
                 }
                     
             }
 
             if (BacktestOptions.ConsoleMode)
             {
-                Program.WriteSeparator();
+                ConsoleUtility.WriteSeparator();
             }
             
         }
@@ -86,7 +87,7 @@ namespace Mynt.Backtester
                 Console.WriteLine();
                 Console.WriteLine($"\t=============== BACKTESTING REPORT {strategy.Name.ToUpper()} ===============");
                 Console.WriteLine();
-                Program.WriteColoredLine($"\tNote: Profit is based on trading with 0.1 BTC each trade.", ConsoleColor.Cyan);
+                ConsoleUtility.WriteColoredLine($"\tNote: Profit is based on trading with 0.1 BTC each trade.", ConsoleColor.Cyan);
                 Console.WriteLine();
             }
 
@@ -118,12 +119,12 @@ namespace Mynt.Backtester
             {
                 if (BacktestOptions.ConsoleMode)
                 {
-                    Program.WriteColoredLine("\tNo backtests results found...", ConsoleColor.Red);
+                    ConsoleUtility.WriteColoredLine("\tNo backtests results found...", ConsoleColor.Red);
                 }
             }
             if (BacktestOptions.ConsoleMode)
             {
-                Program.WriteSeparator();
+                ConsoleUtility.WriteSeparator();
             }
             
         }
@@ -137,7 +138,7 @@ namespace Mynt.Backtester
                 Console.WriteLine();
                 Console.WriteLine($"\t=============== BACKTESTING REPORT ===============");
                 Console.WriteLine();
-                Program.WriteColoredLine($"\tNote: Profit is based on trading with 0.1 BTC each trade.", ConsoleColor.Cyan);
+                ConsoleUtility.WriteColoredLine($"\tNote: Profit is based on trading with 0.1 BTC each trade.", ConsoleColor.Cyan);
                 Console.WriteLine();
             }
 
@@ -170,12 +171,12 @@ namespace Mynt.Backtester
             {
                 if (BacktestOptions.ConsoleMode)
                 {
-                    Program.WriteColoredLine("\tNo backtests results found...", ConsoleColor.Red);
+                    ConsoleUtility.WriteColoredLine("\tNo backtests results found...", ConsoleColor.Red);
                 }
             }
             if (BacktestOptions.ConsoleMode)
             {
-                Program.WriteSeparator();
+                ConsoleUtility.WriteSeparator();
             }
         }
 

@@ -4,8 +4,9 @@ using System.Threading.Tasks;
 using Mynt.Backtester.Models;
 using Mynt.Core.Enums;
 using Mynt.Core.Interfaces;
+using Mynt.Core.Utility;
 
-namespace Mynt.Backtester
+namespace Mynt.Core.Backtester
 {
     public class BackTestRunner
     {
@@ -68,8 +69,8 @@ namespace Mynt.Backtester
                 {
                     if (BacktestOptions.ConsoleMode)
                     {
-                        Program.WriteColoredLine($"Error in Strategy: {strategy.Name}", ConsoleColor.Red);
-                        Program.WriteColoredLine($"\t{ex.Message}", ConsoleColor.Red);
+                        ConsoleUtility.WriteColoredLine($"Error in Strategy: {strategy.Name}", ConsoleColor.Red);
+                        ConsoleUtility.WriteColoredLine($"\t{ex.Message}", ConsoleColor.Red);
                     }
                 }
 

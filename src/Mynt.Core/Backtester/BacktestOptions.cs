@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Mynt.Backtester
+namespace Mynt.Core.Backtester
 {
     public class BacktestOptions
     {
