@@ -498,6 +498,8 @@ namespace Mynt.Core.TradeManagers
             {
                 var exchangeOrder = await _api.GetOrder(trade.BuyOrderId, trade.Market);
 
+                _logger.LogInformation("Checking {Market} BUY order @ {OpenRate}...", trade.Market, trade.OpenRate.ToString("0.00000000"));
+
                 // if this order is filled, we can update our database.
                 if (exchangeOrder?.Status == OrderStatus.Filled)
                 {
@@ -588,7 +590,7 @@ namespace Mynt.Core.TradeManagers
             // that means its a trade that is waiting to get sold. See if we can update that first.
 
             // An open order currently not selling or being an immediate sell are checked for SL  etc.
-            foreach (var trade in _activeTrades.Where(x => !x.IsSelling && !x.IsBuying && x.IsOpen))
+			foreach (var trade in _activeTrades.Where(x => !x.IsSelling && !x.IsBuying && x.IsOpen))
             {
                 // These are trades that are not being bought or sold at the moment so these need to be checked for sell conditions.
                 var ticker = await _api.GetTicker(trade.Market);
