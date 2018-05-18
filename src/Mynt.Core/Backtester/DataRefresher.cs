@@ -59,12 +59,28 @@ namespace Mynt.Core.Backtester
                     }
                 }
 
+                DateTime lastCandleDateTime = DateTime.MinValue;
+
                 // Get these in batches of 500 because they're limited in the API.
                 while (startDate < endDate.RoundDown(TimeSpan.FromMinutes(backtestOptions.CandlePeriod)))
                 {
-                    List<Candle> candles = await _api.GetTickerHistory(coinToBuy, backtestOptions.CandlePeriod.FromMinutesEquivalent(), startDate, endDate);
-                    startDate = candles.LastOrDefault().Timestamp;
-                    candleCollection.InsertBulk(candles);
+                    try
+                    {
+                        candleCollection.EnsureIndex("Timestamp");
+                        List<Candle> candles = await _api.GetTickerHistory(coinToBuy, backtestOptions.CandlePeriod.FromMinutesEquivalent(), startDate, endDate);
+                        startDate = candles.LastOrDefault().Timestamp.ToUniversalTime();
+                        if (lastCandleDateTime == startDate)
+                        {
+                            break;
+                        }
+                        lastCandleDateTime = startDate;
+                        candleCollection.InsertBulk(candles);
+                    }
+                    catch (Exception e)
+                    {
+                        callback($"\tError while updating {backtestOptions.Exchange.ToString()} {coinToBuy}: {e.Message}");
+                        break;
+                    }
                 }
 
 				callback($"\tRefreshed data for {coinToBuy}...");
