@@ -23,7 +23,7 @@ namespace Mynt.Backtester
                 Console.WriteLine();
                 Console.WriteLine();
 
-                if (!DataRefresher.CheckForCandleData())
+                if (!DataRefresher.CheckForCandleData(BacktestOptions))
                 {
                     ConsoleUtility.WriteColoredLine("\tNo data present. Please retrieve data first.", ConsoleColor.Red);
                     Console.WriteLine();

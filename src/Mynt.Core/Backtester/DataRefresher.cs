@@ -32,7 +32,8 @@ namespace Mynt.Core.Backtester
             {
                 DateTime startDate = Convert.ToDateTime(backtestOptions.StartDate).ToUniversalTime();
                 DateTime endDate = DateTime.UtcNow;
-				var filePath = BacktesterDatabase.GetDataDirectory(backtestOptions.DataFolder, backtestOptions.Exchange.ToString().ToLower(), coinToBuy);
+                var filePath = BacktesterDatabase.GetDataDirectory(backtestOptions.DataFolder, backtestOptions.Exchange.ToString().ToLower(), coinToBuy);
+                bool databaseExists = true;
 
                 LiteCollection<Candle> candleCollection = BacktesterDatabase.DataStore.GetInstance(filePath).GetTable<Candle>("Candle_" + backtestOptions.CandlePeriod.ToString());
 
@@ -48,33 +49,48 @@ namespace Mynt.Core.Backtester
                 else
                 {
                     candleCollection.EnsureIndex("Timestamp");
-                    Candle currentHistoricalData = candleCollection.Find(Query.All("Timestamp", Query.Descending), limit: 1).FirstOrDefault();
-                    if (currentHistoricalData != null)
+                    Candle databaseLastCandle = candleCollection.Find(Query.All("Timestamp", Query.Descending), limit: 1).FirstOrDefault();
+                    if (databaseLastCandle != null)
                     {
-                        startDate = currentHistoricalData.Timestamp.ToUniversalTime();
-						callback($"\tUpdate database with Period {backtestOptions.CandlePeriod.ToString()}min for {coinToBuy.ToString()} from {startDate.ToString()} UTC to {endDate.RoundDown(TimeSpan.FromMinutes(backtestOptions.CandlePeriod))} UTC");
+                        startDate = databaseLastCandle.Timestamp.ToUniversalTime();
+                        callback($"\tUpdate database with Period {backtestOptions.CandlePeriod.ToString()}min for {coinToBuy.ToString()} from {startDate.ToString()} UTC to {endDate.RoundDown(TimeSpan.FromMinutes(backtestOptions.CandlePeriod))} UTC");
                     } else
                     {
 						callback($"\tCreate new database with Period {backtestOptions.CandlePeriod.ToString()}min for {coinToBuy.ToString()} from {startDate.ToString()} UTC to {endDate.RoundDown(TimeSpan.FromMinutes(backtestOptions.CandlePeriod))} UTC");
+                        databaseExists = false;
                     }
                 }
 
-                DateTime lastCandleDateTime = DateTime.MinValue;
+                if (startDate == endDate.RoundDown(TimeSpan.FromMinutes(backtestOptions.CandlePeriod)))
+                {
+                    callback($"\tAlready up to date");
+                    return;
+                }
 
                 // Get these in batches of 500 because they're limited in the API.
                 while (startDate < endDate.RoundDown(TimeSpan.FromMinutes(backtestOptions.CandlePeriod)))
                 {
+                    candleCollection.EnsureIndex("Timestamp");
+
                     try
                     {
-                        candleCollection.EnsureIndex("Timestamp");
-                        List<Candle> candles = await _api.GetTickerHistory(coinToBuy, backtestOptions.CandlePeriod.FromMinutesEquivalent(), startDate, endDate);
+                        List<Candle> candles = await _api.GetTickerHistory(coinToBuy, backtestOptions.CandlePeriod.FromMinutesEquivalent(), startDate, endDate.RoundDown(TimeSpan.FromMinutes(backtestOptions.CandlePeriod)));
                         startDate = candles.LastOrDefault().Timestamp.ToUniversalTime();
-                        if (lastCandleDateTime == startDate)
+
+                        if (!databaseExists)
                         {
-                            break;
+                            candleCollection.InsertBulk(candles);
+                            databaseExists = true;
+                        } else {
+                            foreach (var candle in candles)
+                            {
+                                var newCandle = candleCollection.FindOne(x => x.Timestamp == candle.Timestamp);
+                                if (newCandle == null)
+                                {
+                                    candleCollection.Insert(candle);
+                                }
+                            }
                         }
-                        lastCandleDateTime = startDate;
-                        candleCollection.InsertBulk(candles);
                     }
                     catch (Exception e)
                     {
