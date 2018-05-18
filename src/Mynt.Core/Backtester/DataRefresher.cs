@@ -53,17 +53,17 @@ namespace Mynt.Core.Backtester
                     if (databaseLastCandle != null)
                     {
                         startDate = databaseLastCandle.Timestamp.ToUniversalTime();
-                        callback($"\tUpdate database with Period {backtestOptions.CandlePeriod.ToString()}min for {coinToBuy.ToString()} from {startDate.ToString()} UTC to {endDate.RoundDown(TimeSpan.FromMinutes(backtestOptions.CandlePeriod))} UTC");
+                        callback($"\tUpdate database: {backtestOptions.Exchange.ToString()} with Period {backtestOptions.CandlePeriod.ToString()}min for {coinToBuy.ToString()} from {startDate.ToString()} UTC to {endDate.RoundDown(TimeSpan.FromMinutes(backtestOptions.CandlePeriod))} UTC");
                     } else
                     {
-						callback($"\tCreate new database with Period {backtestOptions.CandlePeriod.ToString()}min for {coinToBuy.ToString()} from {startDate.ToString()} UTC to {endDate.RoundDown(TimeSpan.FromMinutes(backtestOptions.CandlePeriod))} UTC");
+						callback($"\tCreate database: {backtestOptions.Exchange.ToString()} with Period {backtestOptions.CandlePeriod.ToString()}min for {coinToBuy.ToString()} from {startDate.ToString()} UTC to {endDate.RoundDown(TimeSpan.FromMinutes(backtestOptions.CandlePeriod))} UTC");
                         databaseExists = false;
                     }
                 }
 
                 if (startDate == endDate.RoundDown(TimeSpan.FromMinutes(backtestOptions.CandlePeriod)))
                 {
-                    callback($"\tAlready up to date");
+                    callback($"\tAlready up to date: {backtestOptions.Exchange.ToString()} with Period {backtestOptions.CandlePeriod.ToString()}min for {coinToBuy.ToString()} from {startDate.ToString()} UTC to {endDate.RoundDown(TimeSpan.FromMinutes(backtestOptions.CandlePeriod))} UTC");
                     return;
                 }
 
@@ -75,6 +75,11 @@ namespace Mynt.Core.Backtester
                     try
                     {
                         List<Candle> candles = await _api.GetTickerHistory(coinToBuy, backtestOptions.CandlePeriod.FromMinutesEquivalent(), startDate, endDate.RoundDown(TimeSpan.FromMinutes(backtestOptions.CandlePeriod)));
+                        if (candles.Count == 0 || candles.LastOrDefault().Timestamp.ToUniversalTime() == startDate)
+                        {
+                            callback($"\tNo update: {backtestOptions.Exchange.ToString()} with Period {backtestOptions.CandlePeriod.ToString()}min for {coinToBuy.ToString()} from {startDate.ToString()} UTC to {endDate.RoundDown(TimeSpan.FromMinutes(backtestOptions.CandlePeriod))} UTC");
+                            break;
+                        }
                         startDate = candles.LastOrDefault().Timestamp.ToUniversalTime();
 
                         if (!databaseExists)
@@ -91,15 +96,16 @@ namespace Mynt.Core.Backtester
                                 }
                             }
                         }
+
+                        callback($"\tUpdated: {backtestOptions.Exchange.ToString()} with Period {backtestOptions.CandlePeriod.ToString()}min for {coinToBuy.ToString()} from {startDate.ToString()} UTC to {endDate.RoundDown(TimeSpan.FromMinutes(backtestOptions.CandlePeriod))} UTC");
                     }
                     catch (Exception e)
                     {
-                        callback($"\tError while updating {backtestOptions.Exchange.ToString()} {coinToBuy}: {e.Message}");
+                        callback($"\tError while updating: {backtestOptions.Exchange.ToString()} {coinToBuy}: {e.Message}");
                         break;
                     }
                 }
 
-				callback($"\tRefreshed data for {coinToBuy}...");
                 writtenFiles.Add(filePath);
             }
 
