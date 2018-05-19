@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Mynt.Backtester.Models;
 using Mynt.Core.Enums;
 using Mynt.Core.Interfaces;
@@ -17,7 +16,7 @@ namespace Mynt.Core.Backtester
             // Go through our coinpairs and backtest them.
             foreach (var pair in backtestOptions.Coins)
             {
-                var candleProvider = new DatabaseCandleProvider("data");
+                var candleProvider = new DatabaseCandleProvider();
 
                 // This creates a list of buy signals.
                 var candles = candleProvider.GetCandles(pair, backtestOptions);
@@ -72,7 +71,7 @@ namespace Mynt.Core.Backtester
                 }
 
                 results.Add(backTestResult);
-            };
+            }
 
             return results;
         }

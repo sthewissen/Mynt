@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace Mynt.Core.Backtester
 {
@@ -71,7 +70,7 @@ namespace Mynt.Core.Backtester
                 Console.WriteLine(results
                                   .OrderByDescending(x => x.SuccessRate)
                                   .ToList()
-                                  .ToStringTable<BackTestResult>(new string[] { "Market", "# Trades", "# Profitable", "Success Rate", "BTC Profit", "Profit %", "Avg. Duration", "Period" },
+                                  .ToStringTable(new[] { "Market", "# Trades", "# Profitable", "Success Rate", "BTC Profit", "Profit %", "Avg. Duration", "Period" },
                                                                  (x) => x.Market,
                                                                  (x) => x.AmountOfTrades,
                                                                  (x) => x.AmountOfProfitableTrades,
@@ -149,7 +148,7 @@ namespace Mynt.Core.Backtester
                 Console.WriteLine(trades
                                   .OrderBy(x => x.StartDate)
                                   .ToList()
-                                  .ToStringTable<BackTestTradeResult>(new string[] { "Market", "Open", "Close", "BTC Profit", "Profit %", "Duration", "Startdate", "Enddate" },
+                                  .ToStringTable(new[] { "Market", "Open", "Close", "BTC Profit", "Profit %", "Duration", "Startdate", "Enddate" },
                                                                  (x) => x.Market,
                                                                  (x) => $"{x.OpenRate:0.00000000}",
                                                                  (x) => $"{x.CloseRate:0.00000000}",
@@ -169,8 +168,6 @@ namespace Mynt.Core.Backtester
 
         public static List<BackTestStrategyResult> BackTestAll(BacktestOptions backtestOptions)
         {
-            JArray strategies = new JArray();
-
             var runner = new BackTestRunner();
             var results = new List<BackTestStrategyResult>();
 
@@ -179,7 +176,7 @@ namespace Mynt.Core.Backtester
                 var stratResult = new BackTestStrategyResult() { Strategy = item.Name };
                 stratResult.Results.AddRange(runner.RunSingleStrategy(item, backtestOptions));
                 results.Add(stratResult);
-            };
+            }
 
             return results;
         }
@@ -223,7 +220,7 @@ namespace Mynt.Core.Backtester
                 Console.WriteLine(results
                                   .OrderByDescending(x => x.SuccessRate)
                                   .ToList()
-                                  .ToStringTable<BackTestStrategyResult>(new string[] { "Strategy", "# Trades", "# Profitable", "Success Rate", "BTC Profit", "Profit %", "Avg. Duration", "Max. Period" },
+                                  .ToStringTable(new[] { "Strategy", "# Trades", "# Profitable", "Success Rate", "BTC Profit", "Profit %", "Avg. Duration", "Max. Period" },
                                                                        (x) => x.Strategy,
                                                                        (x) => x.AmountOfTrades,
                                                                        (x) => x.AmountOfProfitableTrades,

@@ -1,15 +1,13 @@
 ﻿using LiteDB;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Text;
 
 namespace Mynt.Core.Backtester
 {
     public class BacktesterDatabase
     {
-        public static Dictionary<string, DataStore> instance = new Dictionary<string, DataStore>();
+        private static readonly Dictionary<string, DataStore> DatabaseInstances = new Dictionary<string, DataStore>();
 
         public static string GetDataDirectory(string datafolder, string exchange = null, string pair = null)
         {
@@ -25,37 +23,37 @@ namespace Mynt.Core.Backtester
 
         public class DataStore
         {
-            private LiteDatabase liteDataBase;
+            private readonly LiteDatabase _liteDatabase;
 
             private DataStore(string databasePath)
             {
                 // Workaround on OSX -> Dont support Locking/unlocking file regions 
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                 {
-                    liteDataBase = new LiteDatabase("filename=" + databasePath + ";mode=Exclusive");
+                    _liteDatabase = new LiteDatabase("filename=" + databasePath + ";mode=Exclusive;utc=true");
                 }
                 else
                 {
-                    liteDataBase = new LiteDatabase(databasePath);
+                    _liteDatabase = new LiteDatabase("filename=" + databasePath + ";mode=Exclusive;mode=Shared;utc=true");
                 }
             }
 
             public static DataStore GetInstance(string databasePath)
             {
-                if (!instance.ContainsKey(databasePath))
+                if (!DatabaseInstances.ContainsKey(databasePath))
                 {
-                    instance[databasePath] = new DataStore(databasePath);
+                    DatabaseInstances[databasePath] = new DataStore(databasePath);
                 }
-                return instance[databasePath];
+                return DatabaseInstances[databasePath];
             }
 
             public LiteCollection<T> GetTable<T>(string collectionName = null) where T : new()
             {
                 if (collectionName == null)
                 {
-                    return liteDataBase.GetCollection<T>(typeof(T).Name);
+                    return _liteDatabase.GetCollection<T>(typeof(T).Name);
                 }
-                return liteDataBase.GetCollection<T>(collectionName);
+                return _liteDatabase.GetCollection<T>(collectionName);
             }
         }
     }

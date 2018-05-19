@@ -3,14 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using ExchangeSharp;
 using LiteDB;
-using Microsoft.Extensions.Configuration;
-using Mynt.Core.Enums;
 using Mynt.Core.Exchanges;
 using Mynt.Core.Extensions;
 using Mynt.Core.Models;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace Mynt.Core.Backtester
@@ -26,18 +22,18 @@ namespace Mynt.Core.Backtester
 
         public static async Task RefreshCandleData(Action<string> callback, BacktestOptions backtestOptions)
         {
-            BaseExchange _api = new BaseExchangeInstance().BaseExchange(backtestOptions.Exchange.ToString());
+            BaseExchange baseExchangeApi = new BaseExchangeInstance().BaseExchange(backtestOptions.Exchange.ToString());
 
             List<string> writtenFiles = new List<string>();
 
             foreach (var coinToBuy in backtestOptions.Coins)
             {
-                string currentlyRunningString = backtestOptions.Exchange.ToString() + "_" + coinToBuy + "_" + backtestOptions.CandlePeriod.ToString();
+                string currentlyRunningString = backtestOptions.Exchange + "_" + coinToBuy + "_" + backtestOptions.CandlePeriod;
                 lock (CurrentlyRunningUpdates)
                 {
                     if (CurrentlyRunningUpdates.ContainsKey(currentlyRunningString))
                     {
-                        callback($"\tUpdate still in process:  {backtestOptions.Exchange.ToString()} with Period {backtestOptions.CandlePeriod.ToString()}min for {coinToBuy.ToString()} from {backtestOptions.StartDate.ToString()} UTC to {DateTime.UtcNow.RoundDown(TimeSpan.FromMinutes(backtestOptions.CandlePeriod))} UTC");
+                        callback($"\tUpdate still in process:  {backtestOptions.Exchange.ToString()} with Period {backtestOptions.CandlePeriod.ToString()}min for {coinToBuy} from {backtestOptions.StartDate} UTC to {DateTime.UtcNow.RoundDown(TimeSpan.FromMinutes(backtestOptions.CandlePeriod))} UTC");
                         return;
                     }
                     CurrentlyRunningUpdates[currentlyRunningString] = backtestOptions;
@@ -48,7 +44,7 @@ namespace Mynt.Core.Backtester
                 var filePath = BacktesterDatabase.GetDataDirectory(backtestOptions.DataFolder, backtestOptions.Exchange.ToString().ToLower(), coinToBuy);
                 bool databaseExists = true;
 
-                LiteCollection<Candle> candleCollection = BacktesterDatabase.DataStore.GetInstance(filePath).GetTable<Candle>("Candle_" + backtestOptions.CandlePeriod.ToString());
+                LiteCollection<Candle> candleCollection = BacktesterDatabase.DataStore.GetInstance(filePath).GetTable<Candle>("Candle_" + backtestOptions.CandlePeriod);
 
                 // Delete an existing file if this is no update
                 if (!backtestOptions.UpdateCandles)
@@ -57,7 +53,7 @@ namespace Mynt.Core.Backtester
                     {
                         File.Delete(filePath);
                     } 
-					callback($"\tRecreate database: {backtestOptions.Exchange.ToString()} with Period {backtestOptions.CandlePeriod.ToString()}min for {coinToBuy.ToString()} {startDate.ToString()} to {endDate.RoundDown(TimeSpan.FromMinutes(backtestOptions.CandlePeriod))} UTC");
+					callback($"\tRecreate database: {backtestOptions.Exchange.ToString()} with Period {backtestOptions.CandlePeriod.ToString()}min for {coinToBuy} {startDate.ToUniversalTime()} to {endDate.RoundDown(TimeSpan.FromMinutes(backtestOptions.CandlePeriod))} UTC");
                 }
                 else
                 {
@@ -66,18 +62,21 @@ namespace Mynt.Core.Backtester
                     if (databaseLastCandle != null)
                     {
                         startDate = databaseLastCandle.Timestamp.ToUniversalTime();
-                        callback($"\tUpdate database: {backtestOptions.Exchange.ToString()} with Period {backtestOptions.CandlePeriod.ToString()}min for {coinToBuy.ToString()} {startDate.ToString()} to {endDate.RoundDown(TimeSpan.FromMinutes(backtestOptions.CandlePeriod))} UTC");
+                        callback($"\tUpdate database: {backtestOptions.Exchange.ToString()} with Period {backtestOptions.CandlePeriod.ToString()}min for {coinToBuy} {startDate.ToUniversalTime()} to {endDate.RoundDown(TimeSpan.FromMinutes(backtestOptions.CandlePeriod))} UTC");
                     } else
                     {
-						callback($"\tCreate database: {backtestOptions.Exchange.ToString()} with Period {backtestOptions.CandlePeriod.ToString()}min for {coinToBuy.ToString()} {startDate.ToString()} to {endDate.RoundDown(TimeSpan.FromMinutes(backtestOptions.CandlePeriod))} UTC");
+						callback($"\tCreate database: {backtestOptions.Exchange.ToString()} with Period {backtestOptions.CandlePeriod.ToString()}min for {coinToBuy} {startDate.ToUniversalTime()} to {endDate.RoundDown(TimeSpan.FromMinutes(backtestOptions.CandlePeriod))} UTC");
                         databaseExists = false;
                     }
                 }
 
                 if (startDate == endDate.RoundDown(TimeSpan.FromMinutes(backtestOptions.CandlePeriod)))
                 {
-                    callback($"\tAlready up to date: {backtestOptions.Exchange.ToString()} with Period {backtestOptions.CandlePeriod.ToString()}min for {coinToBuy.ToString()} {startDate.ToString()} to {endDate.RoundDown(TimeSpan.FromMinutes(backtestOptions.CandlePeriod))} UTC");
-                    CurrentlyRunningUpdates.Remove(currentlyRunningString);
+                    callback($"\tAlready up to date: {backtestOptions.Exchange.ToString()} with Period {backtestOptions.CandlePeriod.ToString()}min for {coinToBuy} {startDate.ToUniversalTime()} to {endDate.RoundDown(TimeSpan.FromMinutes(backtestOptions.CandlePeriod))} UTC");
+                    lock (CurrentlyRunningUpdates)
+                    {
+                        CurrentlyRunningUpdates.Remove(currentlyRunningString);
+                    }
                     return;
                 }
 
@@ -88,13 +87,13 @@ namespace Mynt.Core.Backtester
 
                     try
                     {
-                        List<Candle> candles = await _api.GetTickerHistory(coinToBuy, backtestOptions.CandlePeriod.FromMinutesEquivalent(), startDate, endDate.RoundDown(TimeSpan.FromMinutes(backtestOptions.CandlePeriod)));
-                        if (candles.Count == 0 || candles.LastOrDefault().Timestamp.ToUniversalTime() == startDate)
+                        List<Candle> candles = await baseExchangeApi.GetTickerHistory(coinToBuy, backtestOptions.CandlePeriod.FromMinutesEquivalent(), startDate, endDate.RoundDown(TimeSpan.FromMinutes(backtestOptions.CandlePeriod)));
+                        if (candles.Count == 0 || candles.Last().Timestamp.ToUniversalTime() == startDate)
                         {
-                            callback($"\tNo update: {backtestOptions.Exchange.ToString()} with Period {backtestOptions.CandlePeriod.ToString()}min for {coinToBuy.ToString()} {startDate.ToString()} to {endDate.RoundDown(TimeSpan.FromMinutes(backtestOptions.CandlePeriod))} UTC");
+                            callback($"\tNo update: {backtestOptions.Exchange.ToString()} with Period {backtestOptions.CandlePeriod.ToString()}min for {coinToBuy} {startDate.ToUniversalTime()} to {endDate.RoundDown(TimeSpan.FromMinutes(backtestOptions.CandlePeriod))} UTC");
                             break;
                         }
-                        startDate = candles.LastOrDefault().Timestamp.ToUniversalTime();
+                        startDate = candles.Last().Timestamp.ToUniversalTime();
 
                         if (!databaseExists)
                         {
@@ -111,7 +110,7 @@ namespace Mynt.Core.Backtester
                             }
                         }
 
-                        callback($"\tUpdated: {backtestOptions.Exchange.ToString()} with Period {backtestOptions.CandlePeriod.ToString()}min for {coinToBuy.ToString()} {startDate.ToString()} to {endDate.RoundDown(TimeSpan.FromMinutes(backtestOptions.CandlePeriod))} UTC");
+                        callback($"\tUpdated: {backtestOptions.Exchange.ToString()} with Period {backtestOptions.CandlePeriod.ToString()}min for {coinToBuy} {startDate.ToUniversalTime()} to {endDate.RoundDown(TimeSpan.FromMinutes(backtestOptions.CandlePeriod))} UTC");
                     }
                     catch (Exception e)
                     {
@@ -151,7 +150,7 @@ namespace Mynt.Core.Backtester
                 {
                     LiteCollection<Candle> getCacheAge = BacktesterDatabase.DataStore.GetInstance(instance).GetTable<Candle>("Candle_" + backtestOptions.CandlePeriod);
                     Candle currentHistoricalDataLast = getCacheAge.Find(Query.All("Timestamp", Query.Descending), limit: 1).FirstOrDefault();
-                    Candle currentHistoricalDataFirst = getCacheAge.Find(Query.All("Timestamp", Query.Ascending), limit: 1).FirstOrDefault();
+                    Candle currentHistoricalDataFirst = getCacheAge.Find(Query.All("Timestamp"), limit: 1).FirstOrDefault();
                     if (currentHistoricalDataFirst != null && currentHistoricalDataLast != null)
                     {
                         JObject currentResult = new JObject();
@@ -169,13 +168,13 @@ namespace Mynt.Core.Backtester
 
         public static void GetCacheAgeConsole(BacktestOptions backtestOptions)
         {
-            Console.WriteLine("\tBacktest StartDate: " + Convert.ToDateTime(backtestOptions.StartDate).ToUniversalTime().ToString() + " UTC");
-            if (backtestOptions.EndDate != null && backtestOptions.EndDate != "")
+            Console.WriteLine("\tBacktest StartDate: " + Convert.ToDateTime(backtestOptions.StartDate).ToUniversalTime() + " UTC");
+            if (!string.IsNullOrEmpty(backtestOptions.EndDate))
             {
-                Console.WriteLine("\tBacktest EndDate: " + Convert.ToDateTime(backtestOptions.EndDate).ToUniversalTime().ToString() + " UTC");
+                Console.WriteLine("\tBacktest EndDate: " + Convert.ToDateTime(backtestOptions.EndDate).ToUniversalTime() + " UTC");
             } else
             {
-                Console.WriteLine("\tBacktest EndDate: " + DateTime.UtcNow.ToString() + " UTC");
+                Console.WriteLine("\tBacktest EndDate: " + DateTime.UtcNow + " UTC");
             }
 
             Console.WriteLine("");
@@ -188,7 +187,7 @@ namespace Mynt.Core.Backtester
                 {
                     LiteCollection<Candle> getCacheAge = BacktesterDatabase.DataStore.GetInstance(instance).GetTable<Candle>("Candle_" + backtestOptions.CandlePeriod);
                     Candle currentHistoricalDataLast = getCacheAge.Find(Query.All("Timestamp", Query.Descending), limit: 1).FirstOrDefault();
-                    Candle currentHistoricalDataFirst = getCacheAge.Find(Query.All("Timestamp", Query.Ascending), limit: 1).FirstOrDefault();
+                    Candle currentHistoricalDataFirst = getCacheAge.Find(Query.All("Timestamp"), limit: 1).FirstOrDefault();
                     if (currentHistoricalDataFirst != null && currentHistoricalDataLast != null)
                     {
                         Console.WriteLine("\tAvailable Cache for " + backtestOptions.Exchange + " " + coin + " Period: " + backtestOptions.CandlePeriod + "min  - from " + currentHistoricalDataFirst.Timestamp.ToUniversalTime() + " until " + currentHistoricalDataLast.Timestamp.ToUniversalTime());

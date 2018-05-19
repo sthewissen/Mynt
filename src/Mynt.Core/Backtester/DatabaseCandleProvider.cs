@@ -3,22 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using LiteDB;
-using Mynt.Core.Enums;
-using Mynt.Core.Extensions;
 using Mynt.Core.Models;
-using Newtonsoft.Json;
 
 namespace Mynt.Core.Backtester
 {
     public class DatabaseCandleProvider
     {
-        private readonly string folder;
-
-        public DatabaseCandleProvider(string folder)
-        {
-            this.folder = folder;
-        }
-
         public List<Candle> GetCandles(string symbol, BacktestOptions backtestOptions)
         {
             //var basePath = AppDomain.CurrentDomain.BaseDirectory;
@@ -27,7 +17,7 @@ namespace Mynt.Core.Backtester
             DateTime startDate = Convert.ToDateTime(backtestOptions.StartDate);
             DateTime endDate = DateTime.UtcNow;
 
-            if (backtestOptions.EndDate != null && backtestOptions.EndDate != "")
+            if (!string.IsNullOrEmpty(backtestOptions.EndDate))
             {
                 endDate = Convert.ToDateTime(backtestOptions.EndDate);
             }
