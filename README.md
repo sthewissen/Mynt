@@ -32,8 +32,8 @@ A lot of the logic is based on the [Freqtrade] bot and was converted to C#. This
 
 ## Documentation
 
-* [Installation (Azure)](https://github.com/sthewissen/Mynt/wiki/Installation-(Azure))
-* [Installation (Local)](https://github.com/sthewissen/Mynt/wiki/Installation-(Local))
+* [Installation (Azure)](https://github.com/sthewissen/Mynt/wiki/Cloud-installation-on-Azure)
+* [Installation (Local)](https://github.com/sthewissen/Mynt/wiki/Local-installation-using-SQL-Express-and-IIS-Express)
 * [Configuration](https://github.com/sthewissen/Mynt/wiki/Configuration)
 * [Indicators](https://github.com/sthewissen/Mynt/wiki/Indicators)
 * [Strategies](https://github.com/sthewissen/Mynt/wiki/Strategies)
