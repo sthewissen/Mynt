@@ -32,44 +32,37 @@ namespace Mynt.Core.TradeManagers
         /// <returns></returns>
         public async Task LookForNewTrades()
         {
-            var trades = await FindBuyOpportunities();
+            await FindBuyOpportunities();
+        }
 
-            if (trades.Count > 0)
+        private async Task CreateTradeSignal(TradeSignal trade)
+        {
+            // The amount here is an indication and will probably not be precisely what you get.
+            var ticker = await _api.GetTicker(trade.MarketName);
+            var openRate = GetTargetBid(ticker, trade.SignalCandle);
+            var stop = openRate * (1 + _settings.StopLossPercentage);
+
+            if (trade.TradeAdvice == TradeAdvice.Buy)
             {
-                foreach (var trade in trades)
+                if (trade.Strategy is INotificationTradingStrategy)
                 {
-                    // The amount here is an indication and will probably not be precisely what you get.
-                    var ticker = await _api.GetTicker(trade.MarketName);
-                    var openRate = GetTargetBid(ticker, trade.SignalCandle);
-                    var stop = openRate * (1 + _settings.StopLossPercentage);
-
-                    if (trade.TradeAdvice == TradeAdvice.Buy)
-                    {
-                        if (trade.Strategy is INotificationTradingStrategy)
-                        {
-                            await SendNotification($"✅ {trade.Strategy.Name} - #{trade.MarketName} at {openRate:0.00000000}\n{((INotificationTradingStrategy)trade.Strategy).BuyMessage}");
-                        }
-                        else
-                        {
-                            await SendNotification($"🆘 {trade.Strategy.Name} - #{trade.MarketName} at {openRate:0.00000000}");
-                        }
-                    }
-                    else if (trade.TradeAdvice == TradeAdvice.Sell)
-                    {
-                        if (trade.Strategy is INotificationTradingStrategy)
-                        {
-                            await SendNotification($"🆘 {trade.Strategy.Name} - #{trade.MarketName} at {openRate:0.00000000}\n{((INotificationTradingStrategy)trade.Strategy).SellMessage}");
-                        }
-                        else
-                        {
-                            await SendNotification($"🆘 {trade.Strategy.Name} - #{trade.MarketName} at {openRate:0.00000000}");
-                        }
-                    }
+                    await SendNotification($"✅ {trade.Strategy.Name} - #{trade.MarketName} at {openRate:0.00000000}\n{((INotificationTradingStrategy)trade.Strategy).BuyMessage}");
+                }
+                else
+                {
+                    await SendNotification($"🆘 {trade.Strategy.Name} - #{trade.MarketName} at {openRate:0.00000000}");
                 }
             }
-            else
+            else if (trade.TradeAdvice == TradeAdvice.Sell)
             {
-                _logger.LogInformation("No trade opportunities found...");
+                if (trade.Strategy is INotificationTradingStrategy)
+                {
+                    await SendNotification($"🆘 {trade.Strategy.Name} - #{trade.MarketName} at {openRate:0.00000000}\n{((INotificationTradingStrategy)trade.Strategy).SellMessage}");
+                }
+                else
+                {
+                    await SendNotification($"🆘 {trade.Strategy.Name} - #{trade.MarketName} at {openRate:0.00000000}");
+                }
             }
         }
 
@@ -81,7 +74,7 @@ namespace Mynt.Core.TradeManagers
         private async Task<List<TradeSignal>> FindBuyOpportunities()
         {
             // Retrieve our current markets
-            var markets = await _api.GetMarketSummaries();
+            var markets = await _api.GetMarketSummaries(_settings.QuoteCurrency);
             var pairs = new List<TradeSignal>();
 
             // Check if there are markets matching our volume.
@@ -94,6 +87,10 @@ namespace Mynt.Core.TradeManagers
             foreach (var market in _settings.MarketBlackList)
                 markets.RemoveAll(x => x.CurrencyPair.BaseCurrency == market);
 
+            // If there are items on the only trade list remove the rest
+            foreach (var item in _settings.OnlyTradeList)
+                markets.RemoveAll(x => x.CurrencyPair.BaseCurrency != item);
+
             // Prioritize markets with high volume.
             foreach (var market in markets.Distinct().OrderByDescending(x => x.Volume).ToList())
             {
@@ -103,7 +100,7 @@ namespace Mynt.Core.TradeManagers
                 {
                     if (item.TradeAdvice != TradeAdvice.Hold)
                     {
-                        pairs.Add(item);
+                        await CreateTradeSignal(item);
                     }
                 }
             }
