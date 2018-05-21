@@ -288,3 +288,4 @@ __pycache__/
 *.xsd.cs
 
 .DS_Store
+/src/Mynt.AspNetCore.Host/appsettings.overrides.json
