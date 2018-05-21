@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -19,14 +16,15 @@ namespace Mynt.AspNetCore.Host.Controllers
             _dataStore = dataStore;
         }
 
-        // GET: /<controller>/
-        public IActionResult Dashboard()
+        // GET: /<controller>/        
+        public async Task<IActionResult> Dashboard()
         {
             var tradeOptions = Startup.Configuration.GetSection("TradeOptions").Get<TradeOptions>();
 
             ViewBag.quoteCurrency = tradeOptions.QuoteCurrency;
-            ViewBag.traders = _dataStore.GetTradersAsync().Result;
-            ViewBag.closedTrades = _dataStore.GetClosedTradesAsync().Result;
+
+            ViewBag.traders = await _dataStore.GetTradersAsync();
+            ViewBag.closedTrades = await _dataStore.GetClosedTradesAsync();
 
             return View();
         }

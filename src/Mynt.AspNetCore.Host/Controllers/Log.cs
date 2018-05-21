@@ -15,12 +15,12 @@ namespace Mynt.AspNetCore.Host.Controllers
         /// <param name="filename">filename as string</param>
         /// <param name="lines">Get number of lines which should be red</param>
         /// <returns></returns>
-        public static string[] ReadTail(string filename, int lines = 10)
+        public static string[] ReadTail(string filename, int lines = 10, bool descending = true)
         {
             using (var fs = File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             {
                 TextReader tr = new StreamReader(fs);
-                return Tail(tr, lines);
+                return Tail(tr, lines, true);
             }
         }
         
@@ -29,7 +29,7 @@ namespace Mynt.AspNetCore.Host.Controllers
         ///<param name="reader">The reader to read from.</param>
         ///<param name="lineCount">The number of lines to return.</param>
         ///<returns>The last lneCount lines from the reader.</returns>
-        public static string[] Tail(TextReader reader, int lineCount)
+        public static string[] Tail(TextReader reader, int lineCount, bool descending = true)
         {
             var buffer = new List<string>(lineCount);
             string line;
@@ -54,6 +54,8 @@ namespace Mynt.AspNetCore.Host.Controllers
             var retVal = new string[lineCount];
             buffer.CopyTo(lastLine + 1, retVal, 0, lineCount - lastLine - 1);
             buffer.CopyTo(0, retVal, lineCount - lastLine - 1, lastLine + 1);
+            if (descending)
+                return retVal.OrderByDescending(l => l).ToArray();
             return retVal;
         }
     }

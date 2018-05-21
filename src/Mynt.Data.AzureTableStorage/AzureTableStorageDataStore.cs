@@ -52,9 +52,26 @@ namespace Mynt.Data.AzureTableStorage
             return destination;
         }
 
-        public async Task<List<Trade>> GetActiveTradesAsync()
+        // Get close trades
+        public async Task<List<Trade>> GetClosedTradesAsync()
         {
             var query = new TableQuery<TradeAdapter>().Where(TableQuery.GenerateFilterConditionForBool("IsOpen", QueryComparisons.Equal, true));
+            TableContinuationToken token = null;
+            var items = new List<TradeAdapter>();
+            do
+            {
+                var results = await _orderTable.ExecuteQuerySegmentedAsync(query, token);
+                items.AddRange(results);
+                token = results.ContinuationToken;
+            } while (token != null);
+
+            var destination = Mapping.Mapper.Map<List<Trade>>(items);
+            return destination;
+        }
+
+        public async Task<List<Trade>> GetActiveTradesAsync()
+        {
+            var query = new TableQuery<TradeAdapter>().Where(TableQuery.GenerateFilterConditionForBool("IsOpen", QueryComparisons.Equal, false));
             TableContinuationToken token = null;
             var items = new List<TradeAdapter>();
             do

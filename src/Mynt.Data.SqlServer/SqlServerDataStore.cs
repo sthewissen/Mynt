@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Mynt.Core.Interfaces;
@@ -24,7 +23,6 @@ namespace Mynt.Data.SqlServer
             await _context.Database.MigrateAsync();
         }
 
-        // Get close trades
         public async Task<List<Trade>> GetClosedTradesAsync()
         {
             var trades = await _context.Orders.Where(x => !x.IsOpen).ToListAsync();
