@@ -8,17 +8,16 @@ namespace Mynt.Core.Backtester
 {
     public class DatabaseCandleProvider
     {
-        public async Task<List<Candle>> GetCandles(string symbol, BacktestOptions backtestOptions, IDataStore dataStore)
+        public async Task<List<Candle>> GetCandles(BacktestOptions backtestOptions, IDataStore dataStore)
         {
-            DateTime startDate = Convert.ToDateTime(backtestOptions.StartDate);
-            DateTime endDate = DateTime.UtcNow;
+            backtestOptions.EndDate = DateTime.UtcNow;
 
-            if (!string.IsNullOrEmpty(backtestOptions.EndDate))
+            if (backtestOptions.EndDate != DateTime.MinValue)
             {
-                endDate = Convert.ToDateTime(backtestOptions.EndDate);
+                backtestOptions.EndDate = backtestOptions.EndDate;
             }
 
-            List<Candle> candles = await dataStore.GetBacktestCandlesBetweenTime(backtestOptions, symbol, startDate, endDate);
+            List<Candle> candles = await dataStore.GetBacktestCandlesBetweenTime(backtestOptions);
 
             return candles;
         }

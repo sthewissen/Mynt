@@ -15,12 +15,12 @@ namespace Mynt.Core.Backtester
             var results = new List<BackTestResult>();
 
             // Go through our coinpairs and backtest them.
-            foreach (var pair in backtestOptions.Coins)
+            foreach (string pair in backtestOptions.Coins)
             {
                 var candleProvider = new DatabaseCandleProvider();
-
+                backtestOptions.Coin = pair;
                 // This creates a list of buy signals.
-                var candles = await candleProvider.GetCandles(pair, backtestOptions, dataStore);
+                var candles = await candleProvider.GetCandles(backtestOptions, dataStore);
                 var backTestResult = new BackTestResult { Market = pair };
 
                 try

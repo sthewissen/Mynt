@@ -25,16 +25,16 @@ namespace Mynt.Data.LiteDB
             traderAdapter = database.GetCollection<TraderAdapter>("Traders");
         }
 
-        public static string GetDatabase(BacktestOptions backtestOptions, string coin = null)
+        public static string GetDatabase(BacktestOptions backtestOptions)
         {
             if (!Directory.Exists(backtestOptions.DataFolder))
                 Directory.CreateDirectory(backtestOptions.DataFolder);
 
-            if (coin == null)
+            if (backtestOptions.Coin == null)
             {
                 return backtestOptions.DataFolder.Replace("\\", "/");
             }
-            return backtestOptions.DataFolder.Replace("\\", "/") + "/" + backtestOptions.Exchange + "_" + coin + ".db";
+            return backtestOptions.DataFolder.Replace("\\", "/") + "/" + backtestOptions.Exchange + "_" + backtestOptions.Coin + ".db";
         }
 
         private static readonly Dictionary<string, DataStore> DatabaseInstances = new Dictionary<string, DataStore>();
@@ -149,45 +149,45 @@ namespace Mynt.Data.LiteDB
 
         /* Backtester */
 
-        public async Task<List<Candle>> GetBacktestCandlesBetweenTime(BacktestOptions backtestOptions, string coin, DateTime startDate, DateTime endDate)
+        public async Task<List<Candle>> GetBacktestCandlesBetweenTime(BacktestOptions backtestOptions)
         {
-            LiteCollection<CandleAdapter> candleCollection = DataStore.GetInstance(GetDatabase(backtestOptions, coin)).GetTable<CandleAdapter>("Candle_" + backtestOptions.CandlePeriod);
+            LiteCollection<CandleAdapter> candleCollection = DataStore.GetInstance(GetDatabase(backtestOptions)).GetTable<CandleAdapter>("Candle_" + backtestOptions.CandlePeriod);
             candleCollection.EnsureIndex("Timestamp");
-            List<CandleAdapter> candles = candleCollection.Find(Query.Between("Timestamp", startDate, endDate), Query.Ascending).ToList();
+            List<CandleAdapter> candles = candleCollection.Find(Query.Between("Timestamp", backtestOptions.StartDate, backtestOptions.EndDate), Query.Ascending).ToList();
             var items = Mapping.Mapper.Map<List<Candle>>(candles);
             return items;
         }
 
-        public async Task<Candle> GetBacktestFirstCandle(BacktestOptions backtestOptions, string coin)
+        public async Task<Candle> GetBacktestFirstCandle(BacktestOptions backtestOptions)
         {
-            LiteCollection<CandleAdapter> candleCollection = DataStore.GetInstance(GetDatabase(backtestOptions, coin)).GetTable<CandleAdapter>("Candle_" + backtestOptions.CandlePeriod);
+            LiteCollection<CandleAdapter> candleCollection = DataStore.GetInstance(GetDatabase(backtestOptions)).GetTable<CandleAdapter>("Candle_" + backtestOptions.CandlePeriod);
             candleCollection.EnsureIndex("Timestamp");
             CandleAdapter lastCandle = candleCollection.Find(Query.All("Timestamp"), limit: 1).FirstOrDefault();
             var items = Mapping.Mapper.Map<Candle>(lastCandle);
             return items;
         }
 
-        public async Task<Candle> GetBacktestLastCandle(BacktestOptions backtestOptions, string coin)
+        public async Task<Candle> GetBacktestLastCandle(BacktestOptions backtestOptions)
         {
-            LiteCollection<CandleAdapter> candleCollection = DataStore.GetInstance(GetDatabase(backtestOptions, coin)).GetTable<CandleAdapter>("Candle_" + backtestOptions.CandlePeriod);
+            LiteCollection<CandleAdapter> candleCollection = DataStore.GetInstance(GetDatabase(backtestOptions)).GetTable<CandleAdapter>("Candle_" + backtestOptions.CandlePeriod);
             candleCollection.EnsureIndex("Timestamp");
             CandleAdapter lastCandle = candleCollection.Find(Query.All("Timestamp", Query.Descending), limit: 1).FirstOrDefault();
             var items = Mapping.Mapper.Map<Candle>(lastCandle);
             return items;
         }
 
-        public async Task SaveBacktestCandlesBulk(List<Candle> candles, BacktestOptions backtestOptions, string coin)
+        public async Task SaveBacktestCandlesBulk(List<Candle> candles, BacktestOptions backtestOptions)
         {
             var items = Mapping.Mapper.Map<List<CandleAdapter>>(candles);
-            LiteCollection<CandleAdapter> candleCollection = DataStore.GetInstance(GetDatabase(backtestOptions, coin)).GetTable<CandleAdapter>("Candle_" + backtestOptions.CandlePeriod);
+            LiteCollection<CandleAdapter> candleCollection = DataStore.GetInstance(GetDatabase(backtestOptions)).GetTable<CandleAdapter>("Candle_" + backtestOptions.CandlePeriod);
             candleCollection.EnsureIndex("Timestamp");
             candleCollection.InsertBulk(items);
         }
 
-        public async Task SaveBacktestCandle(Candle candle, BacktestOptions backtestOptions, string coin)
+        public async Task SaveBacktestCandle(Candle candle, BacktestOptions backtestOptions)
         {
             var item = Mapping.Mapper.Map<CandleAdapter>(candle);
-            LiteCollection<CandleAdapter> candleCollection = DataStore.GetInstance(GetDatabase(backtestOptions, coin)).GetTable<CandleAdapter>("Candle_" + backtestOptions.CandlePeriod);
+            LiteCollection<CandleAdapter> candleCollection = DataStore.GetInstance(GetDatabase(backtestOptions)).GetTable<CandleAdapter>("Candle_" + backtestOptions.CandlePeriod);
             candleCollection.EnsureIndex("Timestamp");
             var newCandle = candleCollection.FindOne(x => x.Timestamp == item.Timestamp);
             if (newCandle == null)
@@ -202,11 +202,11 @@ namespace Mynt.Data.LiteDB
             return allDatabaseFiles;
         }
 
-        public async Task DeleteBacktestDatabase(BacktestOptions backtestOptions, string coin)
+        public async Task DeleteBacktestDatabase(BacktestOptions backtestOptions)
         {
-            if (File.Exists(GetDatabase(backtestOptions, coin)))
+            if (File.Exists(GetDatabase(backtestOptions)))
             {
-                File.Delete(GetDatabase(backtestOptions, coin));
+                File.Delete(GetDatabase(backtestOptions));
             }
         }
 

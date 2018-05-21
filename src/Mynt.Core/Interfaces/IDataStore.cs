@@ -25,12 +25,12 @@ namespace Mynt.Core.Interfaces
         Task SaveTraderAsync(Trader trader);
 
         // Backtest related methods
-        Task<List<Candle>> GetBacktestCandlesBetweenTime(BacktestOptions backtestOptions, string coin, DateTime startDate, DateTime endDate);
-        Task<Candle> GetBacktestLastCandle(BacktestOptions backtestOptions, string coin);
-        Task<Candle> GetBacktestFirstCandle(BacktestOptions backtestOptions, string coin);
-        Task SaveBacktestCandlesBulk(List<Candle> candles, BacktestOptions backtestOptions, string coin);
-        Task SaveBacktestCandle(Candle candles, BacktestOptions backtestOptions, string coin);
+        Task<List<Candle>> GetBacktestCandlesBetweenTime(BacktestOptions backtestOptions);
+        Task<Candle> GetBacktestLastCandle(BacktestOptions backtestOptions);
+        Task<Candle> GetBacktestFirstCandle(BacktestOptions backtestOptions);
+        Task SaveBacktestCandlesBulk(List<Candle> candles, BacktestOptions backtestOptions);
+        Task SaveBacktestCandle(Candle candles, BacktestOptions backtestOptions);
         Task<List<string>> GetBacktestAllDatabases(BacktestOptions backtestOptions);
-        Task DeleteBacktestDatabase(BacktestOptions backtestOptions, string coin);
+        Task DeleteBacktestDatabase(BacktestOptions backtestOptions);
     }
 }
