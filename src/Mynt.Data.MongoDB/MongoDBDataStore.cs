@@ -13,6 +13,7 @@ namespace Mynt.Data.MongoDB
         private MongoClient client;
         private IMongoDatabase database;
         public static MongoDBOptions mongoDbOptions;
+        public string mongoDbBaseName;
         private IMongoCollection<TraderAdapter> traderAdapter;
         private IMongoCollection<TradeAdapter> ordersAdapter;
 
@@ -21,6 +22,7 @@ namespace Mynt.Data.MongoDB
             mongoDbOptions = options;
             client = new MongoClient(options.MongoUrl);
 			database = client.GetDatabase(options.MongoDatabaseName);
+            mongoDbBaseName = "Backtest_Candle_";
             ordersAdapter = database.GetCollection<TradeAdapter>("Orders");
             traderAdapter = database.GetCollection<TraderAdapter>("Traders");
         }
@@ -166,7 +168,7 @@ namespace Mynt.Data.MongoDB
 
         public async Task<List<Candle>> GetBacktestCandlesBetweenTime(BacktestOptions backtestOptions)
         {
-            IMongoCollection<CandleAdapter> candleCollection = DataStore.GetInstance("Backtest_Candle_" + backtestOptions.CandlePeriod).GetTable<CandleAdapter>(backtestOptions.Exchange + "_" + backtestOptions.Coin);
+            IMongoCollection<CandleAdapter> candleCollection = DataStore.GetInstance(mongoDbBaseName + backtestOptions.CandlePeriod).GetTable<CandleAdapter>(backtestOptions.Exchange + "_" + backtestOptions.Coin);
             List<CandleAdapter> candles = await candleCollection.Find(entry => entry.Timestamp >= backtestOptions.StartDate && entry.Timestamp <= backtestOptions.EndDate).ToListAsync();
             var items = Mapping.Mapper.Map<List<Candle>>(candles);
             return items;
@@ -174,7 +176,7 @@ namespace Mynt.Data.MongoDB
 
         public async Task<Candle> GetBacktestFirstCandle(BacktestOptions backtestOptions)
         {
-            IMongoCollection<CandleAdapter> candleCollection = DataStore.GetInstance("Backtest_Candle_" + backtestOptions.CandlePeriod).GetTable<CandleAdapter>(backtestOptions.Exchange + "_" + backtestOptions.Coin);
+            IMongoCollection<CandleAdapter> candleCollection = DataStore.GetInstance(mongoDbBaseName + backtestOptions.CandlePeriod).GetTable<CandleAdapter>(backtestOptions.Exchange + "_" + backtestOptions.Coin);
             CandleAdapter lastCandle = await candleCollection.Find(_ => true).SortBy(e => e.Timestamp).Limit(1).FirstOrDefaultAsync();
             var items = Mapping.Mapper.Map<Candle>(lastCandle);
             return items;
@@ -182,7 +184,7 @@ namespace Mynt.Data.MongoDB
 
         public async Task<Candle> GetBacktestLastCandle(BacktestOptions backtestOptions)
         {
-            IMongoCollection<CandleAdapter> candleCollection = DataStore.GetInstance("Backtest_Candle_" + backtestOptions.CandlePeriod).GetTable<CandleAdapter>(backtestOptions.Exchange + "_" + backtestOptions.Coin);
+            IMongoCollection<CandleAdapter> candleCollection = DataStore.GetInstance(mongoDbBaseName + backtestOptions.CandlePeriod).GetTable<CandleAdapter>(backtestOptions.Exchange + "_" + backtestOptions.Coin);
             CandleAdapter lastCandle = await candleCollection.Find(_ => true).SortByDescending(e => e.Timestamp).Limit(1).FirstOrDefaultAsync();
             var items = Mapping.Mapper.Map<Candle>(lastCandle);
             return items;
@@ -191,14 +193,14 @@ namespace Mynt.Data.MongoDB
         public async Task SaveBacktestCandlesBulk(List<Candle> candles, BacktestOptions backtestOptions)
         {
             var items = Mapping.Mapper.Map<List<CandleAdapter>>(candles);
-            IMongoCollection<CandleAdapter> candleCollection = DataStore.GetInstance("Backtest_Candle_" + backtestOptions.CandlePeriod).GetTable<CandleAdapter>(backtestOptions.Exchange + "_" + backtestOptions.Coin);
+            IMongoCollection<CandleAdapter> candleCollection = DataStore.GetInstance(mongoDbBaseName + backtestOptions.CandlePeriod).GetTable<CandleAdapter>(backtestOptions.Exchange + "_" + backtestOptions.Coin);
             await candleCollection.InsertManyAsync(items);
         }
 
         public async Task SaveBacktestCandle(Candle candle, BacktestOptions backtestOptions)
         {
             var item = Mapping.Mapper.Map<CandleAdapter>(candle);
-            IMongoCollection<CandleAdapter> candleCollection = DataStore.GetInstance("Backtest_Candle_" + backtestOptions.CandlePeriod).GetTable<CandleAdapter>(backtestOptions.Exchange + "_" + backtestOptions.Coin);
+            IMongoCollection<CandleAdapter> candleCollection = DataStore.GetInstance(mongoDbBaseName + backtestOptions.CandlePeriod).GetTable<CandleAdapter>(backtestOptions.Exchange + "_" + backtestOptions.Coin);
             FindOptions<CandleAdapter> marketCandleFindOptions = new FindOptions<CandleAdapter> { Limit = 1 };
             IAsyncCursor<CandleAdapter> checkData = await candleCollection.FindAsync(x => x.Timestamp == item.Timestamp, marketCandleFindOptions);
             if (await checkData.FirstOrDefaultAsync() == null)
