@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace Mynt.Core.Backtester
 {
@@ -31,16 +32,16 @@ namespace Mynt.Core.Backtester
 
         #region backtesting
 
-        public static List<BackTestResult> BackTest(ITradingStrategy strategy, BacktestOptions backtestOptions)
+        public static async Task<List<BackTestResult>> BackTest(ITradingStrategy strategy, BacktestOptions backtestOptions, IDataStore dataStore)
         {
             var runner = new BackTestRunner();
-            var results = runner.RunSingleStrategy(strategy, backtestOptions);
+            var results = await runner.RunSingleStrategy(strategy, backtestOptions, dataStore);
             return results;
         }
 
-        public static JArray BackTestJson(ITradingStrategy strategy, BacktestOptions backtestOptions)
+        public static async Task<JArray> BackTestJson(ITradingStrategy strategy, BacktestOptions backtestOptions, IDataStore dataStore)
         {
-            List<BackTestResult> results = BackTest(strategy, backtestOptions);
+            List<BackTestResult> results = await BackTest(strategy, backtestOptions, dataStore);
             JArray jArrayResult = new JArray();
 
             if (results.Count > 0)
@@ -62,9 +63,9 @@ namespace Mynt.Core.Backtester
             return jArrayResult;
         }
 
-        public static void BackTestConsole(ITradingStrategy strategy, BacktestOptions backtestOptions)
+        public static async void BackTestConsole(ITradingStrategy strategy, BacktestOptions backtestOptions, IDataStore dataStore)
         {
-            List<BackTestResult> results = BackTest(strategy, backtestOptions);
+            List<BackTestResult> results = await BackTest(strategy, backtestOptions, dataStore);
             if (results.Count > 0)
             {
                 Console.WriteLine(results
@@ -87,16 +88,16 @@ namespace Mynt.Core.Backtester
             ConsoleUtility.WriteSeparator();
         }
 
-        public static List<BackTestResult> BackTestShowTrades(ITradingStrategy strategy, BacktestOptions backtestOptions)
+        public static async Task<List<BackTestResult>> BackTestShowTrades(ITradingStrategy strategy, BacktestOptions backtestOptions, IDataStore dataStore)
         {
             var runner = new BackTestRunner();
-            var results = runner.RunSingleStrategy(strategy, backtestOptions);
+            var results = await runner.RunSingleStrategy(strategy, backtestOptions, dataStore);
             return results;
         }
 
-        public static JArray BackTestShowTradesJson(ITradingStrategy strategy, BacktestOptions backtestOptions)
+        public static async Task<JArray> BackTestShowTradesJson(ITradingStrategy strategy, BacktestOptions backtestOptions, IDataStore dataStore)
         {
-            var results = BackTestShowTrades(strategy, backtestOptions);
+            var results = await BackTestShowTrades(strategy, backtestOptions, dataStore);
 
             JArray jArrayResult = new JArray();
 
@@ -124,9 +125,9 @@ namespace Mynt.Core.Backtester
             return jArrayResult;
         }
 
-        public static void BackTestShowTradesConsole(ITradingStrategy strategy, BacktestOptions backtestOptions)
+        public static async void BackTestShowTradesConsole(ITradingStrategy strategy, BacktestOptions backtestOptions, IDataStore dataStore)
         {
-            var results = BackTestShowTrades(strategy, backtestOptions);
+            var results = await BackTestShowTrades(strategy, backtestOptions, dataStore);
 
             Console.WriteLine();
             Console.WriteLine($"\t=============== BACKTESTING REPORT {strategy.Name.ToUpper()} ===============");
@@ -166,7 +167,7 @@ namespace Mynt.Core.Backtester
         }
 
 
-        public static List<BackTestStrategyResult> BackTestAll(BacktestOptions backtestOptions)
+        public static async Task<List<BackTestStrategyResult>> BackTestAll(BacktestOptions backtestOptions, IDataStore dataStore)
         {
             var runner = new BackTestRunner();
             var results = new List<BackTestStrategyResult>();
@@ -174,16 +175,16 @@ namespace Mynt.Core.Backtester
             foreach (var item in GetTradingStrategies())
             {
                 var stratResult = new BackTestStrategyResult() { Strategy = item.Name };
-                stratResult.Results.AddRange(runner.RunSingleStrategy(item, backtestOptions));
+                stratResult.Results.AddRange(await runner.RunSingleStrategy(item, backtestOptions, dataStore));
                 results.Add(stratResult);
             }
 
             return results;
         }
 
-        public static JArray BackTestAllJson(BacktestOptions backtestOptions)
+        public static async Task<JArray> BackTestAllJson(BacktestOptions backtestOptions, IDataStore dataStore)
         {
-            List<BackTestStrategyResult> results = BackTestAll(backtestOptions);
+            List<BackTestStrategyResult> results = await BackTestAll(backtestOptions, dataStore);
             JArray jArrayResult = new JArray();
 
             foreach (var result in results)
@@ -203,10 +204,10 @@ namespace Mynt.Core.Backtester
         }
 
 
-        public static void BackTestAllConsole(BacktestOptions backtestOptions)
+        public static async void BackTestAllConsole(BacktestOptions backtestOptions, IDataStore dataStore)
         {
 
-            List<BackTestStrategyResult> results = BackTestAll(backtestOptions);
+            List<BackTestStrategyResult> results = await BackTestAll(backtestOptions, dataStore);
 
             Console.WriteLine();
             Console.WriteLine($"\t=============== BACKTESTING REPORT ===============");

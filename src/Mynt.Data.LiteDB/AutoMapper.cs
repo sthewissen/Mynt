@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using AutoMapper;
+using Mynt.Backtester.Models;
 using Mynt.Core.Models;
 
 

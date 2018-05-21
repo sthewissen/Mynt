@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Mynt.Backtester.Models;
 using Mynt.Core.Enums;
 using Mynt.Core.Interfaces;
@@ -9,7 +10,7 @@ namespace Mynt.Core.Backtester
 {
     public class BackTestRunner
     {
-        public List<BackTestResult> RunSingleStrategy(ITradingStrategy strategy, BacktestOptions backtestOptions)
+        public async Task<List<BackTestResult>> RunSingleStrategy(ITradingStrategy strategy, BacktestOptions backtestOptions, IDataStore dataStore)
         {
             var results = new List<BackTestResult>();
 
@@ -19,7 +20,7 @@ namespace Mynt.Core.Backtester
                 var candleProvider = new DatabaseCandleProvider();
 
                 // This creates a list of buy signals.
-                var candles = candleProvider.GetCandles(pair, backtestOptions);
+                var candles = await candleProvider.GetCandles(pair, backtestOptions, dataStore);
                 var backTestResult = new BackTestResult { Market = pair };
 
                 try

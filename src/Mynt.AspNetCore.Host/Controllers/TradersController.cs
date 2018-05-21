@@ -41,7 +41,7 @@ namespace Mynt.AspNetCore.Host.Controllers
             backtestOptions.Exchange = (Exchange)Enum.Parse(typeof(Exchange), exchange);
             backtestOptions.Coins = new List<string>(new string[] { "NEOBTC", "OMGBTC", "ARKBTC", "XRPBTC", "REQBTC", "LTCBTC", "ETHBTC", "VENBTC" });
 
-            return DataRefresher.GetCacheAge(backtestOptions);
+            return await DataRefresher.GetCacheAge(backtestOptions, Startup.BacktestDataStore);
         }
     }
 
@@ -57,7 +57,7 @@ namespace Mynt.AspNetCore.Host.Controllers
             backtestOptions.Exchange = (Exchange)Enum.Parse(typeof(Exchange), exchange);
             backtestOptions.Coins = new List<string>(new string[] { "NEOBTC", "OMGBTC", "ARKBTC", "XRPBTC", "REQBTC", "LTCBTC", "ETHBTC", "VENBTC" });
 
-            await DataRefresher.RefreshCandleData((x) => Console.WriteLine(x), backtestOptions);
+            await DataRefresher.RefreshCandleData((x) => Console.WriteLine(x), backtestOptions, Startup.BacktestDataStore);
 
             return "Refresh Done";
         }
@@ -75,7 +75,7 @@ namespace Mynt.AspNetCore.Host.Controllers
             backtestOptions.Exchange = (Exchange)Enum.Parse(typeof(Exchange), exchange);
             backtestOptions.Coins =  new List<string>(new string[] { "NEOBTC", "OMGBTC", "ARKBTC", "XRPBTC", "REQBTC", "LTCBTC", "ETHBTC", "VENBTC" });
 
-            return BacktestFunctions.BackTestAllJson(backtestOptions);
+            return await BacktestFunctions.BackTestAllJson(backtestOptions, Startup.BacktestDataStore);
         }
     }
 }

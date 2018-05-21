@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Driver;
+using Mynt.Core.Backtester;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
 
@@ -12,16 +12,55 @@ namespace Mynt.Data.MongoDB
     {
         private MongoClient client;
         private IMongoDatabase database;
+        public static MongoDBOptions mongoDbOptions;
         private IMongoCollection<TraderAdapter> traderAdapter;
         private IMongoCollection<TradeAdapter> ordersAdapter;
 
         public MongoDBDataStore(MongoDBOptions options)
         {
-			client = new MongoClient(options.MongoUrl);
+            mongoDbOptions = options;
+            client = new MongoClient(options.MongoUrl);
 			database = client.GetDatabase(options.MongoDatabaseName);
             ordersAdapter = database.GetCollection<TradeAdapter>("Orders");
             traderAdapter = database.GetCollection<TraderAdapter>("Traders");
         }
+
+        public static string GetDatabase(BacktestOptions backtestOptions, string coin = null)
+        {
+            return backtestOptions.Exchange + "_" + coin + "_" + backtestOptions.CandlePeriod;
+        }
+
+        public class DataStore
+        {
+            private MongoClient client;
+            private IMongoDatabase database;
+            private static Dictionary<string, DataStore> instance = new Dictionary<string, DataStore>();
+
+            private DataStore(string databaseName)
+            {
+                client = new MongoClient(mongoDbOptions.MongoUrl);
+                database = client.GetDatabase(databaseName);
+            }
+
+            public static DataStore GetInstance(string databaseName)
+            {
+                if (!instance.ContainsKey(databaseName))
+                {
+                    instance["databaseName"] = new DataStore(databaseName);
+                }
+                return instance["databaseName"];
+            }
+
+            public IMongoCollection<T> GetTable<T>(string collectionName = null) where T : new()
+            {
+                if (collectionName == null)
+                {
+                    return database.GetCollection<T>(typeof(T).Name);
+                }
+                return database.GetCollection<T>(collectionName);
+            }
+        }
+
 
         public async Task InitializeAsync()
         {
@@ -121,5 +160,71 @@ namespace Mynt.Data.MongoDB
 
             return items;
         }
+
+
+        /* Backtester */
+
+        public async Task<List<Candle>> GetBacktestCandlesBetweenTime(BacktestOptions backtestOptions, string coin, DateTime startDate, DateTime endDate)
+        {
+            IMongoCollection<CandleAdapter> candleCollection = DataStore.GetInstance("Backtest_Candle_" + backtestOptions.CandlePeriod).GetTable<CandleAdapter>(backtestOptions.Exchange + "_" + coin);
+            List<CandleAdapter> candles = await candleCollection.Find(entry => entry.Timestamp >= startDate && entry.Timestamp <= endDate).ToListAsync();
+            var items = Mapping.Mapper.Map<List<Candle>>(candles);
+            return items;
+        }
+
+        public async Task<Candle> GetBacktestFirstCandle(BacktestOptions backtestOptions, string coin)
+        {
+            IMongoCollection<CandleAdapter> candleCollection = DataStore.GetInstance("Backtest_Candle_" + backtestOptions.CandlePeriod).GetTable<CandleAdapter>(backtestOptions.Exchange + "_" + coin);
+            CandleAdapter lastCandle = await candleCollection.Find(_ => true).SortBy(e => e.Timestamp).Limit(1).FirstOrDefaultAsync();
+            var items = Mapping.Mapper.Map<Candle>(lastCandle);
+            return items;
+        }
+
+        public async Task<Candle> GetBacktestLastCandle(BacktestOptions backtestOptions, string coin)
+        {
+            IMongoCollection<CandleAdapter> candleCollection = DataStore.GetInstance("Backtest_Candle_" + backtestOptions.CandlePeriod).GetTable<CandleAdapter>(backtestOptions.Exchange + "_" + coin);
+            CandleAdapter lastCandle = await candleCollection.Find(_ => true).SortByDescending(e => e.Timestamp).Limit(1).FirstOrDefaultAsync();
+            var items = Mapping.Mapper.Map<Candle>(lastCandle);
+            return items;
+        }
+
+        public async Task SaveBacktestCandlesBulk(List<Candle> candles, BacktestOptions backtestOptions, string coin)
+        {
+            var items = Mapping.Mapper.Map<List<CandleAdapter>>(candles);
+            IMongoCollection<CandleAdapter> candleCollection = DataStore.GetInstance("Backtest_Candle_" + backtestOptions.CandlePeriod).GetTable<CandleAdapter>(backtestOptions.Exchange + "_" + coin);
+            await candleCollection.InsertManyAsync(items);
+        }
+
+        public async Task SaveBacktestCandle(Candle candle, BacktestOptions backtestOptions, string coin)
+        {
+            var item = Mapping.Mapper.Map<CandleAdapter>(candle);
+            IMongoCollection<CandleAdapter> candleCollection = DataStore.GetInstance("Backtest_Candle_" + backtestOptions.CandlePeriod).GetTable<CandleAdapter>(backtestOptions.Exchange + "_" + coin);
+            FindOptions<CandleAdapter> marketCandleFindOptions = new FindOptions<CandleAdapter> { Limit = 1 };
+            IAsyncCursor<CandleAdapter> checkData = await candleCollection.FindAsync(x => x.Timestamp == item.Timestamp, marketCandleFindOptions);
+            if (await checkData.FirstOrDefaultAsync() == null)
+            {
+                await candleCollection.InsertOneAsync(item);
+            }
+        }
+
+        public async Task<List<string>> GetBacktestAllDatabases(BacktestOptions backtestOptions)
+        {
+            List<string> allDatabases = new List<string>();
+            var dbList = await client.GetDatabase(mongoDbOptions.MongoDatabaseName).ListCollectionsAsync();
+            foreach (var item in await dbList.ToListAsync())
+            {
+                allDatabases.Add(item.ToString());
+            }
+            return allDatabases;
+        }
+
+        public async Task DeleteBacktestDatabase(BacktestOptions backtestOptions, string coin)
+        {
+            var dbList = client.GetDatabase(mongoDbOptions.MongoDatabaseName);
+            dbList.DropCollection(backtestOptions.Exchange + "_" + coin);
+        }
+
+
+
     }
 }

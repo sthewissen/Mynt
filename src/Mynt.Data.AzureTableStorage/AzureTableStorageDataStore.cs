@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
+using Mynt.Core.Backtester;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
 
@@ -151,5 +153,43 @@ namespace Mynt.Data.AzureTableStorage
             if (tradeBatch.Count > 0)
                 await _orderTable.ExecuteBatchAsync(tradeBatch);
         }
+
+        /* Backtester */
+
+        public async Task<List<Candle>> GetBacktestCandlesBetweenTime(BacktestOptions backtestOptions, string coin, DateTime startDate, DateTime endDate)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<Candle> GetBacktestFirstCandle(BacktestOptions backtestOptions, string coin)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<Candle> GetBacktestLastCandle(BacktestOptions backtestOptions, string coin)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task SaveBacktestCandlesBulk(List<Candle> candles, BacktestOptions backtestOptions, string coin)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task SaveBacktestCandle(Candle candle, BacktestOptions backtestOptions, string coin)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<List<string>> GetBacktestAllDatabases(BacktestOptions backtestOptions)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task DeleteBacktestDatabase(BacktestOptions backtestOptions, string coin)
+        {
+            throw new NotImplementedException();
+        }
+
     }
 }

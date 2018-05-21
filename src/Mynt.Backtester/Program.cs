@@ -3,7 +3,9 @@ using System.IO;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
 using Mynt.Core.Backtester;
+using Mynt.Core.Interfaces;
 using Mynt.Core.Utility;
+using Mynt.Data.LiteDB;
 
 namespace Mynt.Backtester
 {
@@ -11,7 +13,8 @@ namespace Mynt.Backtester
     {
         public static IConfiguration Configuration { get; set; }
         public static BacktestOptions BacktestOptions { get; set; }
-        public static int writeMenuCount = 0;
+        public static IDataStore DataStore { get; set; }
+        public static int WriteMenuCount;
 
         static void Main(string[] args)
         {
@@ -23,7 +26,7 @@ namespace Mynt.Backtester
                 Console.WriteLine();
                 Console.WriteLine();
 
-                if (!DataRefresher.CheckForCandleData(BacktestOptions))
+                if (!DataRefresher.CheckForCandleData(BacktestOptions, DataStore).Result)
                 {
                     ConsoleUtility.WriteColoredLine("\tNo data present. Please retrieve data first.", ConsoleColor.Red);
                     Console.WriteLine();
@@ -43,6 +46,9 @@ namespace Mynt.Backtester
             var builder = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json", optional: true);
             Configuration = builder.Build();
             BacktestOptions = Configuration.Get<BacktestOptions>();
+
+            LiteDBOptions backtestDatabaseOptions = new LiteDBOptions();
+            DataStore = new LiteDBDataStore(backtestDatabaseOptions);
         }
 
         #region console bootstrapping
@@ -77,7 +83,7 @@ namespace Mynt.Backtester
                         {
                             Console.WriteLine();
                             Console.WriteLine("\tBacktesting a single strategy. Starting...");
-                            BacktestFunctions.BackTestConsole(strats[index - 1], BacktestOptions);
+                            BacktestFunctions.BackTestConsole(strats[index - 1], BacktestOptions, DataStore);
                         }
                         else
                         {
@@ -100,7 +106,7 @@ namespace Mynt.Backtester
                         {
                             Console.WriteLine();
                             Console.WriteLine("\tBacktesting a single strategy. Starting...");
-                            BacktestFunctions.BackTestShowTradesConsole(strats[indexStrategy - 1], BacktestOptions);
+                            BacktestFunctions.BackTestShowTradesConsole(strats[indexStrategy - 1], BacktestOptions, DataStore);
                         }
                         else
                         {
@@ -112,14 +118,14 @@ namespace Mynt.Backtester
 
                     case "3":
                         Console.WriteLine("\tBacktesting all strategies takes some time and uses historic data. Starting...");
-                        BacktestFunctions.BackTestAllConsole(BacktestOptions);
+                        BacktestFunctions.BackTestAllConsole(BacktestOptions, DataStore);
                         continue;
 
                     case "4":
                         Console.WriteLine("\tRefreshing...");
-                        DataRefresher.RefreshCandleData((x) => ConsoleUtility.WriteColoredLine(x, ConsoleColor.Green), BacktestOptions).Wait();
+                        DataRefresher.RefreshCandleData((x) => ConsoleUtility.WriteColoredLine(x, ConsoleColor.Green), BacktestOptions, DataStore).Wait();
                         ActionCompleted();
-                        writeMenuCount = 0;
+                        WriteMenuCount = 0;
                         continue;
 
                     case "5":
@@ -127,7 +133,6 @@ namespace Mynt.Backtester
                         Environment.Exit(1);
                         break;
                 }
-                break;
             }
         }
 
@@ -150,11 +155,11 @@ namespace Mynt.Backtester
 
         public static void WriteMenu()
         {
-            if (writeMenuCount == 0)
+            if (WriteMenuCount == 0)
             {
-                DataRefresher.GetCacheAgeConsole(BacktestOptions);
+                DataRefresher.GetCacheAgeConsole(BacktestOptions, DataStore);
             }
-            writeMenuCount = writeMenuCount + 1;
+            WriteMenuCount = WriteMenuCount + 1;
 
             Console.WriteLine("\t1. Run a single strategy");
             Console.WriteLine("\t2. Run a single strategy (show all trades)");
