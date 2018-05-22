@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using Mynt.Core.Enums;
 using Mynt.Core.Indicators;
 using Mynt.Core.Interfaces;
@@ -8,32 +10,34 @@ using Mynt.Core.Models;
 
 namespace Mynt.Core.Strategies
 {
-    /// <summary>
-    /// https://www.liteforex.com/beginners/trading-strategies/830/
-    /// </summary>
-    public class CciScalper : BaseStrategy
+    public class FreqTradeClassic : BaseStrategy
     {
-        public override string Name => "CCI Scalper";
-        public override int MinimumAmountOfCandles => 200;
+        public override string Name => "FreqTrade Classic";
+        public override int MinimumAmountOfCandles => 100;
         public override Period IdealPeriod => Period.Hour;
 
         public override List<TradeAdvice> Prepare(List<Candle> candles)
         {
             var result = new List<TradeAdvice>();
 
-            if (candles.Count < 200)
-                throw new Exception("Need larger data set: (200 min).");
+            var sma = candles.Sma(100);
+            var closes = candles.Select(x => x.Close).ToList();
+            var adx = candles.Adx();
+            var tema = candles.Tema(4);
+            var mfi = candles.Mfi(14);
+            var sar = candles.Sar(0.02, 0.22);
 
-            var cci = candles.Cci(200);
-            var ema10 = candles.Ema(10);
-            var ema21 = candles.Ema(21);
-            var ema50 = candles.Ema(50);
+            var cci = candles.Cci(5);
+            var stoch = candles.StochFast();
+            var bbandsLower = candles.Bbands().MiddleBand;
+            var fishers = candles.Fisher();
 
             for (int i = 0; i < candles.Count; i++)
             {
-                if (cci[i] > 0 && ema10[i] > ema21[i] && ema10[i] > ema50[i])
+                if (closes[i] < sma[i] && cci[i] < -100 && stoch.D[i] < 20 && fishers[i] < 0 &&
+                    adx[i] > 20 && mfi[i] < 30 && tema[i] <= bbandsLower[i])
                     result.Add(TradeAdvice.Buy);
-                else if (cci[i] < 0 && ema10[i] < ema21[i] && ema10[i] < ema50[i])
+                else if (fishers[i] == 1)
                     result.Add(TradeAdvice.Sell);
                 else
                     result.Add(TradeAdvice.Hold);

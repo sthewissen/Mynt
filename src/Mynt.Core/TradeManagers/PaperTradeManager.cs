@@ -18,17 +18,26 @@ namespace Mynt.Core.TradeManagers
         private List<Trade> _activeTrades;
         private List<Trader> _currentTraders;
         private readonly IDataStore _dataStore;
+<<<<<<< HEAD
         private readonly OrderBehavior _orderBehavior;
         private readonly TradeOptions _settings;
 
         public PaperTradeManager(IExchangeApi api, ITradingStrategy strategy, INotificationManager notificationManager, ILogger logger, TradeOptions settings, IDataStore dataStore, OrderBehavior orderBehavior = OrderBehavior.AlwaysFill)
+=======
+        private readonly TradeOptions _settings;
+
+        public PaperTradeManager(IExchangeApi api, ITradingStrategy strategy, INotificationManager notificationManager, ILogger logger, TradeOptions settings, IDataStore dataStore)
+>>>>>>> a8381648f34e683d38b45afc3ae6b1c0b7b4a985
         {
             _api = api;
             _strategy = strategy;
             _logger = logger;
             _notification = notificationManager;
             _dataStore = dataStore;
+<<<<<<< HEAD
             _orderBehavior = orderBehavior;
+=======
+>>>>>>> a8381648f34e683d38b45afc3ae6b1c0b7b4a985
             _settings = settings;
 
             if (_api == null) throw new ArgumentException("Invalid exchange provided...");
@@ -126,10 +135,15 @@ namespace Mynt.Core.TradeManagers
             // Initialize the things we'll be using throughout the process.
             await Initialize(true);
 
+<<<<<<< HEAD
             _logger.LogInformation($"Looking for trades using {_strategy.Name}");
 
             // This means an order to buy has been open for an entire buy cycle.
             if (_settings.CancelUnboughtOrdersEachCycle && _orderBehavior == OrderBehavior.CheckMarket)
+=======
+            // This means an order to buy has been open for an entire buy cycle.
+            if (_settings.CancelUnboughtOrdersEachCycle)
+>>>>>>> a8381648f34e683d38b45afc3ae6b1c0b7b4a985
                 await CancelUnboughtOrders();
 
             // Check active trades against our strategy.
@@ -211,7 +225,11 @@ namespace Mynt.Core.TradeManagers
         private async Task CheckActiveTradesAgainstStrategy()
         {
             // Check our active trades for a sell signal from the strategy
+<<<<<<< HEAD
             foreach (var trade in _activeTrades.Where(x => !x.IsSelling && x.IsOpen))
+=======
+            foreach (var trade in _activeTrades.Where(x => (x.OpenOrderId == null || x.SellType == SellType.Immediate) && x.IsOpen))
+>>>>>>> a8381648f34e683d38b45afc3ae6b1c0b7b4a985
             {
                 var signal = await GetStrategySignal(trade.Market);
 
@@ -241,18 +259,31 @@ namespace Mynt.Core.TradeManagers
         private async Task<List<TradeSignal>> FindBuyOpportunities()
         {
             // Retrieve our current markets
+<<<<<<< HEAD
             var markets = await _api.GetMarketSummaries(_settings.QuoteCurrency);
+=======
+            var markets = await _api.GetMarketSummaries();
+>>>>>>> a8381648f34e683d38b45afc3ae6b1c0b7b4a985
             var pairs = new List<TradeSignal>();
 
             // Check if there are markets matching our volume.
             markets = markets.Where(x =>
                 (x.Volume > _settings.MinimumAmountOfVolume ||
+<<<<<<< HEAD
                  _settings.AlwaysTradeList.Contains(x.CurrencyPair.BaseCurrency)) &&
                  _settings.QuoteCurrency.ToUpper() == x.CurrencyPair.QuoteCurrency.ToUpper()).ToList();
 
             // If there are items on the only trade list remove the rest
             if (_settings.OnlyTradeList.Count > 0)
                 markets = markets.Where(m => _settings.OnlyTradeList.Any(c => c == m.CurrencyPair.BaseCurrency)).ToList();
+=======
+                 _settings.AlwaysTradeList.Contains(x.CurrencyPair.BaseCurrency)) && 
+                 _settings.QuoteCurrency.ToUpper() == x.CurrencyPair.QuoteCurrency.ToUpper()).ToList();
+
+            // If there are items on the only trade list remove the rest
+            foreach (var item in _settings.OnlyTradeList)
+                markets.RemoveAll(x => x.CurrencyPair.BaseCurrency != item);
+>>>>>>> a8381648f34e683d38b45afc3ae6b1c0b7b4a985
 
             // Remove existing trades from the list to check.
             foreach (var trade in _activeTrades)
@@ -293,8 +324,11 @@ namespace Mynt.Core.TradeManagers
         {
             try
             {
+<<<<<<< HEAD
                 _logger.LogInformation("Checking market {Market}...", market);
 
+=======
+>>>>>>> a8381648f34e683d38b45afc3ae6b1c0b7b4a985
                 var minimumDate = _strategy.GetMinimumDateTime();
                 var candleDate = _strategy.GetCurrentCandleDateTime();
                 var candles = await _api.GetTickerHistory(market, _strategy.IdealPeriod, minimumDate);
@@ -477,6 +511,12 @@ namespace Mynt.Core.TradeManagers
             {
                 await CheckForSellConditions();
             }
+<<<<<<< HEAD
+=======
+
+            // Save the changes
+            // await _dataStore.SaveTradesAsync(_activeTrades);
+>>>>>>> a8381648f34e683d38b45afc3ae6b1c0b7b4a985
         }
 
         /// <summary>
@@ -487,7 +527,11 @@ namespace Mynt.Core.TradeManagers
         {
             // There are trades that have an open order ID set & no sell order id set
             // that means its a buy trade that is waiting to get bought. See if we can update that first.
+<<<<<<< HEAD
             foreach (var trade in _activeTrades.Where(x => x.IsBuying))
+=======
+            foreach (var trade in _activeTrades.Where(x => x.OpenOrderId != null && x.SellOrderId == null))
+>>>>>>> a8381648f34e683d38b45afc3ae6b1c0b7b4a985
             {
                 var candles = await _api.GetTickerHistory(trade.Market, Period.Minute, 1);
                 var candle = candles.FirstOrDefault();
@@ -496,7 +540,11 @@ namespace Mynt.Core.TradeManagers
 
                 // This means the order probably would've gotten filled...
                 // We have no other way to check this, because no actual orders are being placed.
+<<<<<<< HEAD
                 if (candle != null && (trade.OpenRate >= candle.High || (trade.OpenRate >= candle.Low && trade.OpenRate <= candle.High) || _orderBehavior == OrderBehavior.AlwaysFill))
+=======
+                if (candle != null && (trade.OpenRate >= candle.High || (trade.OpenRate >= candle.Low && trade.OpenRate <= candle.High)))
+>>>>>>> a8381648f34e683d38b45afc3ae6b1c0b7b4a985
                 {
                     trade.OpenOrderId = null;
                     trade.IsBuying = false;
@@ -532,7 +580,11 @@ namespace Mynt.Core.TradeManagers
             // There are trades that have an open order ID set & sell order id set
             // that means its a sell trade that is waiting to get sold. See if we can update that first.
 
+<<<<<<< HEAD
             foreach (var order in _activeTrades.Where(x => x.IsSelling))
+=======
+            foreach (var order in _activeTrades.Where(x => x.OpenOrderId != null && x.SellOrderId != null))
+>>>>>>> a8381648f34e683d38b45afc3ae6b1c0b7b4a985
             {
                 var candles = await _api.GetTickerHistory(order.Market, Period.Minute, 1);
                 var candle = candles.FirstOrDefault();
@@ -541,7 +593,11 @@ namespace Mynt.Core.TradeManagers
 
                 // This means the order probably would've gotten filled...
                 // We have no other way to check this, because no actual orders are being placed.
+<<<<<<< HEAD
                 if (candle != null && (order.CloseRate <= candle.Low || (order.CloseRate >= candle.Low && order.CloseRate <= candle.High) || _orderBehavior == OrderBehavior.AlwaysFill))
+=======
+                if (candle != null && (order.CloseRate <= candle.Low || (order.CloseRate >= candle.Low && order.CloseRate <= candle.High)))
+>>>>>>> a8381648f34e683d38b45afc3ae6b1c0b7b4a985
                 {
                     order.OpenOrderId = null;
                     order.IsOpen = false;
@@ -582,7 +638,11 @@ namespace Mynt.Core.TradeManagers
             // that means its a trade that is waiting to get sold. See if we can update that first.
 
             // An open order currently not selling or being an immediate sell are checked for SL  etc.
+<<<<<<< HEAD
             foreach (var trade in _activeTrades.Where(x => !x.IsSelling && !x.IsBuying && x.IsOpen))
+=======
+            foreach (var trade in _activeTrades.Where(x => (x.OpenOrderId == null || x.SellType == SellType.Immediate) && x.IsOpen))
+>>>>>>> a8381648f34e683d38b45afc3ae6b1c0b7b4a985
             {
                 // These are trades that are not being bought or sold at the moment so these need to be checked for sell conditions.
                 var ticker = await _api.GetTicker(trade.Market);
@@ -682,13 +742,21 @@ namespace Mynt.Core.TradeManagers
             return SellType.None;
         }
 
+<<<<<<< HEAD
         #endregion
 
+=======
+>>>>>>> a8381648f34e683d38b45afc3ae6b1c0b7b4a985
         private static string GetOrderId()
         {
             return Guid.NewGuid().ToString().Replace("-", string.Empty);
         }
 
+<<<<<<< HEAD
+=======
+        #endregion
+
+>>>>>>> a8381648f34e683d38b45afc3ae6b1c0b7b4a985
         private async Task SendNotification(string message)
         {
             if (_notification != null)
@@ -696,5 +764,11 @@ namespace Mynt.Core.TradeManagers
                 await _notification.SendNotification(message);
             }
         }
+<<<<<<< HEAD
     }
 }
+=======
+
+    }
+}
+>>>>>>> a8381648f34e683d38b45afc3ae6b1c0b7b4a985

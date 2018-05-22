@@ -6,22 +6,22 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Storage.Internal;
 using Mynt.Core.Enums;
-using Mynt.Data.SqlServer;
+using Mynt.Data.Sqlite;
 using System;
 
-namespace Mynt.Data.SqlServer.Migrations
+namespace Mynt.Data.Sqlite.Migrations
 {
     [DbContext(typeof(MyntDbContext))]
-    partial class MyntDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180330103637_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.0.2-rtm-10011")
-                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                .HasAnnotation("ProductVersion", "2.0.2-rtm-10011");
 
-            modelBuilder.Entity("Mynt.Data.SqlServer.TradeAdapter", b =>
+            modelBuilder.Entity("Mynt.Data.Sqlite.TradeAdapter", b =>
                 {
                     b.Property<int>("TradeId")
                         .ValueGeneratedOnAdd();
@@ -69,7 +69,7 @@ namespace Mynt.Data.SqlServer.Migrations
                     b.ToTable("Orders");
                 });
 
-            modelBuilder.Entity("Mynt.Data.SqlServer.TraderAdapter", b =>
+            modelBuilder.Entity("Mynt.Data.Sqlite.TraderAdapter", b =>
                 {
                     b.Property<int>("TraderId")
                         .ValueGeneratedOnAdd();

@@ -16,6 +16,5 @@ namespace Mynt.Core.Models
         public decimal Price { get; set; }
         public TradeAdvice TradeAdvice { get; set; }
         public Candle SignalCandle { get; set; }
-		public ITradingStrategy Strategy { get; internal set; }
-	}
+    }
 }

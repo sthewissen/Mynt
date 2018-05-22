@@ -5,14 +5,12 @@ using System.Threading.Tasks;
 using Humanizer;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
-using Microsoft.Extensions.Logging;
 using Mynt.Core.Configuration;
 using Mynt.Core.Exchanges;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Notifications;
 using Mynt.Data.AzureTableStorage;
 using Serilog;
-using Serilog.Core;
 using Serilog.Sinks.AzureWebJobsTraceWriter;
 
 namespace Mynt.Functions
@@ -44,8 +42,8 @@ namespace Mynt.Functions
 
                 var telegram = new TelegramNotificationManager(telegramNotificationOptions);
 
-                await SendTradeOverviewMessage(logger, telegram, dataStore);
-                await SendProfitText(logger, telegram, dataStore);
+                await SendTradeOverviewMessage(telegram, dataStore);
+                await SendProfitText(telegram, dataStore);
 
                 logger.Information("Done...");
             }
@@ -59,7 +57,7 @@ namespace Mynt.Functions
             }
         }
 
-        private static async Task SendProfitText(Logger log, INotificationManager notificationManager, IDataStore dataStore)
+        private static async Task SendProfitText(INotificationManager notificationManager, IDataStore dataStore)
         {
             var traders = await dataStore.GetTradersAsync();
 
@@ -71,13 +69,11 @@ namespace Mynt.Functions
                 if (balance - stake == 0)
                     return;
 
-                log.Information($"Current profit is {(balance - stake):0.00000000} BTC ({(((balance - stake) / stake) * 100):0.00}%)");
-
                 await notificationManager.SendNotification($"Current profit is {(balance - stake):0.00000000} BTC ({(((balance - stake) / stake) * 100):0.00}%)");
             }
         }
 
-        private static async Task SendTradeOverviewMessage(Logger log, INotificationManager notificationManager, IDataStore dataStore)
+        private static async Task SendTradeOverviewMessage(INotificationManager notificationManager, IDataStore dataStore)
         {
             var trades = await dataStore.GetActiveTradesAsync();
 
@@ -92,8 +88,6 @@ namespace Mynt.Functions
                     var ticker = await exchange.GetTicker(item.Market);
                     var currentProfit = ((ticker.Bid - item.OpenRate) / item.OpenRate) * 100;
                     stringResult.AppendLine($"#{item.Market}: *{currentProfit:0.00}%* opened {item.OpenDate.Humanize()} at {item.OpenRate:0.00000000} BTC");
-
-                    log.Information($"#{item.Market}: *{currentProfit:0.00}%* opened {item.OpenDate.Humanize()} at {item.OpenRate:0.00000000} BTC");
                 }
 
                 await notificationManager.SendNotification(stringResult.ToString());

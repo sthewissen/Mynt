@@ -12,9 +12,10 @@ using System;
 namespace Mynt.Data.SqlServer.Migrations
 {
     [DbContext(typeof(MyntDbContext))]
-    partial class MyntDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180330094956_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
