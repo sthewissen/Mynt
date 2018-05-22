@@ -1,5 +1,6 @@
 ﻿@page
 @using Mynt.Core.Models
+@using Mynt.AspNetCore.Host.Helpers
 
 @{
     ViewBag.Title = "Mynt - Dashboard";
@@ -14,6 +15,11 @@
     <div class="row">
         @foreach (Trader trader in ViewBag.traders)
         {
+            var trade = new Trade();
+            if (trader.ActiveTrade != null)
+            {
+                trade = trader.ActiveTrade;
+            }
             <div class="col-lg-6 col-md-6 col-sm-6">
                 <div class="whiteblock trader">
                     <div class="row">
@@ -25,17 +31,24 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-md-5">
+                        <div class="col-md-4">
                             <div>Current Balance</div>
                             <b>@trader.CurrentBalance @ViewBag.quoteCurrency</b>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-4">
                             <div>Profit/Loss</div>
-                            <b>@trader.CurrentBalance @ViewBag.quoteCurrency</b>
+                            <div>@FormatHelper.DecideColorFromValue(trader.ProfitLoss, 2, "%", "float-left font-weight-bold")  <div class="currencyStyle">@ViewBag.quoteCurrency</div></div>
                         </div>
                         <div class="col-md-4">
                             <div>Trading</div>
-                            <b>?</b>
+                            @if (trader.ActiveTrade != null)
+                            {
+                                <div>@FormatHelper.DecideColorFromValue(trader.ActiveTrade.OpenProfitPercentage.Value, 2, "%", "float-left font-weight-bold")  <div class="currencyStyle">@trade.Market</div></div>
+                            }
+                            @if (trader.ActiveTrade == null)
+                            {
+                                <div>No active trade</div>
+                            }
                         </div>
                     </div>
                 </div>
@@ -45,6 +58,39 @@
 }
 
 
+@* Active trades *@
+<h3 class="mt-5">Active Trades</h3>
+@if (ViewBag.activeTrades == null || ViewBag.activeTrades.Count == 0)
+{<p>No closed trades!</p>}
+@if (ViewBag.activeTrades != null && ViewBag.activeTrades.Count > 0)
+{
+    <div class="whiteblock">
+        <table class="table table-hover table-sm table-responsive" id="activeTrades">
+            <thead>
+                <tr>
+                    <th>Trader Id</th>
+                    <th>Bought</th>
+                    <th>Coin</th>
+                    <th>Open rate</th>
+                    <th>Quantity</th>
+                </tr>
+            </thead>
+
+            @foreach (Trade trade in ViewBag.activeTrades)
+            {
+                <tbody>
+                    <tr>
+                        <td>@trade.TraderId</td>
+                        <td>@trade.OpenDate</td>
+                        <td>@trade.Market</td>
+                        <td>@trade.OpenRate</td>
+                        <td>@trade.Quantity</td>>
+                    </tr>
+                </tbody>
+            }
+        </table>
+    </div>
+}
 
 @* Closed trades *@
 <h3 class="mt-5">Trade history</h3>
@@ -53,35 +99,37 @@
 @if (ViewBag.closedTrades != null && ViewBag.closedTrades.Count > 0)
 {
     <div class="whiteblock">
-        <table class="table table-hover" id="closedTrades">
+        <table class="table table-hover table-sm table-responsive sortable" id="closedTrades">
             <thead>
-            <tr>
-                <th>Bought</th>
-                <th>Coin</th>
-                <th>Open rate</th>
-                <th>Quantity</th>
-                <th>Close rate</th>
-                <th>Closed</th>
-                <th>Profit</th>
-                <th>Profit %</th>
-                <th>Reason</th>
-            </tr>
+                <tr>
+                    <th data-sort="int">Trader Id</th>
+                    <th>Bought</th>
+                    <th>Coin</th>
+                    <th>Open rate</th>
+                    <th>Quantity</th>
+                    <th>Close rate</th>
+                    <th>Closed</th>
+                    <th>Profit</th>
+                    <th>Profit %</th>
+                    <th>Reason</th>
+                </tr>
             </thead>
 
             @foreach (Trade trade in ViewBag.closedTrades)
             {
                 <tbody>
-                <tr>
-                    <td>@trade.OpenDate</td>
-                    <td>@trade.Market</td>
-                    <td>@trade.OpenRate</td>
-                    <td>@trade.Quantity</td>
-                    <td>@trade.CloseRate</td>
-                    <td>@trade.CloseDate</td>
-                    <td>@trade.CloseProfit</td>
-                    <td>@trade.CloseProfitPercentage</td>
-                    <td>@trade.SellType</td>
-                </tr>
+                    <tr>
+                        <td>@trade.TraderId</td>
+                        <td>@trade.OpenDate</td>
+                        <td>@trade.Market</td>
+                        <td>@trade.OpenRate</td>
+                        <td>@trade.Quantity</td>
+                        <td>@trade.CloseRate</td>
+                        <td>@trade.CloseDate</td>
+                        <td>@trade.CloseProfit</td>
+                        <td>@trade.CloseProfitPercentage</td>
+                        <td>@trade.SellType</td>
+                    </tr>
                 </tbody>
             }
         </table>

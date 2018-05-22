@@ -1,5 +1,6 @@
 ﻿/* Sticky footer styles
 -------------------------------------------------- */
+@import url('style.css');
 html {
     position: relative;
     min-height: 100%;
@@ -61,4 +62,19 @@ code {
 
 .tradertitle {
     text-transform: uppercase;
+}
+
+.currencyStyle {
+    font-weight: bold;
+    padding-left: 5px;
+    float: left;
+}
+
+/* Additional Style */
+.green {
+    color: green
+}
+
+.red {
+    color: red
 }

@@ -69,12 +69,7 @@
     <Folder Include="Strategies\Simple\" />
   </ItemGroup>
   <ItemGroup>
-<<<<<<< HEAD
-    <PackageReference Include="DigitalRuby.ExchangeSharp" Version="0.4.1" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.0.2" />
-=======
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.0.0" />
->>>>>>> ad9a4f7bc3f735bfdb1431ca1067b3458162da67
     <PackageReference Include="TA-Lib" Version="0.5.0.3" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.4.1" />
     <PackageReference Include="DigitalRuby.ExchangeSharp" Version="0.4.1" />

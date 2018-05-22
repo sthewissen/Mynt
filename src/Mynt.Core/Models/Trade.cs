@@ -41,5 +41,9 @@ namespace Mynt.Core.Models
             IsOpen = true;
             OpenDate = DateTime.UtcNow;
         }
+
+        // Used for Mynt.AspNetCore.Host UI output
+        public decimal? OpenProfit { get; set; }
+        public decimal? OpenProfitPercentage { get; set; }
     }
 }

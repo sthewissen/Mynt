@@ -23,26 +23,27 @@ namespace Mynt.Core.Strategies
 
             for (int i = 0; i < candles.Count; i++)
             {
-                if (i < 1)
-                    result.Add(TradeAdvice.Hold);
-                else
-                {
-                    if (sma200[i] < closes[i] && 
-                        stoch.K[i - 1] <= stoch.D[i - 1] &&
-                        stoch.K[i] > stoch.D[i] &&
-                        stoch.D[i - 1] < 20 &&
-                        stoch.K[i - 1] < 20)
-                        result.Add(TradeAdvice.Buy);
+                result.Add(TradeAdvice.Buy);
+                //if (i < 1)
+                //    result.Add(TradeAdvice.Hold);
+                //else
+                //{
+                //    if (sma200[i] < closes[i] && 
+                //        stoch.K[i - 1] <= stoch.D[i - 1] &&
+                //        stoch.K[i] > stoch.D[i] &&
+                //        stoch.D[i - 1] < 20 &&
+                //        stoch.K[i - 1] < 20)
+                //        result.Add(TradeAdvice.Buy);
                     
-                    else if (stoch.K[i - 1] <= stoch.D[i - 1] &&
-                        stoch.K[i] > stoch.D[i] &&
-                        stoch.D[i - 1] > 80 &&
-                        stoch.K[i - 1] > 80)
-                        result.Add(TradeAdvice.Sell);
+                //    else if (stoch.K[i - 1] <= stoch.D[i - 1] &&
+                //        stoch.K[i] > stoch.D[i] &&
+                //        stoch.D[i - 1] > 80 &&
+                //        stoch.K[i - 1] > 80)
+                //        result.Add(TradeAdvice.Sell);
                     
-                    else
-                        result.Add(TradeAdvice.Hold);
-                }
+                //    else
+                //        result.Add(TradeAdvice.Hold);
+                //}
             }
 
             return result;
