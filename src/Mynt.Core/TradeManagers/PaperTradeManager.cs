@@ -18,15 +18,17 @@ namespace Mynt.Core.TradeManagers
         private List<Trade> _activeTrades;
         private List<Trader> _currentTraders;
         private readonly IDataStore _dataStore;
+        private readonly OrderBehavior _orderBehavior;
         private readonly TradeOptions _settings;
 
-        public PaperTradeManager(IExchangeApi api, ITradingStrategy strategy, INotificationManager notificationManager, ILogger logger, TradeOptions settings, IDataStore dataStore)
+        public PaperTradeManager(IExchangeApi api, ITradingStrategy strategy, INotificationManager notificationManager, ILogger logger, TradeOptions settings, IDataStore dataStore, OrderBehavior orderBehavior = OrderBehavior.AlwaysFill)
         {
             _api = api;
             _strategy = strategy;
             _logger = logger;
             _notification = notificationManager;
             _dataStore = dataStore;
+            _orderBehavior = orderBehavior;
             _settings = settings;
 
             if (_api == null) throw new ArgumentException("Invalid exchange provided...");
@@ -127,7 +129,7 @@ namespace Mynt.Core.TradeManagers
             _logger.LogInformation($"Looking for trades using {_strategy.Name}");
 
             // This means an order to buy has been open for an entire buy cycle.
-            if (_settings.CancelUnboughtOrdersEachCycle)
+            if (_settings.CancelUnboughtOrdersEachCycle && _orderBehavior == OrderBehavior.CheckMarket)
                 await CancelUnboughtOrders();
 
             // Check active trades against our strategy.
@@ -239,7 +241,7 @@ namespace Mynt.Core.TradeManagers
         private async Task<List<TradeSignal>> FindBuyOpportunities()
         {
             // Retrieve our current markets
-            var markets = await _api.GetMarketSummaries();
+            var markets = await _api.GetMarketSummaries(_settings.QuoteCurrency);
             var pairs = new List<TradeSignal>();
 
             // Check if there are markets matching our volume.
@@ -249,8 +251,8 @@ namespace Mynt.Core.TradeManagers
                  _settings.QuoteCurrency.ToUpper() == x.CurrencyPair.QuoteCurrency.ToUpper()).ToList();
 
             // If there are items on the only trade list remove the rest
-            foreach (var item in _settings.OnlyTradeList)
-                markets.RemoveAll(x => x.CurrencyPair.BaseCurrency != item);
+            if (_settings.OnlyTradeList.Count > 0)
+                markets = markets.Where(m => _settings.OnlyTradeList.Any(c => c == m.CurrencyPair.BaseCurrency)).ToList();
 
             // Remove existing trades from the list to check.
             foreach (var trade in _activeTrades)
@@ -291,6 +293,8 @@ namespace Mynt.Core.TradeManagers
         {
             try
             {
+                _logger.LogInformation("Checking market {Market}...", market);
+
                 var minimumDate = _strategy.GetMinimumDateTime();
                 var candleDate = _strategy.GetCurrentCandleDateTime();
                 var candles = await _api.GetTickerHistory(market, _strategy.IdealPeriod, minimumDate);
@@ -492,7 +496,7 @@ namespace Mynt.Core.TradeManagers
 
                 // This means the order probably would've gotten filled...
                 // We have no other way to check this, because no actual orders are being placed.
-                if (candle != null && (trade.OpenRate >= candle.High || (trade.OpenRate >= candle.Low && trade.OpenRate <= candle.High)))
+                if (candle != null && (trade.OpenRate >= candle.High || (trade.OpenRate >= candle.Low && trade.OpenRate <= candle.High) || _orderBehavior == OrderBehavior.AlwaysFill))
                 {
                     trade.OpenOrderId = null;
                     trade.IsBuying = false;
@@ -537,7 +541,7 @@ namespace Mynt.Core.TradeManagers
 
                 // This means the order probably would've gotten filled...
                 // We have no other way to check this, because no actual orders are being placed.
-                if (candle != null && (order.CloseRate <= candle.Low || (order.CloseRate >= candle.Low && order.CloseRate <= candle.High)))
+                if (candle != null && (order.CloseRate <= candle.Low || (order.CloseRate >= candle.Low && order.CloseRate <= candle.High) || _orderBehavior == OrderBehavior.AlwaysFill))
                 {
                     order.OpenOrderId = null;
                     order.IsOpen = false;
@@ -578,7 +582,7 @@ namespace Mynt.Core.TradeManagers
             // that means its a trade that is waiting to get sold. See if we can update that first.
 
             // An open order currently not selling or being an immediate sell are checked for SL  etc.
-            foreach (var trade in _activeTrades.Where(x => (!x.IsSelling && !x.IsBuying && x.IsOpen) || (x.IsOpen && x.SellType == SellType.Immediate)))
+            foreach (var trade in _activeTrades.Where(x => !x.IsSelling && !x.IsBuying && x.IsOpen))
             {
                 // These are trades that are not being bought or sold at the moment so these need to be checked for sell conditions.
                 var ticker = await _api.GetTicker(trade.Market);
@@ -621,67 +625,19 @@ namespace Mynt.Core.TradeManagers
 
             _logger.LogInformation("Should sell {Market}? Profit: {Profit}%...", trade.Market, (currentProfit * 100).ToString("0.00"));
 
-            if (trade.SellType != SellType.Immediate)
+            // Let's not do a stoploss for now...
+            if (currentProfit < _settings.StopLossPercentage)
             {
-                // Let's not do a stoploss for now...
-                if (currentProfit < _settings.StopLossPercentage)
-                {
-                    _logger.LogInformation("Stop loss hit: {StopLoss}%", _settings.StopLossPercentage);
-                    return SellType.StopLoss;
-                }
-
-                // Only use ROI when no stoploss is set, because the stop loss
-                // will be the anchor that sells when the trade falls below it.
-                // This gives the trade room to rise further instead of selling directly.
-                if (!trade.StopLossRate.HasValue)
-                {
-                    // Check if time matches and current rate is above threshold
-                    foreach (var item in _settings.ReturnOnInvestment)
-                    {
-                        var timeDiff = (utcNow - trade.OpenDate).TotalSeconds / 60;
-
-                        if (timeDiff > item.Duration && currentProfit > item.Profit)
-                        {
-                            _logger.LogInformation("Timer hit: {TimeDifference} mins, profit {Profit}%", timeDiff, item.Profit.ToString("0.00"));
-                            return SellType.Timed;
-                        }
-                    }
-                }
-
-                // Only run this when we're past our starting percentage for trailing stop.
-                if (_settings.EnableTrailingStop)
-                {
-                    // If the current rate is below our current stoploss percentage, close the trade.
-                    if (trade.StopLossRate.HasValue && currentRateBid < trade.StopLossRate.Value)
-                        return SellType.TrailingStopLoss;
-
-                    // The new stop would be at a specific percentage above our starting point.
-                    var newStopRate = trade.OpenRate * (1 + (currentProfit - _settings.TrailingStopPercentage));
-
-                    // Only update the trailing stop when its above our starting percentage and higher than the previous one.
-                    if (currentProfit > _settings.TrailingStopStartingPercentage && (trade.StopLossRate < newStopRate || !trade.StopLossRate.HasValue))
-                    {
-                        _logger.LogInformation("Trailing stop loss updated for {Market} from {StopLossRate} to {NewStopRate}", trade.Market, trade.StopLossRate?.ToString("0.00000000"), newStopRate.ToString("0.00000000"));
-
-                        // The current profit percentage is high enough to create the trailing stop value.
-                        // If we are getting our first stop loss raise, we set it to break even. From there the stop
-                        // gets increased every given TrailingStopPercentage...
-                        if (!trade.StopLossRate.HasValue)
-                            trade.StopLossRate = trade.OpenRate;
-                        else
-                            trade.StopLossRate = Math.Round(newStopRate, 8);
-
-                        return SellType.TrailingStopLossUpdated;
-                    }
-
-                    return SellType.None;
-                }
+                _logger.LogInformation("Stop loss hit: {StopLoss}%", _settings.StopLossPercentage);
+                return SellType.StopLoss;
             }
-            else
-            {
-                // Immediates have a bit different behavior...
 
-                // Check for an ROI
+            // Only use ROI when no stoploss is set, because the stop loss
+            // will be the anchor that sells when the trade falls below it.
+            // This gives the trade room to rise further instead of selling directly.
+            if (!trade.StopLossRate.HasValue)
+            {
+                // Check if time matches and current rate is above threshold
                 foreach (var item in _settings.ReturnOnInvestment)
                 {
                     var timeDiff = (utcNow - trade.OpenDate).TotalSeconds / 60;
@@ -694,15 +650,44 @@ namespace Mynt.Core.TradeManagers
                 }
             }
 
+            // Only run this when we're past our starting percentage for trailing stop.
+            if (_settings.EnableTrailingStop)
+            {
+                // If the current rate is below our current stoploss percentage, close the trade.
+                if (trade.StopLossRate.HasValue && currentRateBid < trade.StopLossRate.Value)
+                    return SellType.TrailingStopLoss;
+
+                // The new stop would be at a specific percentage above our starting point.
+                var newStopRate = trade.OpenRate * (1 + (currentProfit - _settings.TrailingStopPercentage));
+
+                // Only update the trailing stop when its above our starting percentage and higher than the previous one.
+                if (currentProfit > _settings.TrailingStopStartingPercentage && (trade.StopLossRate < newStopRate || !trade.StopLossRate.HasValue))
+                {
+                    _logger.LogInformation("Trailing stop loss updated for {Market} from {StopLossRate} to {NewStopRate}", trade.Market, trade.StopLossRate?.ToString("0.00000000"), newStopRate.ToString("0.00000000"));
+
+                    // The current profit percentage is high enough to create the trailing stop value.
+                    // If we are getting our first stop loss raise, we set it to break even. From there the stop
+                    // gets increased every given TrailingStopPercentage...
+                    if (!trade.StopLossRate.HasValue)
+                        trade.StopLossRate = trade.OpenRate;
+                    else
+                        trade.StopLossRate = Math.Round(newStopRate, 8);
+
+                    return SellType.TrailingStopLossUpdated;
+                }
+
+                return SellType.None;
+            }
+
             return SellType.None;
         }
+
+        #endregion
 
         private static string GetOrderId()
         {
             return Guid.NewGuid().ToString().Replace("-", string.Empty);
         }
-
-        #endregion
 
         private async Task SendNotification(string message)
         {
@@ -711,6 +696,5 @@ namespace Mynt.Core.TradeManagers
                 await _notification.SendNotification(message);
             }
         }
-
     }
 }
