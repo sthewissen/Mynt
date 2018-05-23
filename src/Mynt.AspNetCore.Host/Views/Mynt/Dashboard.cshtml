@@ -65,29 +65,31 @@
 @if (ViewBag.activeTrades != null && ViewBag.activeTrades.Count > 0)
 {
     <div class="whiteblock">
-        <table class="table table-hover table-sm table-responsive" id="activeTrades">
+        <table class="table table-hover table-sm" id="activeTrades" style="width: 100%">
             <thead>
                 <tr>
                     <th>Trader Id</th>
                     <th>Bought</th>
                     <th>Coin</th>
-                    <th>Open rate</th>
                     <th>Quantity</th>
+                    <th>Open rate</th>
+                    <th>Last price</th>
                 </tr>
             </thead>
 
-            @foreach (Trade trade in ViewBag.activeTrades)
-            {
-                <tbody>
+            <tbody>
+                @foreach (Trade trade in ViewBag.activeTrades)
+                {
                     <tr>
                         <td>@trade.TraderId</td>
                         <td>@trade.OpenDate</td>
                         <td>@trade.Market</td>
+                        <td>@trade.Quantity</td>
                         <td>@trade.OpenRate</td>
-                        <td>@trade.Quantity</td>>
+                        <td>@trade.TickerLast.Last</td>
                     </tr>
-                </tbody>
-            }
+                }
+            </tbody>
         </table>
     </div>
 }

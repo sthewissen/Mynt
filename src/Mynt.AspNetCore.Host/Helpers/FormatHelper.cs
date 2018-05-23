@@ -30,7 +30,13 @@ namespace Mynt.AspNetCore.Host.Helpers
 
             // Create tag builder and fill in styles and value
             var coloredValue = new TagBuilder("div");
-            @coloredValue.AddCssClass(val > 0 ? "green" : "red");
+            if (val > 0)
+                @coloredValue.AddCssClass("green");
+            if (val < 0)
+                @coloredValue.AddCssClass("red");
+            if (val == 0)
+                @coloredValue.AddCssClass("yellow");
+
             @coloredValue.AddCssClass(addClass);
             @coloredValue.InnerHtml.Append(val.ToString(CultureInfo.InvariantCulture) + signInEnd);
 

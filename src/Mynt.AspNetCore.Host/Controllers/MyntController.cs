@@ -50,9 +50,9 @@ namespace Mynt.AspNetCore.Host.Controllers
                         var actT = trader.ActiveTrade;
 
                         // Get Tickers
-                        var ticker = await _api.GetTicker(actT.Market);
-                        trader.ActiveTrade.OpenProfit = actT.OpenRate - ticker.Last;
-                        trader.ActiveTrade.OpenProfitPercentage = ((actT.OpenRate + actT.OpenProfit) - actT.OpenRate) * 100;
+                        trader.ActiveTrade.TickerLast = await _api.GetTicker(actT.Market);
+                        trader.ActiveTrade.OpenProfit = actT.OpenRate - trader.ActiveTrade.TickerLast.Last;
+                        trader.ActiveTrade.OpenProfitPercentage = ((100 * trader.ActiveTrade.TickerLast.Last) / actT.OpenRate) - 100;
                     }
                 }
 
