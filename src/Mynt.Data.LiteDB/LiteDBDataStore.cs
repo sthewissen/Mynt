@@ -23,6 +23,7 @@ namespace Mynt.Data.LiteDB
             database = new LiteDatabase(options.LiteDBName);
             ordersAdapter = database.GetCollection<TradeAdapter>("Orders");
             traderAdapter = database.GetCollection<TraderAdapter>("Traders");
+            GetDatabase(new BacktestOptions());
         }
 
         public static string GetDatabase(BacktestOptions backtestOptions)
