@@ -21,7 +21,7 @@ namespace Mynt.Core.Exchanges
             IConfiguration Configuration = builder.Build();
 
             ExchangeOptions ExchangeOptions = new ExchangeOptions();
-            ExchangeOptions.Exchange = (Exchange)Enum.Parse(typeof(Exchange), exchange);
+            ExchangeOptions.Exchange = (Exchange)Enum.Parse(typeof(Exchange), exchange, true);
 
             string apiKey;
             string apiSecret;
@@ -38,7 +38,7 @@ namespace Mynt.Core.Exchanges
                 apiSecret = Configuration.GetValue<string>("ApiSecret");
             }
 
-            ExchangeOptions.Exchange = (Exchange)Enum.Parse(typeof(Exchange), exchange);
+            ExchangeOptions.Exchange = (Exchange)Enum.Parse(typeof(Exchange), exchange, true);
             ExchangeOptions.ApiKey = apiKey;
             ExchangeOptions.ApiSecret = apiSecret;
 
@@ -302,11 +302,36 @@ namespace Mynt.Core.Exchanges
 			return _exchangeInfo.FirstOrDefault(x => x.MarketName == symbol);
 		}
 
-		#endregion
+	    public string GlobalSymbolToExchangeSymbol(string symbol)
+	    {
+            //Temporary workaround - My PR is already merged but not in nuget yet -> Wait for ExchangeSharp 0.4.3
+	        if (_exchange == Exchange.Binance)
+	        {
+	            if (symbol.EndsWith("BTC") || symbol.EndsWith("ETH") || symbol.EndsWith("BNB"))
+	            {
+	                string baseSymbol = symbol.Substring(symbol.Length - 3);
+	                return baseSymbol + symbol.Replace(baseSymbol, "");
+	            }
+	            if (symbol.EndsWith("USDT"))
+	            {
+	                string baseSymbol = symbol.Substring(symbol.Length - 4);
+	                return baseSymbol + symbol.Replace(baseSymbol, "");
+                }
+            }
+            return _api.GlobalSymbolToExchangeSymbol(symbol);
+	    }
 
-		#region non-default implementations
+	    public string ExchangeCurrencyToGlobalCurrency(string symbol)
+	    {
+            //This is currently wrong for Binance -> Also fixed in ExchangeSharp 0.4.3 but not used in Backtester 
+            return _api.ExchangeSymbolToGlobalSymbol(symbol);
+	    }
 
-		private async Task<List<Models.MarketSummary>> GetExtendedMarketSummaries(string quoteCurrency)
+        #endregion
+
+        #region non-default implementations
+
+        private async Task<List<Models.MarketSummary>> GetExtendedMarketSummaries(string quoteCurrency)
 		{
 			var summaries = new List<Models.MarketSummary>();
 			var symbols = await _api.GetSymbolsMetadataAsync();

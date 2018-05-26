@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Mynt.Backtester.Models;
 using Mynt.Core.Enums;
+using Mynt.Core.Exchanges;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Utility;
 
@@ -15,13 +16,14 @@ namespace Mynt.Core.Backtester
             var results = new List<BackTestResult>();
 
             // Go through our coinpairs and backtest them.
-            foreach (string pair in backtestOptions.Coins)
+            foreach (string globalSymbol in backtestOptions.Coins)
             {
                 var candleProvider = new DatabaseCandleProvider();
-                backtestOptions.Coin = pair;
+                backtestOptions.Coin = globalSymbol;
+
                 // This creates a list of buy signals.
                 var candles = await candleProvider.GetCandles(backtestOptions, dataStore);
-                var backTestResult = new BackTestResult { Market = pair };
+                var backTestResult = new BackTestResult { Market = globalSymbol };
 
                 try
                 {
@@ -44,7 +46,7 @@ namespace Mynt.Core.Backtester
 
                                     backTestResult.Trades.Add(new BackTestTradeResult
                                     {
-                                        Market = pair,
+                                        Market = globalSymbol,
                                         Quantity = quantity,
                                         OpenRate = candles[i].Close,
                                         CloseRate = candles[j].Close,
