@@ -8,7 +8,7 @@ namespace Mynt.Core.Models
 {
     public class Candle
     {
-        public string Id { get; set; }
+        public int Id { get; set; }
         public DateTime Timestamp { get; set; }
         public decimal High { get; set; }
         public decimal Low { get; set; }
