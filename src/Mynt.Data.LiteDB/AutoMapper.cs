@@ -37,6 +37,10 @@ namespace Mynt.Data.LiteDB
             CreateMap<TraderAdapter, Trader>();
 
             CreateMap<Trader, TraderAdapter>();
+
+            CreateMap<CandleAdapter, Candle>();
+
+            CreateMap<Candle, CandleAdapter>();
         }
     }
 }
