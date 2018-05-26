@@ -304,7 +304,20 @@ namespace Mynt.Core.Exchanges
 
 	    public string GlobalSymbolToExchangeSymbol(string symbol)
 	    {
-            //Temporary workaround - My PR is already merged but not in nuget yet -> Wait for ExchangeSharp 0.4.3
+	        //Temporary workaround - My PR is already merged but not in nuget yet -> Wait for ExchangeSharp 0.4.3
+            if (_exchange == Exchange.Binance)
+	        {
+	            Char delimiter = '-';
+	            string[] symbolArray = symbol.Split(delimiter);
+	            symbol = symbolArray[1] + symbolArray[0];
+	            return symbol;
+	        }
+            return _api.GlobalSymbolToExchangeSymbol(symbol);
+	    }
+
+	    public string ExchangeCurrencyToGlobalCurrency(string symbol)
+	    {
+	        //Temporary workaround - My PR is already merged but not in nuget yet -> Wait for ExchangeSharp 0.4.3
 	        if (_exchange == Exchange.Binance)
 	        {
 	            if (symbol.EndsWith("BTC") || symbol.EndsWith("ETH") || symbol.EndsWith("BNB"))
@@ -316,14 +329,8 @@ namespace Mynt.Core.Exchanges
 	            {
 	                string baseSymbol = symbol.Substring(symbol.Length - 4);
 	                return baseSymbol + symbol.Replace(baseSymbol, "");
-                }
-            }
-            return _api.GlobalSymbolToExchangeSymbol(symbol);
-	    }
-
-	    public string ExchangeCurrencyToGlobalCurrency(string symbol)
-	    {
-            //This is currently wrong for Binance -> Also fixed in ExchangeSharp 0.4.3 but not used in Backtester 
+	            }
+	        }
             return _api.ExchangeSymbolToGlobalSymbol(symbol);
 	    }
 
