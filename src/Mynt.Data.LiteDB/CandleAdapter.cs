@@ -8,7 +8,7 @@ namespace Mynt.Data.LiteDB
     public class CandleAdapter
     {
         [BsonId]
-        public ObjectId Id { get; set; }
+        public int Id { get; set; }
         public DateTime Timestamp { get; set; }
         public decimal High { get; set; }
         public decimal Low { get; set; }
