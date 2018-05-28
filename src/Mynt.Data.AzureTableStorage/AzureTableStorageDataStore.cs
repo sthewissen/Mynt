@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
+using Mynt.Core.Backtester;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
 
@@ -151,5 +153,6 @@ namespace Mynt.Data.AzureTableStorage
             if (tradeBatch.Count > 0)
                 await _orderTable.ExecuteBatchAsync(tradeBatch);
         }
+
     }
 }

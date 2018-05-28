@@ -36,6 +36,10 @@ namespace Mynt.Data.MongoDB
             CreateMap<TraderAdapter, Trader>();
 
             CreateMap<Trader, TraderAdapter>();
+
+            CreateMap<CandleAdapter, Candle>();
+
+            CreateMap<Candle, CandleAdapter>();
         }
     }
 }

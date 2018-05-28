@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using LiteDB;
@@ -8,6 +7,7 @@ using Mynt.Core.Models;
 
 namespace Mynt.Data.LiteDB
 {
+
     public class LiteDBDataStore : IDataStore
     {
         private LiteDatabase database;

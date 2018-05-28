@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using Mynt.Core.Interfaces;
@@ -12,13 +10,14 @@ namespace Mynt.Data.MongoDB
     {
         private MongoClient client;
         private IMongoDatabase database;
+        public static MongoDBOptions mongoDbOptions;
         private IMongoCollection<TraderAdapter> traderAdapter;
         private IMongoCollection<TradeAdapter> ordersAdapter;
 
         public MongoDBDataStore(MongoDBOptions options)
         {
-			client = new MongoClient(options.MongoUrl);
-			database = client.GetDatabase(options.MongoDatabaseName);
+            mongoDbOptions = options;
+            client = new MongoClient(options.MongoUrl);
             ordersAdapter = database.GetCollection<TradeAdapter>("Orders");
             traderAdapter = database.GetCollection<TraderAdapter>("Traders");
         }
@@ -121,5 +120,6 @@ namespace Mynt.Data.MongoDB
 
             return items;
         }
+
     }
 }

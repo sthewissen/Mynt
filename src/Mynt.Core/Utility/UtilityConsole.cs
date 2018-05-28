@@ -4,22 +4,51 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
-namespace Mynt.Backtester
+namespace Mynt.Core.Utility
 {
-    internal static class TableOutputWriter
+    public static class ConsoleUtility
+    {
+        public static void WriteColored(string line, ConsoleColor color, bool padded = false)
+        {
+            Console.ForegroundColor = color;
+            if (padded) Console.WriteLine();
+            Console.Write(line);
+            if (padded) Console.WriteLine();
+            Console.ResetColor();
+        }
+
+        public static void WriteColoredLine(string line, ConsoleColor color, bool padded = false)
+        {
+            Console.ForegroundColor = color;
+            if (padded) Console.WriteLine();
+            Console.WriteLine(line);
+            if (padded) Console.WriteLine();
+            Console.ResetColor();
+        }
+
+        public static void WriteSeparator()
+        {
+            Console.WriteLine();
+            Console.WriteLine("\t============================================================");
+            Console.WriteLine();
+        }
+    }
+
+
+    public static class TableOutputWriter
     {
         public static string ToStringTable<T>(
-          this IEnumerable<T> values,
-          string[] columnHeaders,
-          params Func<T, object>[] valueSelectors)
+            this IEnumerable<T> values,
+            string[] columnHeaders,
+            params Func<T, object>[] valueSelectors)
         {
             return ToStringTable(values.ToArray(), columnHeaders, valueSelectors);
         }
 
         public static string ToStringTable<T>(
-          this T[] values,
-          string[] columnHeaders,
-          params Func<T, object>[] valueSelectors)
+            this T[] values,
+            string[] columnHeaders,
+            params Func<T, object>[] valueSelectors)
         {
             Debug.Assert(columnHeaders.Length == valueSelectors.Length);
 
@@ -37,7 +66,7 @@ namespace Mynt.Backtester
                 for (int colIndex = 0; colIndex < arrValues.GetLength(1); colIndex++)
                 {
                     arrValues[rowIndex, colIndex] = valueSelectors[colIndex]
-                      .Invoke(values[rowIndex - 1]).ToString();
+                        .Invoke(values[rowIndex - 1]).ToString();
                 }
             }
 
@@ -100,4 +129,5 @@ namespace Mynt.Backtester
             return maxColumnsWidth;
         }
     }
+
 }

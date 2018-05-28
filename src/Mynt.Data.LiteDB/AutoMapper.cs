@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using AutoMapper;
+using Mynt.Backtester.Models;
 using Mynt.Core.Models;
 
 
@@ -36,6 +37,10 @@ namespace Mynt.Data.LiteDB
             CreateMap<TraderAdapter, Trader>();
 
             CreateMap<Trader, TraderAdapter>();
+
+            CreateMap<CandleAdapter, Candle>();
+
+            CreateMap<Candle, CandleAdapter>();
         }
     }
 }

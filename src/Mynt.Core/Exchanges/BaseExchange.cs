@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using ExchangeSharp;
+using Microsoft.Extensions.Configuration;
 using Mynt.Core.Enums;
 using Mynt.Core.Extensions;
 using Mynt.Core.Interfaces;
@@ -10,6 +12,40 @@ using Mynt.Core.Models;
 
 namespace Mynt.Core.Exchanges
 {
+    public class BaseExchangeInstance
+    {
+        public BaseExchange BaseExchange(string exchange)
+        {
+            IExchangeAPI _api = ExchangeAPI.GetExchangeAPI(exchange.ToLower());
+            var builder = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json", optional: true);
+            IConfiguration Configuration = builder.Build();
+
+            ExchangeOptions ExchangeOptions = new ExchangeOptions();
+            ExchangeOptions.Exchange = (Exchange)Enum.Parse(typeof(Exchange), exchange);
+
+            string apiKey;
+            string apiSecret;
+
+            //Check if there are multiple exchanges in config, else Fallback to single mode
+            if (Configuration.GetSection("Exchanges").GetSection(exchange) != null)
+            {
+                apiKey = Configuration.GetSection("Exchanges").GetSection(exchange).GetValue<string>("ApiKey");
+                apiSecret = Configuration.GetSection("Exchanges").GetSection(exchange).GetValue<string>("ApiSecret");
+                
+            } else
+            {
+                apiKey = Configuration.GetValue<string>("ApiKey");
+                apiSecret = Configuration.GetValue<string>("ApiSecret");
+            }
+
+            ExchangeOptions.Exchange = (Exchange)Enum.Parse(typeof(Exchange), exchange);
+            ExchangeOptions.ApiKey = apiKey;
+            ExchangeOptions.ApiSecret = apiSecret;
+
+            return new BaseExchange(ExchangeOptions);
+        }
+    }
+
 	public class BaseExchange : IExchangeApi
 	{
 		private readonly ExchangeSharp.ExchangeAPI _api;
@@ -57,9 +93,9 @@ namespace Mynt.Core.Exchanges
 			_api.LoadAPIKeysUnsecure(options.ApiKey, options.ApiSecret, options.PassPhrase);
 		}
 
-		#region default implementations
+        #region default implementations
 
-		public async Task<string> Buy(string market, decimal quantity, decimal rate)
+        public async Task<string> Buy(string market, decimal quantity, decimal rate)
 		{
 			var request = new ExchangeSharp.ExchangeOrderRequest()
 			{
@@ -203,7 +239,9 @@ namespace Mynt.Core.Exchanges
 
 		public async Task<List<Candle>> GetTickerHistory(string market, Period period, DateTime startDate, DateTime? endDate = null)
 		{
-			var ticker = await _api.GetCandlesAsync(market, period.ToMinutesEquivalent() * 60, startDate, endDate);
+            //Should we use globals markets ?
+            //market = _api.GlobalCurrencyToExchangeCurrency(market);
+            var ticker = await _api.GetCandlesAsync(market, period.ToMinutesEquivalent() * 60, startDate, endDate);
 
 			if (ticker.Any())
 				return ticker.Select(x => new Candle

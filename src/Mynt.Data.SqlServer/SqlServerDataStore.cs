@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Mynt.Core.Backtester;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Models;
 
@@ -88,5 +89,6 @@ namespace Mynt.Data.SqlServer
 
             return items;
         }
+
     }
 }

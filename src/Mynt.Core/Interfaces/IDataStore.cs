@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Mynt.Backtester.Models;
+using Mynt.Core.Backtester;
 using Mynt.Core.Models;
 
 namespace Mynt.Core.Interfaces

@@ -60,5 +60,30 @@ namespace Mynt.Core.Extensions
                     throw new ArgumentException($"{period} is an unknown value for Period");
             }
         }
+
+        public static Period FromMinutesEquivalent(this int period)
+        {
+            switch (period)
+            {
+                case 1:
+                    return Period.Minute;
+                case 5:
+                    return Period.FiveMinutes;
+                case 15:
+                    return Period.QuarterOfAnHour;
+                case 30:
+                    return Period.HalfAnHour;
+                case 60:
+                    return Period.Hour;
+                case 120:
+                    return Period.TwoHours;
+                case 240:
+                    return Period.FourHours;
+                case 1440:
+                    return Period.Day;
+                default:
+                    throw new ArgumentException($"{period} is an unknown value for Period");
+            }
+        }
     }
 }

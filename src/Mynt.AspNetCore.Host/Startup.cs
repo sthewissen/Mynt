@@ -13,6 +13,7 @@ using Mynt.Core.Notifications;
 using Mynt.Core.Strategies;
 using Mynt.Core.TradeManagers;
 using Mynt.Data.AzureTableStorage;
+using Mynt.Data.LiteDB;
 using Serilog;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
@@ -25,7 +26,8 @@ namespace Mynt.AspNetCore.Host
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
+        public static IConfiguration Configuration { get; set;}
+        public static IDataStore BacktestDataStore { get; set; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -38,6 +40,10 @@ namespace Mynt.AspNetCore.Host
             services.AddLogging(b => { b.AddSerilog(serilogger); });
 
             services.AddMvc();
+
+            //Add Datastore for backtester
+            LiteDBOptions backtestDatabaseOptions = new LiteDBOptions();
+            BacktestDataStore = new LiteDBDataStore(backtestDatabaseOptions);
 
             // Set up exchange - TODO
             var exchangeOptions = Configuration.Get<ExchangeOptions>();
