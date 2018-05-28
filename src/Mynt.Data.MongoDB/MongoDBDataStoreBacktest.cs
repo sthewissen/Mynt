@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using Mynt.Core.Backtester;
@@ -93,6 +92,21 @@ namespace Mynt.Data.MongoDB
             var items = Mapping.Mapper.Map<List<CandleAdapter>>(candles);
             IMongoCollection<CandleAdapter> candleCollection = DataStoreBacktest.GetInstance(mongoDbBaseName + backtestOptions.CandlePeriod).GetTable<CandleAdapter>(backtestOptions.Exchange + "_" + backtestOptions.Coin);
             await candleCollection.InsertManyAsync(items);
+        }
+
+        public async Task SaveBacktestCandlesBulkCheckExisting(List<Candle> candles, BacktestOptions backtestOptions)
+        {
+            var items = Mapping.Mapper.Map<List<CandleAdapter>>(candles);
+            IMongoCollection<CandleAdapter> candleCollection = DataStoreBacktest.GetInstance(mongoDbBaseName + backtestOptions.CandlePeriod).GetTable<CandleAdapter>(backtestOptions.Exchange + "_" + backtestOptions.Coin);
+            FindOptions<CandleAdapter> marketCandleFindOptions = new FindOptions<CandleAdapter> { Limit = 1 };
+            foreach (var item in items)
+            {
+                IAsyncCursor<CandleAdapter> checkData = await candleCollection.FindAsync(x => x.Timestamp.Equals(item.Timestamp), marketCandleFindOptions);
+                if (await checkData.FirstOrDefaultAsync() == null)
+                {
+                    await candleCollection.InsertOneAsync(item);
+                }
+            }
         }
 
         public async Task SaveBacktestCandle(Candle candle, BacktestOptions backtestOptions)
