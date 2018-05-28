@@ -21,7 +21,7 @@ namespace Mynt.Core.Exchanges
             IConfiguration Configuration = builder.Build();
 
             ExchangeOptions ExchangeOptions = new ExchangeOptions();
-            ExchangeOptions.Exchange = (Exchange)Enum.Parse(typeof(Exchange), exchange);
+            ExchangeOptions.Exchange = (Exchange)Enum.Parse(typeof(Exchange), exchange, true);
 
             string apiKey;
             string apiSecret;
@@ -38,7 +38,7 @@ namespace Mynt.Core.Exchanges
                 apiSecret = Configuration.GetValue<string>("ApiSecret");
             }
 
-            ExchangeOptions.Exchange = (Exchange)Enum.Parse(typeof(Exchange), exchange);
+            ExchangeOptions.Exchange = (Exchange)Enum.Parse(typeof(Exchange), exchange, true);
             ExchangeOptions.ApiKey = apiKey;
             ExchangeOptions.ApiSecret = apiSecret;
 
@@ -302,11 +302,21 @@ namespace Mynt.Core.Exchanges
 			return _exchangeInfo.FirstOrDefault(x => x.MarketName == symbol);
 		}
 
-		#endregion
+	    public string GlobalSymbolToExchangeSymbol(string symbol)
+	    {
+            return _api.GlobalSymbolToExchangeSymbol(symbol);
+	    }
 
-		#region non-default implementations
+	    public string ExchangeCurrencyToGlobalCurrency(string symbol)
+	    {
+            return _api.ExchangeSymbolToGlobalSymbol(symbol);
+	    }
 
-		private async Task<List<Models.MarketSummary>> GetExtendedMarketSummaries(string quoteCurrency)
+        #endregion
+
+        #region non-default implementations
+
+        private async Task<List<Models.MarketSummary>> GetExtendedMarketSummaries(string quoteCurrency)
 		{
 			var summaries = new List<Models.MarketSummary>();
 			var symbols = await _api.GetSymbolsMetadataAsync();
