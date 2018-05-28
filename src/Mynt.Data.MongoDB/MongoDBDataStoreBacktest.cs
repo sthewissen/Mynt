@@ -14,8 +14,6 @@ namespace Mynt.Data.MongoDB
         private IMongoDatabase database;
         public static MongoDBOptions mongoDbOptions;
         public string mongoDbBaseName;
-        private IMongoCollection<TraderAdapter> traderAdapter;
-        private IMongoCollection<TradeAdapter> ordersAdapter;
 
         public MongoDBDataStoreBacktest(MongoDBOptions options)
         {
@@ -23,8 +21,6 @@ namespace Mynt.Data.MongoDB
             client = new MongoClient(options.MongoUrl);
             database = client.GetDatabase(options.MongoDatabaseName);
             mongoDbBaseName = "Backtest_Candle_";
-            ordersAdapter = database.GetCollection<TradeAdapter>("Orders");
-            traderAdapter = database.GetCollection<TraderAdapter>("Traders");
         }
 
         public static string GetDatabase(BacktestOptions backtestOptions)
