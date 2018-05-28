@@ -29,6 +29,7 @@ namespace Mynt.Core.Interfaces
         Task<Candle> GetBacktestLastCandle(BacktestOptions backtestOptions);
         Task<Candle> GetBacktestFirstCandle(BacktestOptions backtestOptions);
         Task SaveBacktestCandlesBulk(List<Candle> candles, BacktestOptions backtestOptions);
+        Task SaveBacktestCandlesBulkCheckExisting(List<Candle> candles, BacktestOptions backtestOptions);
         Task SaveBacktestCandle(Candle candles, BacktestOptions backtestOptions);
         Task<List<string>> GetBacktestAllDatabases(BacktestOptions backtestOptions);
         Task DeleteBacktestDatabase(BacktestOptions backtestOptions);

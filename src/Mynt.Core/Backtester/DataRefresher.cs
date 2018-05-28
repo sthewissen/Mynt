@@ -96,10 +96,7 @@ namespace Mynt.Core.Backtester
                             await dataStore.SaveBacktestCandlesBulk(candles, backtestOptions);
                             databaseExists = true;
                         } else {
-                            foreach (var candle in candles)
-                            {
-                                await dataStore.SaveBacktestCandle(candle, backtestOptions);
-                            }
+                            await dataStore.SaveBacktestCandlesBulkCheckExisting(candles, backtestOptions);
                         }
 
                         callback($"\tUpdated: {backtestOptions.Exchange.ToString()} with Period {backtestOptions.CandlePeriod.ToString()}min for {globalSymbol} {startDate.ToUniversalTime()} to {endDate.RoundDown(TimeSpan.FromMinutes(backtestOptions.CandlePeriod))} UTC");

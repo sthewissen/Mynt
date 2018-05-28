@@ -185,6 +185,19 @@ namespace Mynt.Data.LiteDB
             candleCollection.InsertBulk(items);
         }
 
+        public async Task SaveBacktestCandlesBulkCheckExisting(List<Candle> candles, BacktestOptions backtestOptions)
+        {
+            var items = Mapping.Mapper.Map<List<CandleAdapter>>(candles);
+            LiteCollection<CandleAdapter> candleCollection = DataStore.GetInstance(GetDatabase(backtestOptions)).GetTable<CandleAdapter>("Candle_" + backtestOptions.CandlePeriod); foreach (var item in items)
+            {
+                var checkData = candleCollection.FindOne(x => x.Timestamp == item.Timestamp);
+                if (checkData == null)
+                {
+                    candleCollection.Insert(item);
+                }
+            }
+        }
+
         public async Task SaveBacktestCandle(Candle candle, BacktestOptions backtestOptions)
         {
             var item = Mapping.Mapper.Map<CandleAdapter>(candle);
