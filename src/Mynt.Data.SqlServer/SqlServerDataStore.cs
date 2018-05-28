@@ -90,42 +90,5 @@ namespace Mynt.Data.SqlServer
             return items;
         }
 
-        /* Backtester */
-
-        public async Task<List<Candle>> GetBacktestCandlesBetweenTime(BacktestOptions backtestOptions)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<Candle> GetBacktestFirstCandle(BacktestOptions backtestOptions)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<Candle> GetBacktestLastCandle(BacktestOptions backtestOptions)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task SaveBacktestCandlesBulk(List<Candle> candles, BacktestOptions backtestOptions)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task SaveBacktestCandle(Candle candle, BacktestOptions backtestOptions)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<List<string>> GetBacktestAllDatabases(BacktestOptions backtestOptions)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task DeleteBacktestDatabase(BacktestOptions backtestOptions)
-        {
-            throw new NotImplementedException();
-        }
-
     }
 }

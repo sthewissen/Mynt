@@ -23,14 +23,5 @@ namespace Mynt.Core.Interfaces
         Task<List<Trader>> GetAvailableTradersAsync();
         Task SaveTradersAsync(List<Trader> traders);
         Task SaveTraderAsync(Trader trader);
-
-        // Backtest related methods
-        Task<List<Candle>> GetBacktestCandlesBetweenTime(BacktestOptions backtestOptions);
-        Task<Candle> GetBacktestLastCandle(BacktestOptions backtestOptions);
-        Task<Candle> GetBacktestFirstCandle(BacktestOptions backtestOptions);
-        Task SaveBacktestCandlesBulk(List<Candle> candles, BacktestOptions backtestOptions);
-        Task SaveBacktestCandle(Candle candles, BacktestOptions backtestOptions);
-        Task<List<string>> GetBacktestAllDatabases(BacktestOptions backtestOptions);
-        Task DeleteBacktestDatabase(BacktestOptions backtestOptions);
     }
 }

@@ -8,7 +8,7 @@ namespace Mynt.Core.Backtester
 {
     public class DatabaseCandleProvider
     {
-        public async Task<List<Candle>> GetCandles(BacktestOptions backtestOptions, IDataStore dataStore)
+        public async Task<List<Candle>> GetCandles(BacktestOptions backtestOptions, IDataStoreBacktest dataStore)
         {
             backtestOptions.EndDate = DateTime.UtcNow;
 

@@ -32,14 +32,14 @@ namespace Mynt.Core.Backtester
 
         #region backtesting
 
-        public static async Task<List<BackTestResult>> BackTest(ITradingStrategy strategy, BacktestOptions backtestOptions, IDataStore dataStore)
+        public static async Task<List<BackTestResult>> BackTest(ITradingStrategy strategy, BacktestOptions backtestOptions, IDataStoreBacktest dataStore)
         {
             var runner = new BackTestRunner();
             var results = await runner.RunSingleStrategy(strategy, backtestOptions, dataStore);
             return results;
         }
 
-        public static async Task<JArray> BackTestJson(ITradingStrategy strategy, BacktestOptions backtestOptions, IDataStore dataStore)
+        public static async Task<JArray> BackTestJson(ITradingStrategy strategy, BacktestOptions backtestOptions, IDataStoreBacktest dataStore)
         {
             List<BackTestResult> results = await BackTest(strategy, backtestOptions, dataStore);
             JArray jArrayResult = new JArray();
@@ -63,7 +63,7 @@ namespace Mynt.Core.Backtester
             return jArrayResult;
         }
 
-        public static async void BackTestConsole(ITradingStrategy strategy, BacktestOptions backtestOptions, IDataStore dataStore)
+        public static async void BackTestConsole(ITradingStrategy strategy, BacktestOptions backtestOptions, IDataStoreBacktest dataStore)
         {
             List<BackTestResult> results = await BackTest(strategy, backtestOptions, dataStore);
             if (results.Count > 0)
@@ -88,14 +88,14 @@ namespace Mynt.Core.Backtester
             ConsoleUtility.WriteSeparator();
         }
 
-        public static async Task<List<BackTestResult>> BackTestShowTrades(ITradingStrategy strategy, BacktestOptions backtestOptions, IDataStore dataStore)
+        public static async Task<List<BackTestResult>> BackTestShowTrades(ITradingStrategy strategy, BacktestOptions backtestOptions, IDataStoreBacktest dataStore)
         {
             var runner = new BackTestRunner();
             var results = await runner.RunSingleStrategy(strategy, backtestOptions, dataStore);
             return results;
         }
 
-        public static async Task<JArray> BackTestShowTradesJson(ITradingStrategy strategy, BacktestOptions backtestOptions, IDataStore dataStore)
+        public static async Task<JArray> BackTestShowTradesJson(ITradingStrategy strategy, BacktestOptions backtestOptions, IDataStoreBacktest dataStore)
         {
             var results = await BackTestShowTrades(strategy, backtestOptions, dataStore);
 
@@ -125,7 +125,7 @@ namespace Mynt.Core.Backtester
             return jArrayResult;
         }
 
-        public static async void BackTestShowTradesConsole(ITradingStrategy strategy, BacktestOptions backtestOptions, IDataStore dataStore)
+        public static async void BackTestShowTradesConsole(ITradingStrategy strategy, BacktestOptions backtestOptions, IDataStoreBacktest dataStore)
         {
             var results = await BackTestShowTrades(strategy, backtestOptions, dataStore);
 
@@ -167,7 +167,7 @@ namespace Mynt.Core.Backtester
         }
 
 
-        public static async Task<List<BackTestStrategyResult>> BackTestAll(BacktestOptions backtestOptions, IDataStore dataStore)
+        public static async Task<List<BackTestStrategyResult>> BackTestAll(BacktestOptions backtestOptions, IDataStoreBacktest dataStore)
         {
             var runner = new BackTestRunner();
             var results = new List<BackTestStrategyResult>();
@@ -182,7 +182,7 @@ namespace Mynt.Core.Backtester
             return results;
         }
 
-        public static async Task<JArray> BackTestAllJson(BacktestOptions backtestOptions, IDataStore dataStore)
+        public static async Task<JArray> BackTestAllJson(BacktestOptions backtestOptions, IDataStoreBacktest dataStore)
         {
             List<BackTestStrategyResult> results = await BackTestAll(backtestOptions, dataStore);
             JArray jArrayResult = new JArray();
@@ -204,7 +204,7 @@ namespace Mynt.Core.Backtester
         }
 
 
-        public static async void BackTestAllConsole(BacktestOptions backtestOptions, IDataStore dataStore)
+        public static async void BackTestAllConsole(BacktestOptions backtestOptions, IDataStoreBacktest dataStore)
         {
 
             List<BackTestStrategyResult> results = await BackTestAll(backtestOptions, dataStore);

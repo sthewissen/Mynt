@@ -6,6 +6,7 @@ using Mynt.Core.Backtester;
 using Mynt.Core.Interfaces;
 using Mynt.Core.Utility;
 using Mynt.Data.LiteDB;
+//using Mynt.Data.MongoDB;
 
 namespace Mynt.Backtester
 {
@@ -13,7 +14,7 @@ namespace Mynt.Backtester
     {
         public static IConfiguration Configuration { get; set; }
         public static BacktestOptions BacktestOptions { get; set; }
-        public static IDataStore DataStore { get; set; }
+        public static IDataStoreBacktest DataStore { get; set; }
         public static int WriteMenuCount;
 
         static void Main(string[] args)
@@ -47,8 +48,12 @@ namespace Mynt.Backtester
             Configuration = builder.Build();
             BacktestOptions = Configuration.Get<BacktestOptions>();
 
+
             LiteDBOptions backtestDatabaseOptions = new LiteDBOptions();
-            DataStore = new LiteDBDataStore(backtestDatabaseOptions);
+            DataStore = new LiteDBDataStoreBacktest(backtestDatabaseOptions);
+
+            //MongoDBOptions backtestDatabaseOptions = new MongoDBOptions();
+            //DataStore = new MongoDBDataStoreBacktest(backtestDatabaseOptions);
         }
 
         #region console bootstrapping
