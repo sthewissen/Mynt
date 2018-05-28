@@ -8,9 +8,8 @@ namespace Mynt.Data.SqlServer
     public class TradeAdapter
     {
         [Key]
-        public int Id { get; set; }
+        public int TradeId { get; set; }
 
-        public string TradeId { get; set; }
         public string TraderId { get; set; }
         public string Market { get; set; }
 

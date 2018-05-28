@@ -8,8 +8,9 @@ namespace Mynt.Core.Interfaces
     {
         // Initialization
         Task InitializeAsync();
- 
+
         // Trade/order related methods
+        Task<List<Trade>> GetClosedTradesAsync();
         Task<List<Trade>> GetActiveTradesAsync();
         Task SaveTradesAsync(List<Trade> trades);
         Task SaveTradeAsync(Trade trade);

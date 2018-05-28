@@ -18,11 +18,11 @@ namespace Mynt.Data.Sqlite.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.0.3-rtm-10026");
+                .HasAnnotation("ProductVersion", "2.0.2-rtm-10011");
 
             modelBuilder.Entity("Mynt.Data.Sqlite.TradeAdapter", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("TradeId")
                         .ValueGeneratedOnAdd();
 
                     b.Property<string>("BuyOrderId");
@@ -61,25 +61,21 @@ namespace Mynt.Data.Sqlite.Migrations
 
                     b.Property<string>("StrategyUsed");
 
-                    b.Property<string>("TradeId");
-
                     b.Property<string>("TraderId");
 
-                    b.HasKey("Id");
+                    b.HasKey("TradeId");
 
                     b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("Mynt.Data.Sqlite.TraderAdapter", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("TraderId")
                         .ValueGeneratedOnAdd();
 
                     b.Property<double>("CurrentBalance");
 
                     b.Property<string>("Identifier");
-
-                    b.Property<bool>("IsArchived");
 
                     b.Property<bool>("IsBusy");
 
@@ -87,7 +83,7 @@ namespace Mynt.Data.Sqlite.Migrations
 
                     b.Property<double>("StakeAmount");
 
-                    b.HasKey("Id");
+                    b.HasKey("TraderId");
 
                     b.ToTable("Traders");
                 });

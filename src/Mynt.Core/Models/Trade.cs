@@ -5,11 +5,10 @@ namespace Mynt.Core.Models
 {
     public class Trade
     {
-        // Used as primary key for the different data storage mechanisms.
-        public int Id { get; set; }
+        public string Id { get; set; }
 
-        public string TradeId { get; set; }
         public string TraderId { get; set; }
+        
         public string Market { get; set; }
 
         public decimal OpenRate { get; set; }
@@ -37,9 +36,14 @@ namespace Mynt.Core.Models
 
         public Trade()
         {
-            TradeId = Guid.NewGuid().ToString().Replace("-", string.Empty);
+            Id = Guid.NewGuid().ToString().Replace("-", string.Empty);
             IsOpen = true;
             OpenDate = DateTime.UtcNow;
         }
+
+        // Used for Mynt.AspNetCore.Host UI output
+        public decimal? OpenProfit { get; set; }
+        public decimal? OpenProfitPercentage { get; set; }
+        public Ticker TickerLast { get; set; }
     }
 }

@@ -20,8 +20,11 @@
   <ItemGroup>
     <Folder Include="Strategies\" />
     <Folder Include="TradeManagers\" />
+<<<<<<< HEAD
     <Folder Include="Extensions\" />
     <Folder Include="Exchanges\" />
+=======
+>>>>>>> a8381648f34e683d38b45afc3ae6b1c0b7b4a985
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mynt.Core\Mynt.Core.csproj" />

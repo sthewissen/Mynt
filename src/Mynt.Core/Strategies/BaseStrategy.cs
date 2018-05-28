@@ -14,8 +14,8 @@ namespace Mynt.Core.Strategies
 
         public DateTime GetCurrentCandleDateTime()
         {
-            var minutes = IdealPeriod == Period.Minute ||
-                IdealPeriod == Period.FiveMinutes ||
+            var minutes = IdealPeriod == Period.Minute || 
+                IdealPeriod == Period.FiveMinutes || 
                 IdealPeriod == Period.QuarterOfAnHour ||
                 IdealPeriod == Period.HalfAnHour ? DateTime.UtcNow.Minute : 0;
 
@@ -87,6 +87,5 @@ namespace Mynt.Core.Strategies
         public abstract List<TradeAdvice> Prepare(List<Candle> candles);
 
         public abstract TradeAdvice Forecast(List<Candle> candles);
-
     }
 }

@@ -23,6 +23,14 @@ namespace Mynt.Data.Sqlite
             await _context.Database.MigrateAsync();
         }
 
+        public async Task<List<Trade>> GetClosedTradesAsync()
+        {
+            var trades = await _context.Orders.Where(x => !x.IsOpen).ToListAsync();
+            var items = Mapping.Mapper.Map<List<Trade>>(trades);
+
+            return items;
+        }
+
         public async Task<List<Trade>> GetActiveTradesAsync()
         {
             var trades = await _context.Orders.Where(x => x.IsOpen).ToListAsync();

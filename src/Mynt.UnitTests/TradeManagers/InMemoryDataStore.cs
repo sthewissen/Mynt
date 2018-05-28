@@ -18,6 +18,10 @@ namespace Mynt.UnitTests.TradeManagers
             Traders = new List<Trader>();
             Instance = this;
         }
+        public Task<List<Trade>> GetClosedTradesAsync()
+        {
+            return Task.FromResult(Trades.Where(x => !x.IsOpen).ToList());
+        }
 
         public Task<List<Trade>> GetActiveTradesAsync()
         {
@@ -47,7 +51,7 @@ namespace Mynt.UnitTests.TradeManagers
 
         public Task SaveTradeAsync(Trade trade)
         {
-            var items = Trades.Where(x => x.TradeId == trade.TradeId).ToList();
+            var items = Trades.Where(x => x.Id == trade.Id).ToList();
 
             if (items.Count > 0)
             {

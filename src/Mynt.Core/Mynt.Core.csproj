@@ -6,6 +6,8 @@
 
   <ItemGroup>
     <Compile Remove="Class1.cs" />
+    <Compile Remove="Indicators\CandlePatterns.cs" />
+    <Compile Remove="Indicators\TDSequential.cs" />
     <Compile Remove="Strategies\AdxMomentum.cs" />
     <Compile Remove="Strategies\AdxSmas.cs" />
     <Compile Remove="Strategies\AwesomeMacd.cs" />
@@ -36,6 +38,7 @@
     <Compile Remove="Strategies\MacdSma.cs" />
     <Compile Remove="Strategies\MacdTema.cs" />
     <Compile Remove="Strategies\Momentum.cs" />
+    <Compile Remove="Strategies\PatternTrading.cs" />
     <Compile Remove="Strategies\PowerRanger.cs" />
     <Compile Remove="Strategies\QuickSma.cs" />
     <Compile Remove="Strategies\Replex.cs" />
@@ -58,7 +61,6 @@
     <Compile Remove="Strategies\WvfExtended.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Indicators\" />
     <Folder Include="Interfaces\" />
     <Folder Include="Models\" />
     <Folder Include="Enums\" />
@@ -66,7 +68,6 @@
     <Folder Include="Exchanges\" />
     <Folder Include="Notifications\" />
     <Folder Include="Configuration\" />
-    <Folder Include="Strategies\Simple\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="2.0.0" />
