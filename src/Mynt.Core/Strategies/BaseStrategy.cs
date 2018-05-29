@@ -21,14 +21,14 @@ namespace Mynt.Core.Strategies
 
             var hour = IdealPeriod == Period.Day ? 0 : DateTime.UtcNow.Hour;
 
-            return new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day, hour, minutes, 0, 0);
+            return new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day, hour, minutes, 0, 0, DateTimeKind.Utc);
         }
 
         public DateTime GetSignalDate()
         {
             var minutes = IdealPeriod == Period.Minute || IdealPeriod == Period.FiveMinutes || IdealPeriod == Period.QuarterOfAnHour || IdealPeriod == Period.HalfAnHour ? DateTime.UtcNow.Minute : 0;
             var hour = IdealPeriod == Period.Day ? 0 : DateTime.UtcNow.Hour;
-            var current = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day, hour, minutes, 0, 0);
+            var current = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day, hour, minutes, 0, 0, DateTimeKind.Utc);
 
             switch (IdealPeriod)
             {
@@ -57,7 +57,7 @@ namespace Mynt.Core.Strategies
         {
             var hour = IdealPeriod == Period.Day ? 0 : DateTime.UtcNow.Hour;
             var minutes = IdealPeriod == Period.Minute || IdealPeriod == Period.FiveMinutes || IdealPeriod == Period.QuarterOfAnHour || IdealPeriod == Period.HalfAnHour ? DateTime.UtcNow.Minute : 0;
-            var current = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day, hour, minutes, 0, 0);
+            var current = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day, hour, minutes, 0, 0, DateTimeKind.Utc);
 
             switch (IdealPeriod)
             {
