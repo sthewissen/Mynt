@@ -59,6 +59,11 @@ namespace Mynt.Core.Indicators
 				}
 			}
 
+            if (fillNullValues)
+            {
+                return FillPivotNulls(result);
+            }
+
 			return result;
 		}
 	}
