@@ -32,7 +32,7 @@ namespace Mynt.Core.Strategies
 					result.Add(TradeAdvice.Buy);
 
                 // Either a upper pivot or a new potential low pivot should make us sell.
-				else if (high[i].HasValue || (lows[i] <= lows[i - 1] && lows[i] <= lows[i - 2] && lows[i] <= lows[i - 3] && lows[i] <= lows[i - 4]))
+				else if (high[i].HasValue || (i > 3 && (lows[i] <= lows[i - 1] && lows[i] <= lows[i - 2] && lows[i] <= lows[i - 3] && lows[i] <= lows[i - 4])))
 					result.Add(TradeAdvice.Sell);
 
                 // Hold otherwise
