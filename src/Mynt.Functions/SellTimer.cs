@@ -46,7 +46,7 @@ namespace Mynt.Functions
                 // Initialize a Trade Manager instance that will run using the settings provided below.
                 // Once again, you can use the default values for the settings defined in te Options classes below.
                 // You can also override them here or using the configuration mechanism of your choosing.
-                var tradeManager = new PaperTradeManager(
+                var tradeManager = new StrategyTradeManager(
                     api: new BaseExchange(exchangeOptions),
                     dataStore: new AzureTableStorageDataStore(azureTableStorageOptions),
                     logger: logger,
@@ -55,7 +55,7 @@ namespace Mynt.Functions
                     strategy: ApplicationHelper.TryCreateTradingStrategy(tradeOptions.DefaultStrategy) ?? new TheScalper());
 
                 // Start running this thing!
-                await tradeManager.UpdateExistingTrades();
+                await tradeManager.Sell();
 
                 logger.LogInformation("Done...");
             }
