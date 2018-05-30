@@ -22,7 +22,7 @@ namespace Mynt.Core.TradeManagers
 		private readonly bool _isPaperTrading;
 
 		// Some variables for internal use.
-        private readonly DateTime _currentRunTime;
+		private readonly DateTime _currentRunTime;
 		private List<Trade> _currentTrades = new List<Trade>();
 		private List<Trader> _availableTraders = new List<Trader>();
 		private List<Trade> _tradesToSave = new List<Trade>();
@@ -61,17 +61,96 @@ namespace Mynt.Core.TradeManagers
 
 		#region initalization logic
 
+        /// <summary>
+        /// Initialize the traders.
+        /// </summary>
+        /// <returns>The initialize.</returns>
+        /// <param name="initTraders">If set to <c>true</c> init traders.</param>
 		async Task Initialize(bool initTraders = false)
 		{
 			// First initialize our data store, because this is used intesively here.
 			await _dataStore.InitializeAsync();
 
-			// TODO: Create traders if there are none...         
+			// Create traders if there are none...         
+			if (initTraders)
+			{
+				var currentTraders = await _dataStore.GetTradersAsync();
 
+				_logger.LogInformation("Currently have {CurrentTraders} traders out of {AllTraders}...", currentTraders.Count, _settings.MaxNumberOfConcurrentTrades);
+
+				// Create our trader records if they're wrong.
+				if (currentTraders.Count < _settings.MaxNumberOfConcurrentTrades)
+					await CreateTraders(currentTraders.Count);
+				else if (currentTraders.Count > _settings.MaxNumberOfConcurrentTrades)
+					await ArchiveTraders(currentTraders);
+
+				// TODO: What if stake amount was changed, we need to update our traders too...
+			}
+		}
+
+        /// <summary>
+        /// Archives the traders.
+        /// </summary>
+        /// <returns>The traders.</returns>
+        /// <param name="currentTraders">Current traders.</param>
+		async Task ArchiveTraders(List<Trader> currentTraders)
+		{
+			// We need to archive some traders because we have more traders than our setting indicates.
+			var amountToArchive = currentTraders.Count - _settings.MaxNumberOfConcurrentTrades;
+			var closedTraders = 0;
+
+			foreach (var item in currentTraders)
+			{
+				// If we've archived what we need, we can stop.
+				if (closedTraders >= amountToArchive)
+					break;
+
+				// This trader is not busy, it can be closed.
+				if (!item.IsBusy && !item.IsArchived)
+				{
+					item.IsArchived = true;
+					closedTraders += 1;
+				}
+			}
+
+			await _dataStore.SaveTradersAsync(currentTraders);
+		}
+
+        /// <summary>
+        /// Creates the traders.
+        /// </summary>
+        /// <returns>The traders.</returns>
+        /// <param name="currentAmount">Current amount.</param>
+		async Task CreateTraders(int currentAmount)
+		{
+			var traders = new List<Trader>();
+
+			for (var i = 0 + currentAmount; i < _settings.MaxNumberOfConcurrentTrades; i++)
+			{
+				var newTrader = new Trader()
+				{
+					Identifier = $"{Guid.NewGuid().ToString().Split('-').FirstOrDefault()}",
+					CurrentBalance = _settings.AmountToInvestPerTrader,
+					IsBusy = false,
+					LastUpdated = DateTime.UtcNow,
+					StakeAmount = _settings.AmountToInvestPerTrader,
+				};
+
+				traders.Add(newTrader);
+			}
+
+			if (traders.Count > 0)
+			{
+				await _dataStore.SaveTradersAsync(traders);
+			}
 		}
 
 		#endregion
 
+        /// <summary>
+        /// Buy new things!
+        /// </summary>
+        /// <returns>The buy.</returns>
 		public async Task Buy()
 		{
 			await Initialize(true);
@@ -97,7 +176,7 @@ namespace Mynt.Core.TradeManagers
 							// Buy it!
 							await CreateTrade(_availableTraders.First(), signal);
 
-                            // Since we created a trade for it, this trader is no longer available.
+							// Since we created a trade for it, this trader is no longer available.
 							_availableTraders.RemoveAt(0);
 						}
 					}
@@ -109,11 +188,15 @@ namespace Mynt.Core.TradeManagers
 				}
 			}
 
-            // Store our changes to the database. By doing these at the end we can do all our changes in one (or well... 2) swift batches.
-            await _dataStore.SaveTradesAsync(_tradesToSave);
+			// Store our changes to the database. By doing these at the end we can do all our changes in one (or well... 2) swift batches.
+			await _dataStore.SaveTradesAsync(_tradesToSave);
 			await _dataStore.SaveTradersAsync(_tradersToSave);
 		}
 
+        /// <summary>
+        /// Sell all the things!
+        /// </summary>
+        /// <returns>The sell.</returns>
 		public async Task Sell()
 		{
 			await Initialize();
@@ -123,96 +206,96 @@ namespace Mynt.Core.TradeManagers
 
 		#region trade management
 
-        /// <summary>
-        /// Creates the trade.
-        /// </summary>
-        /// <returns>The trade.</returns>
-        /// <param name="availableTrader">Available trader.</param>
-        /// <param name="buySignal">Buy signal.</param>
+		/// <summary>
+		/// Creates the trade.
+		/// </summary>
+		/// <returns>The trade.</returns>
+		/// <param name="availableTrader">Available trader.</param>
+		/// <param name="buySignal">Buy signal.</param>
 		async Task CreateTrade(Trader availableTrader, TradeSignal buySignal)
-        {
-            var exchangeQuoteBalance = _isPaperTrading ? null : await _api.GetBalance(buySignal.QuoteCurrency);
+		{
+			var exchangeQuoteBalance = _isPaperTrading ? null : await _api.GetBalance(buySignal.QuoteCurrency);
 			var currentQuoteBalance = _isPaperTrading ? 9999 : exchangeQuoteBalance?.Available;
 
-            // Do we even have enough funds to invest?
-            if (currentQuoteBalance < availableTrader.CurrentBalance)
-            {
-                _logger.LogWarning("Insufficient funds ({Available}) to perform a {MarketName} trade. Skipping this trade.", currentQuoteBalance, buySignal.MarketName);
-                return;
-            }
+			// Do we even have enough funds to invest?
+			if (currentQuoteBalance < availableTrader.CurrentBalance)
+			{
+				_logger.LogWarning("Insufficient funds ({Available}) to perform a {MarketName} trade. Skipping this trade.", currentQuoteBalance, buySignal.MarketName);
+				return;
+			}
 
-            var order = await CreateBuyOrder(availableTrader, buySignal.MarketName, buySignal.SignalCandle);
+			var order = await CreateBuyOrder(availableTrader, buySignal.MarketName, buySignal.SignalCandle);
 
-            // We found a trade and have set it all up!
-            if (order != null)
-            {
+			// We found a trade and have set it all up!
+			if (order != null)
+			{
 				// Save the order.
 				_tradesToSave.Add(order);
 
-                // Send a notification that we found something suitable
-                _logger.LogInformation("New trade signal {market}...", order.Market);
+				// Send a notification that we found something suitable
+				_logger.LogInformation("New trade signal {market}...", order.Market);
 
-                // Update the trader to busy
-                availableTrader.LastUpdated = DateTime.UtcNow;
-                availableTrader.IsBusy = true;
+				// Update the trader to busy
+				availableTrader.LastUpdated = DateTime.UtcNow;
+				availableTrader.IsBusy = true;
 
 				// Save the new trader state.
 				_tradersToSave.Add(availableTrader);
-            }
-        }
+			}
+		}
 
-        /// <summary>
-        /// Creates the buy order.
-        /// </summary>
-        /// <returns>The buy order.</returns>
-        /// <param name="availableTrader">Available trader.</param>
-        /// <param name="pair">Pair.</param>
-        /// <param name="signalCandle">Signal candle.</param>
+		/// <summary>
+		/// Creates the buy order.
+		/// </summary>
+		/// <returns>The buy order.</returns>
+		/// <param name="availableTrader">Available trader.</param>
+		/// <param name="pair">Pair.</param>
+		/// <param name="signalCandle">Signal candle.</param>
 		private async Task<Trade> CreateBuyOrder(Trader availableTrader, string pair, Candle signalCandle)
-        {
-            // Take the amount to invest per trader OR the current balance for this trader.
-            var btcToSpend = 0.0m;
+		{
+			// Take the amount to invest per trader OR the current balance for this trader.
+			var btcToSpend = 0.0m;
 
-            if (availableTrader.CurrentBalance < _settings.AmountToInvestPerTrader || _settings.ProfitStrategy == ProfitType.Reinvest)
-                btcToSpend = availableTrader.CurrentBalance;
-            else
-                btcToSpend = _settings.AmountToInvestPerTrader;
+			if (availableTrader.CurrentBalance < _settings.AmountToInvestPerTrader || _settings.ProfitStrategy == ProfitType.Reinvest)
+				btcToSpend = availableTrader.CurrentBalance;
+			else
+				btcToSpend = _settings.AmountToInvestPerTrader;
 
-            // The amount here is an indication and will probably not be precisely what you get.
-            var ticker = await _api.GetTicker(pair);
-            var openRate = GetTargetBid(ticker, signalCandle);
-            var amount = btcToSpend / openRate;
+			// The amount here is an indication and will probably not be precisely what you get.
+			var ticker = await _api.GetTicker(pair);
+			var openRate = GetTargetBid(ticker, signalCandle);
+			var amount = btcToSpend / openRate;
 
-            // Get the order ID, this is the most important because we need this to check
-            // up on our trade. We update the data below later when the final data is present.
+			// Get the order ID, this is the most important because we need this to check
+			// up on our trade. We update the data below later when the final data is present.
 			var orderId = _isPaperTrading ? CreateFakeOrderId() : await _api.Buy(pair, amount, openRate);
 
-            await SendNotification($"Buying #{pair} with limit {openRate:0.00000000} BTC ({amount:0.0000} units).");
+			await SendNotification($"Buying #{pair} with limit {openRate:0.00000000} BTC ({amount:0.0000} units).");
 
-            var trade = new Trade()
-            {
-                TraderId = availableTrader.Identifier,
-                Market = pair,
-                StakeAmount = btcToSpend,
-                OpenRate = openRate,
-                OpenDate = DateTime.UtcNow,
-                Quantity = amount,
-                OpenOrderId = orderId,
-                BuyOrderId = orderId,
-                IsOpen = true,
-                IsBuying = true,
-                StrategyUsed = _strategy.Name,
-                SellType = SellType.None,
-            };
+			var trade = new Trade()
+			{
+				TraderId = availableTrader.Identifier,
+				Market = pair,
+				StakeAmount = btcToSpend,
+				OpenRate = openRate,
+				OpenDate = DateTime.UtcNow,
+				Quantity = amount,
+				OpenOrderId = orderId,
+				BuyOrderId = orderId,
+				IsOpen = true,
+				IsBuying = true,
+				StrategyUsed = _strategy.Name,
+				SellType = SellType.None,
+			};
 
-            if (_settings.PlaceFirstStopAtSignalCandleLow)
-            {
-                trade.StopLossRate = signalCandle.Low;
-                _logger.LogInformation("Automatic stop set at signal candle low {Low}", signalCandle.Low.ToString("0.00000000"));
-            }
+			if (_settings.PlaceFirstStopAtSignalCandleLow)
+			{
+				trade.StopLossRate = signalCandle.Low;
+				_logger.LogInformation("Automatic stop set at signal candle low {Low}", signalCandle.Low.ToString("0.00000000"));
+			}
 
-            return trade;
-        }
+			return trade;
+		}
 
 		#endregion
 
