@@ -86,6 +86,9 @@ namespace Mynt.Core.TradeManagers
 
 				// TODO: What if stake amount was changed, we need to update our traders too...
 			}
+
+            // Get our active trades so we can use them later
+			_currentTrades = await _dataStore.GetActiveTradesAsync();
 		}
 
         /// <summary>
