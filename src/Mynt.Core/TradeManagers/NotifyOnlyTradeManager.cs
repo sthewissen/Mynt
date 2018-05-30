@@ -15,7 +15,8 @@ namespace Mynt.Core.TradeManagers
         private readonly INotificationManager _notification;
         private readonly List<ITradingStrategy> _strategy;
         private readonly ILogger _logger;
-        private readonly TradeOptions _settings;
+		private readonly TradeOptions _settings;
+        private readonly DateTime _currentRunTime;
 
         public NotifyOnlyTradeManager(IExchangeApi api, INotificationManager notificationManager, ILogger logger, TradeOptions settings, params ITradingStrategy[] strategies)
         {
@@ -23,7 +24,8 @@ namespace Mynt.Core.TradeManagers
             _strategy = strategies.ToList();
             _logger = logger;
             _notification = notificationManager;
-            _settings = settings;
+			_settings = settings;
+            _currentRunTime = DateTime.UtcNow;
         }
 
         /// <summary>
@@ -123,8 +125,8 @@ namespace Mynt.Core.TradeManagers
 
                 foreach (var strategy in _strategy)
                 {
-                    var minimumDate = strategy.GetMinimumDateTime();
-                    var candleDate = strategy.GetCurrentCandleDateTime();
+                    var minimumDate = strategy.GetMinimumDateTime(_currentRunTime);
+					var candleDate = strategy.GetCurrentCandleDateTime(_currentRunTime);
                     var candles = await _api.GetTickerHistory(market, strategy.IdealPeriod, minimumDate);
 
                     // We eliminate all candles that aren't needed for the dataset incl. the last one (if it's the current running candle).
@@ -138,7 +140,7 @@ namespace Mynt.Core.TradeManagers
                     var signalDate = candles[candles.Count - 1].Timestamp;
 
                     // This is an outdated candle...
-                    if (signalDate < strategy.GetSignalDate())
+					if (signalDate < strategy.GetSignalDate(_currentRunTime))
                         return null;
 
                     // This calculates an advice for the next timestamp.

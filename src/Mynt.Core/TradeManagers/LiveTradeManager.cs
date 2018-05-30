@@ -18,7 +18,8 @@ namespace Mynt.Core.TradeManagers
         private List<Trade> _activeTrades;
         private List<Trader> _currentTraders;
         private readonly IDataStore _dataStore;
-        private readonly TradeOptions _settings;
+		private readonly TradeOptions _settings;
+        private readonly DateTime _currentRunTime;
 
         public LiveTradeManager(IExchangeApi api, ITradingStrategy strategy, INotificationManager notificationManager, ILogger logger, TradeOptions settings, IDataStore dataStore)
         {
@@ -27,7 +28,8 @@ namespace Mynt.Core.TradeManagers
             _logger = logger;
             _notification = notificationManager;
             _dataStore = dataStore;
-            _settings = settings;
+			_settings = settings;
+            _currentRunTime = DateTime.UtcNow;
 
             if (_api == null) throw new ArgumentException("Invalid exchange provided...");
             if (_strategy == null) throw new ArgumentException("Invalid strategy provided...");
@@ -302,8 +304,8 @@ namespace Mynt.Core.TradeManagers
             {
                 _logger.LogInformation("Checking market {Market}...", market);
 
-                var minimumDate = _strategy.GetMinimumDateTime();
-                var candleDate = _strategy.GetCurrentCandleDateTime();
+				var minimumDate = _strategy.GetMinimumDateTime(_currentRunTime);
+				var candleDate = _strategy.GetCurrentCandleDateTime(_currentRunTime);
                 var candles = await _api.GetTickerHistory(market, _strategy.IdealPeriod, minimumDate);
 
                 // We eliminate all candles that aren't needed for the dataset incl. the last one (if it's the current running candle).
@@ -324,7 +326,7 @@ namespace Mynt.Core.TradeManagers
                 var signalDate = candles[candles.Count - 1].Timestamp;
 
                 // This is an outdated candle...
-                if (signalDate < _strategy.GetSignalDate())
+				if (signalDate < _strategy.GetSignalDate(_currentRunTime))
                 {
                     _logger.LogInformation("Outdated candle for {Market}...", market);
                     return null;

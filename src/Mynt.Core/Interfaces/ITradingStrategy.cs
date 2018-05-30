@@ -12,9 +12,9 @@ namespace Mynt.Core.Interfaces
         int MinimumAmountOfCandles { get; }
 
         Period IdealPeriod { get; }
-        DateTime GetCurrentCandleDateTime();
-        DateTime GetMinimumDateTime();
-        DateTime GetSignalDate();
+        DateTime GetCurrentCandleDateTime(DateTime date);
+		DateTime GetMinimumDateTime(DateTime date);
+		DateTime GetSignalDate(DateTime date);
 
         Candle GetSignalCandle(List<Candle> candles);
 

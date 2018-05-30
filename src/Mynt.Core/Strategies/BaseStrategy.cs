@@ -12,23 +12,23 @@ namespace Mynt.Core.Strategies
         public abstract int MinimumAmountOfCandles { get; }
         public abstract Period IdealPeriod { get; }
 
-        public DateTime GetCurrentCandleDateTime()
+        public DateTime GetCurrentCandleDateTime(DateTime date)
         {
             var minutes = IdealPeriod == Period.Minute ||
                 IdealPeriod == Period.FiveMinutes ||
                 IdealPeriod == Period.QuarterOfAnHour ||
-                IdealPeriod == Period.HalfAnHour ? DateTime.UtcNow.Minute : 0;
+                IdealPeriod == Period.HalfAnHour ? date.Minute : 0;
 
-            var hour = IdealPeriod == Period.Day ? 0 : DateTime.UtcNow.Hour;
+            var hour = IdealPeriod == Period.Day ? 0 : date.Hour;
 
-            return new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day, hour, minutes, 0, 0, DateTimeKind.Utc);
+            return new DateTime(date.Year, date.Month, date.Day, hour, minutes, 0, 0, DateTimeKind.Utc);
         }
 
-        public DateTime GetSignalDate()
+        public DateTime GetSignalDate(DateTime date)
         {
-            var minutes = IdealPeriod == Period.Minute || IdealPeriod == Period.FiveMinutes || IdealPeriod == Period.QuarterOfAnHour || IdealPeriod == Period.HalfAnHour ? DateTime.UtcNow.Minute : 0;
-            var hour = IdealPeriod == Period.Day ? 0 : DateTime.UtcNow.Hour;
-            var current = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day, hour, minutes, 0, 0, DateTimeKind.Utc);
+            var minutes = IdealPeriod == Period.Minute || IdealPeriod == Period.FiveMinutes || IdealPeriod == Period.QuarterOfAnHour || IdealPeriod == Period.HalfAnHour ? date.Minute : 0;
+            var hour = IdealPeriod == Period.Day ? 0 : date.Hour;
+            var current = new DateTime(date.Year, date.Month, date.Day, hour, minutes, 0, 0, DateTimeKind.Utc);
 
             switch (IdealPeriod)
             {
@@ -53,11 +53,11 @@ namespace Mynt.Core.Strategies
             }
         }
 
-        public DateTime GetMinimumDateTime()
+        public DateTime GetMinimumDateTime(DateTime date)
         {
-            var hour = IdealPeriod == Period.Day ? 0 : DateTime.UtcNow.Hour;
-            var minutes = IdealPeriod == Period.Minute || IdealPeriod == Period.FiveMinutes || IdealPeriod == Period.QuarterOfAnHour || IdealPeriod == Period.HalfAnHour ? DateTime.UtcNow.Minute : 0;
-            var current = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day, hour, minutes, 0, 0, DateTimeKind.Utc);
+            var hour = IdealPeriod == Period.Day ? 0 : date.Hour;
+            var minutes = IdealPeriod == Period.Minute || IdealPeriod == Period.FiveMinutes || IdealPeriod == Period.QuarterOfAnHour || IdealPeriod == Period.HalfAnHour ? date.Minute : 0;
+            var current = new DateTime(date.Year, date.Month, date.Day, hour, minutes, 0, 0, DateTimeKind.Utc);
 
             switch (IdealPeriod)
             {
