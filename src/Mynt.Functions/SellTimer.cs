@@ -24,7 +24,7 @@ namespace Mynt.Functions
             ApplicationHelper.Startup();
         }
 
-        [FunctionName("SellTimer")]
+        [Disable, FunctionName("SellTimer")]
         public static async Task Run([TimerTrigger("0 * * * * *")]TimerInfo sellTimer, TraceWriter log)
         {
             var serilogger = new LoggerConfiguration().WriteTo.TraceWriter(log).CreateLogger();

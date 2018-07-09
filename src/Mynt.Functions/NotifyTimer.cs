@@ -25,7 +25,7 @@ namespace Mynt.Functions
         }
 
         [Disable, FunctionName("NotifyTimer")]
-        public static async Task Run([TimerTrigger("10 1 * * * *")]TimerInfo notifyTimer, TraceWriter log)
+        public static async Task Run([TimerTrigger("10 1 0,4,8,12,16,20 * * *")]TimerInfo notifyTimer, TraceWriter log)
         {
             var serilogger = new LoggerConfiguration().WriteTo.TraceWriter(log).CreateLogger();
             var logger = new LoggerFactory().AddSerilog(serilogger).CreateLogger(nameof(NotifyTimer));
@@ -46,7 +46,7 @@ namespace Mynt.Functions
                     new TelegramNotificationManager(telegramNotificationOptions),
                     logger,
                     tradeOptions,
-                    new RsiOversoldOverbought());
+                    new CloudParty());
 
                 // Start running this thing!
                 await tradeManager.LookForNewTrades();
