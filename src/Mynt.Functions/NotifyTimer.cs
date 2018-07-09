@@ -36,14 +36,14 @@ namespace Mynt.Functions
 
                 var tradeOptions = AppSettings.Get<TradeOptions>();
                 var exchangeOptions = AppSettings.Get<ExchangeOptions>();
-                var telegramNotificationOptions = AppSettings.Get<TelegramNotificationOptions>();
+                var discordOptions = AppSettings.Get<DiscordNotificationOptions>();
 
                 // Initialize a Trade Manager instance that will run using the settings provided below.
                 // Once again, you can use the default values for the settings defined in te Options classes below.
                 // You can also override them here or using the configuration mechanism of your choosing.
                 var tradeManager = new NotifyOnlyTradeManager(
                     new BaseExchange(exchangeOptions),
-                    new TelegramNotificationManager(telegramNotificationOptions),
+                    new DiscordNotificationManager(discordOptions),
                     logger,
                     tradeOptions,
                     new CloudParty());
