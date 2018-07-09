@@ -57,7 +57,7 @@ namespace Mynt.Functions
 				);
 
 				// Start running this thing!
-				await tradeManager.Buy();
+                await tradeManager.LookForNewTrades();
 				logger.LogInformation("Done...");
 			}
 			catch (Exception ex)
