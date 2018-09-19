@@ -1,4 +1,12 @@
-<img src="https://raw.githubusercontent.com/sthewissen/Mynt/master/img/myntlogo.png" alt="Mynt" height="200" />
+## IMPORTANT NOTICE
+
+This project is not actively being developed anymore. All of the development effort had been moved over to the MachinaTrader project which is a continuation of this project. The code in this repo works and remains here for that reason. However, take the code as it is. No active support will be given.
+
+See the new project at: 
+
+https://github.com/MachinaCore/MachinaTrader
+
+## Welcome!
 
 Welcome to the Mynt cryptocurrency trade bot! This bot enables you to trade cryptocurrencies in an automated fashion and comes with a lot of different configuration options. It is a .NET based trade bot that runs at set intervals to find trades and monitor them for sell conditions.
 
